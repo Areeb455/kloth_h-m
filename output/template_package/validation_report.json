@@ -1,18 +1,18 @@
 {
-  "overall_status": "PASS",
-  "summary": "27/27 checks passed",
-  "passed_checks": 27,
+  "overall_status": "FAIL",
+  "summary": "24/27 checks passed",
+  "passed_checks": 24,
   "total_checks": 27,
   "checks": [
     {
       "category": "3D Avatar Fit",
       "name": "3D Simulated Chest Perimeter Ease",
       "status": "PASS",
-      "details": "3D Mesh Chest Perimeter: 104.0 cm vs Avatar Body: 78.0 cm (3D Ease: +26.0 cm)",
+      "details": "3D Mesh Chest Perimeter: 96.7 cm vs Avatar Body: 78.0 cm (3D Ease: +18.7 cm)",
       "metrics": {
         "body_chest_cm": 78.0,
-        "mesh_3d_perimeter_cm": 104.0,
-        "ease_cm": 26.0
+        "mesh_3d_perimeter_cm": 96.7,
+        "ease_cm": 18.7
       }
     },
     {
@@ -30,21 +30,21 @@
       "category": "Vision Verification",
       "name": "Chest Width Image Consistency",
       "status": "PASS",
-      "details": "Image-derived: 36.8 cm vs Pattern: 41.0 cm (\u0394: 4.2 cm <= 5.0 cm)",
+      "details": "Image-derived: 37.8 cm vs Pattern: 41.0 cm (\u0394: 3.2 cm <= 4.0 cm)",
       "metrics": {
-        "image_width_cm": 36.8,
+        "image_width_cm": 37.8,
         "pattern_width_cm": 41.0,
-        "delta_cm": 4.2
+        "delta_cm": 3.2
       }
     },
     {
       "category": "Cloth Simulation",
       "name": "Seam Assembly Gap (< 5 mm)",
       "status": "PASS",
-      "details": "Max seam gap: 0.00 mm, Average gap: 0.00 mm (Threshold: < 5.0 mm)",
+      "details": "Max residual seam gap: 1.28 mm, Average gap: 0.37 mm (Threshold: < 5.0 mm)",
       "metrics": {
-        "max_gap_mm": 0.0,
-        "avg_gap_mm": 0.0
+        "max_gap_mm": 1.28,
+        "avg_gap_mm": 0.37
       }
     },
     {
@@ -60,53 +60,57 @@
       "category": "Cloth Simulation",
       "name": "Simulation Equilibrium Settling",
       "status": "PASS",
-      "details": "Final kinetic energy: 0.000054 J, Max step displacement: 0.697 mm",
+      "details": "Final kinetic energy: 0.000167 J, Max step displacement: 1.151 mm",
       "metrics": {
-        "final_ke": 5.4e-05,
-        "max_displacement_mm": 0.697
+        "final_ke": 0.000167,
+        "max_displacement_mm": 1.151
       }
     },
     {
       "category": "Mannequin Fit",
-      "name": "Avatar Torso Non-Penetration",
+      "name": "Avatar Real Mesh Non-Penetration",
       "status": "PASS",
-      "details": "Zero body penetration verified across 402 torso vertices (min clearance: 0.4 cm)",
+      "details": "Tested 789 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 4.14 mm, max penetration depth: 0.0 mm",
       "metrics": {
-        "penetration_count": 0,
-        "min_clearance_cm": 0.43
+        "total_vertices": 789,
+        "penetrated_vertices": 0,
+        "pct_vertices_inside": 0.0,
+        "max_penetration_mm": 0.0,
+        "min_signed_dist_mm": 4.14,
+        "zero_penetration_pass": true
       }
     },
     {
-      "category": "Area Strain Preservation",
-      "name": "front_panel - Area Strain (<= 35% knit limit)",
-      "status": "PASS",
-      "details": "3D Area: 4082.7 cm2 vs 2D Area: 3622.6 cm2 (Strain: 12.7% within 35% jersey knit elastic stretch limit)",
+      "category": "Edge Strain Preservation",
+      "name": "front_panel - Edge Strain (p95 <= 15.0%)",
+      "status": "FAIL",
+      "details": "front_panel per-edge stretch vs 2D rest: mean=6.96%, p95=24.73% (Limit: <= 15.0%), max=107.39% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "area_3d_sq_cm": 4082.7,
-        "area_2d_sq_cm": 3622.57,
-        "strain_pct": 12.7
+        "mean_strain_pct": 6.96,
+        "p95_strain_pct": 24.73,
+        "max_strain_pct": 107.39
       }
     },
     {
-      "category": "Area Strain Preservation",
-      "name": "back_left_panel - Area Strain (<= 35% knit limit)",
-      "status": "PASS",
-      "details": "3D Area: 2408.1 cm2 vs 2D Area: 1872.1 cm2 (Strain: 28.6% within 35% jersey knit elastic stretch limit)",
+      "category": "Edge Strain Preservation",
+      "name": "back_left_panel - Edge Strain (p95 <= 15.0%)",
+      "status": "FAIL",
+      "details": "back_left_panel per-edge stretch vs 2D rest: mean=8.24%, p95=29.47% (Limit: <= 15.0%), max=186.32% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "area_3d_sq_cm": 2408.1,
-        "area_2d_sq_cm": 1872.09,
-        "strain_pct": 28.6
+        "mean_strain_pct": 8.24,
+        "p95_strain_pct": 29.47,
+        "max_strain_pct": 186.32
       }
     },
     {
-      "category": "Area Strain Preservation",
-      "name": "back_right_panel - Area Strain (<= 35% knit limit)",
-      "status": "PASS",
-      "details": "3D Area: 2491.5 cm2 vs 2D Area: 1872.1 cm2 (Strain: 33.1% within 35% jersey knit elastic stretch limit)",
+      "category": "Edge Strain Preservation",
+      "name": "back_right_panel - Edge Strain (p95 <= 15.0%)",
+      "status": "FAIL",
+      "details": "back_right_panel per-edge stretch vs 2D rest: mean=7.99%, p95=26.93% (Limit: <= 15.0%), max=179.88% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "area_3d_sq_cm": 2491.5,
-        "area_2d_sq_cm": 1872.09,
-        "strain_pct": 33.1
+        "mean_strain_pct": 7.99,
+        "p95_strain_pct": 26.93,
+        "max_strain_pct": 179.88
       }
     },
     {
@@ -240,11 +244,11 @@
       "category": "Sewing Integrity",
       "name": "seam_side_right - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 67.06 cm, Len B: 69.02 cm (ratio: 0.97)",
+      "details": "Len A: 66.66 cm, Len B: 68.63 cm (ratio: 0.97)",
       "metrics": {
-        "length_a": 67.06,
-        "length_b": 69.02,
-        "ratio": 0.972
+        "length_a": 66.66,
+        "length_b": 68.63,
+        "ratio": 0.971
       }
     },
     {
@@ -261,11 +265,11 @@
       "category": "Sewing Integrity",
       "name": "seam_side_left - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 67.06 cm, Len B: 69.02 cm (ratio: 0.97)",
+      "details": "Len A: 66.66 cm, Len B: 68.63 cm (ratio: 0.97)",
       "metrics": {
-        "length_a": 67.06,
-        "length_b": 69.02,
-        "ratio": 0.972
+        "length_a": 66.66,
+        "length_b": 68.63,
+        "ratio": 0.971
       }
     },
     {

@@ -93,12 +93,8 @@ class GarmentVisionAnalyzer:
                 row_widths.append((r - y_top, int(xs[-1] - xs[0])))
 
         w_values = [w for _, w in row_widths]
-        min_w_idx = int(np.argmin(w_values[:int(0.20 * garment_height_px)])) if len(w_values) > 30 else 15
-        underarm_idx = min_w_idx
-        for i in range(min_w_idx, len(row_widths)):
-            if w_values[i] >= 445:
-                underarm_idx = i
-                break
+        # Armhole opening widens to the underarm corner at the base of the armhole (~20-30% height)
+        underarm_idx = int(np.argmax(w_values[:int(0.30 * garment_height_px)]))
 
         armhole_depth_px = row_widths[underarm_idx][0]
         armhole_depth_cm = round(armhole_depth_px * px_to_cm, 1)

@@ -27,6 +27,9 @@ from .exporter import TemplateExporter
 from .loader import load_template, LoadedTemplatePackage
 
 
+from .avatar_collider import AvatarMeshCollider
+
+
 class PipelineOrchestrator:
     def __init__(
         self,
@@ -48,11 +51,12 @@ class PipelineOrchestrator:
             self.product_details = json.load(f)
 
     def run(self) -> Tuple[str, ValidationReport, LoadedTemplatePackage]:
-        print("[1/11] Ingesting avatar & extracting 52-joint skeleton & torso profiles...")
+        print("[1/11] Ingesting avatar & extracting 52-joint skeleton, torso profiles & mesh collider...")
         ap = AvatarProcessor(self.avatar_glb_path)
         mannequin_ref = ap.to_mannequin_ref()
         landmarks = ap.get_anatomical_landmarks()
         torso_fn = ap.get_torso_profile_at_y
+        mesh_collider = AvatarMeshCollider(self.avatar_glb_path, margin=0.006)
 
         print("[2/11] Analyzing garment imagery via Computer Vision (front.jpg & back.jpg)...")
         vision = GarmentVisionAnalyzer(self.front_image_path, self.back_image_path)
@@ -76,7 +80,7 @@ class PipelineOrchestrator:
         flat_meshes = mesher.triangulate_all(panels_2d)
 
         print("[6/11] Conformally wrapping panels in 3D around real torso profile (Category 3)...")
-        placer = GarmentPlacer(landmarks, torso_profile_fn=torso_fn)
+        placer = GarmentPlacer(landmarks, torso_profile_fn=torso_fn, mesh_collider=mesh_collider)
         placed_meshes, placements = placer.place_all_panels(flat_meshes)
 
         print("[7/11] Pairing seams and equalizing vertex counts (Category 4)...")
@@ -89,12 +93,13 @@ class PipelineOrchestrator:
             meshes=placed_meshes,
             sewing_conns=sewing_conns,
             fabric_properties=self.product_details.get("fabric_properties", {}),
+            mesh_collider=mesh_collider,
             torso_profile_fn=torso_fn
         )
-        sim_result = simulator.simulate(num_steps=60, sub_iters=15, dt=0.01)
+        sim_result = simulator.simulate(num_steps=40, sub_iters=4, dt=0.01)
         simulated_meshes = sim_result.simulated_meshes
         sim_metrics = sim_result.metrics
-        print(f"       Simulation: Max seam gap={sim_metrics['max_seam_gap_mm']}mm, Penetrations={sim_metrics['avatar_penetrations']}, Strain={sim_metrics['strain_pct']}%, Settled={sim_metrics['settled']}")
+        print(f"       Simulation: Max seam gap={sim_metrics['max_seam_gap_mm']}mm, Penetrations={sim_metrics['avatar_penetrations']} ({sim_metrics['pct_vertices_inside']}%), Strain p95={sim_metrics['edge_strain_p95_pct']}%, Settled={sim_metrics['settled']}")
 
         print("[9/11] Assigning fabric parameters, grainlines and visibility (Categories 5, 6, 9)...")
         fab_mgr = FabricManager(self.product_details.get("fabric_properties"))
@@ -109,7 +114,8 @@ class PipelineOrchestrator:
             landmarks,
             torso_profile_fn=torso_fn,
             vision_proportions=vp,
-            fabric_properties=self.product_details.get("fabric_properties", {})
+            fabric_properties=self.product_details.get("fabric_properties", {}),
+            mesh_collider=mesh_collider
         )
         grading_info, _ = grader.generate_size_meshes(self.output_dir)
 
@@ -122,6 +128,7 @@ class PipelineOrchestrator:
             meshes=simulated_meshes,
             sewing_conns=sewing_conns,
             torso_profile_fn=torso_fn,
+            mesh_collider=mesh_collider,
             simulation_metrics=sim_metrics
         )
         val_report = validator.run_all_checks()

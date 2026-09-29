@@ -19,6 +19,9 @@ from .sewing import SewingEngine
 from .simulation import ClothSimulator
 
 
+from .avatar_collider import AvatarMeshCollider
+
+
 class GradingEngine:
     def __init__(
         self,
@@ -26,13 +29,15 @@ class GradingEngine:
         landmarks: Dict[str, float],
         torso_profile_fn: Callable[[float], Dict[str, float]] = None,
         vision_proportions: Dict[str, float] = None,
-        fabric_properties: Dict[str, Any] = None
+        fabric_properties: Dict[str, Any] = None,
+        mesh_collider: Optional[AvatarMeshCollider] = None
     ):
         self.sizing = sizing_engine
         self.landmarks = landmarks
         self.torso_profile_fn = torso_profile_fn
         self.vision_proportions = vision_proportions or {}
         self.fabric_properties = fabric_properties or {}
+        self.collider = mesh_collider
         self.base_size = self.sizing.primary_base_size
 
     def generate_size_meshes(
@@ -41,7 +46,7 @@ class GradingEngine:
     ) -> Tuple[GradingInfo, Dict[str, Dict[str, PanelMesh]]]:
         os.makedirs(output_dir, exist_ok=True)
         mesher = PanelMesher(target_edge_length_cm=3.0)
-        placer = GarmentPlacer(self.landmarks, self.torso_profile_fn)
+        placer = GarmentPlacer(self.landmarks, self.torso_profile_fn, mesh_collider=self.collider)
 
         all_size_meshes: Dict[str, Dict[str, PanelMesh]] = {}
         size_refs: Dict[str, SizeMeshRef] = {}
@@ -70,9 +75,10 @@ class GradingEngine:
                 meshes=placed_meshes,
                 sewing_conns=sewing_conns,
                 fabric_properties=self.fabric_properties,
+                mesh_collider=self.collider,
                 torso_profile_fn=self.torso_profile_fn
             )
-            sim_res = sim.simulate(num_steps=50, sub_iters=12, dt=0.01)
+            sim_res = sim.simulate(num_steps=40, sub_iters=4, dt=0.01)
             simulated_meshes = sim_res.simulated_meshes
 
             all_size_meshes[size_label] = simulated_meshes

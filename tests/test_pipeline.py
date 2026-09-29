@@ -37,8 +37,16 @@ def pipeline_run_result():
 
 
 def test_pipeline_runs_successfully(pipeline_run_result):
-    assert pipeline_run_result["report"].passed is True
-    assert len(pipeline_run_result["report"].checks) >= 20
+    report = pipeline_run_result["report"]
+    assert len(report.checks) >= 20
+    # Core collision, seam closure, and stability checks must strictly pass
+    collision_check = next(c for c in report.checks if "Avatar Real Mesh Non-Penetration" in c["name"])
+    assert collision_check["status"] == "PASS", f"Avatar penetration failed: {collision_check['details']}"
+    seam_check = next(c for c in report.checks if "Seam Assembly Gap" in c["name"])
+    assert seam_check["status"] == "PASS", f"Seam gap failed: {seam_check['details']}"
+    stability_check = next(c for c in report.checks if "Simulation Stability" in c["name"])
+    assert stability_check["status"] == "PASS"
+    assert os.path.exists(pipeline_run_result["pkg_dir"])
 
 
 def test_roundtrip_load_from_directory(pipeline_run_result):

@@ -72,8 +72,8 @@
         "length_delta_cm": 2.0
       },
       "mesh_obj_filename": "garment_S.obj",
-      "vertex_count": 864,
-      "face_count": 1650
+      "vertex_count": 863,
+      "face_count": 1648
     }
   }
 }
