@@ -1,0 +1,78 @@
+{
+  "front_bodice": {
+    "panel_id": "front_bodice",
+    "center_3d": [
+      -0.0001,
+      1.1847,
+      0.0967
+    ],
+    "bounding_box_min": [
+      -0.1533,
+      0.9977,
+      0.0207
+    ],
+    "bounding_box_max": [
+      0.1533,
+      1.3777,
+      0.135
+    ],
+    "initial_arrangement": "front_torso_wrap"
+  },
+  "back_bodice": {
+    "panel_id": "back_bodice",
+    "center_3d": [
+      -0.0009,
+      1.2091,
+      -0.0989
+    ],
+    "bounding_box_min": [
+      -0.1533,
+      0.9977,
+      -0.135
+    ],
+    "bounding_box_max": [
+      0.1533,
+      1.3977,
+      -0.0207
+    ],
+    "initial_arrangement": "back_torso_wrap"
+  },
+  "front_skirt": {
+    "panel_id": "front_skirt",
+    "center_3d": [
+      -0.0003,
+      0.7275,
+      0.0934
+    ],
+    "bounding_box_min": [
+      -0.1962,
+      0.4877,
+      -0.0261
+    ],
+    "bounding_box_max": [
+      0.1962,
+      0.9977,
+      0.135
+    ],
+    "initial_arrangement": "front_skirt_drape"
+  },
+  "back_skirt": {
+    "panel_id": "back_skirt",
+    "center_3d": [
+      -0.0003,
+      0.7275,
+      -0.0934
+    ],
+    "bounding_box_min": [
+      -0.1962,
+      0.4877,
+      -0.135
+    ],
+    "bounding_box_max": [
+      0.1962,
+      0.9977,
+      0.0261
+    ],
+    "initial_arrangement": "back_skirt_drape"
+  }
+}

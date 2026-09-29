@@ -1,0 +1,26 @@
+{
+  "front_bodice": {
+    "panel_id": "front_bodice",
+    "visible": true,
+    "opacity": 1.0,
+    "alpha_mode": "OPAQUE"
+  },
+  "back_bodice": {
+    "panel_id": "back_bodice",
+    "visible": true,
+    "opacity": 1.0,
+    "alpha_mode": "OPAQUE"
+  },
+  "front_skirt": {
+    "panel_id": "front_skirt",
+    "visible": true,
+    "opacity": 1.0,
+    "alpha_mode": "OPAQUE"
+  },
+  "back_skirt": {
+    "panel_id": "back_skirt",
+    "visible": true,
+    "opacity": 1.0,
+    "alpha_mode": "OPAQUE"
+  }
+}

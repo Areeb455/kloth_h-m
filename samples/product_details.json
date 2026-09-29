@@ -1,0 +1,65 @@
+{
+  "product_name": "Sleeveless Jersey Shift Dress",
+  "brand": "H&M",
+  "category": "Women's Dresses",
+  "fit": "Regular fit",
+  "neckline": "Round neckline (crew neck)",
+  "sleeves": "Sleeveless with bound armholes",
+  "silhouette": "Gentle A-line shift silhouette",
+  "length": "Knee length / calf length",
+  "composition": {
+    "material": "Cotton single jersey blend",
+    "cotton_percent": 95,
+    "elastane_percent": 5
+  },
+  "fabric_properties": {
+    "fabric_type": "Cotton Jersey 95/5",
+    "weight_gsm": 180.0,
+    "density_kg_m3": 450.0,
+    "stretch_warp_percent": 15.0,
+    "stretch_weft_percent": 28.0,
+    "bending_stiffness_Nm": 0.045,
+    "shear_stiffness_N_m": 0.065,
+    "status": "estimated"
+  },
+  "grainline": {
+    "direction": "vertical",
+    "angle_deg": 0.0,
+    "vector": [0.0, 1.0],
+    "status": "defaulted"
+  },
+  "panels": [
+    {
+      "id": "front_bodice",
+      "name": "Front Upper Panel",
+      "category": "bodice",
+      "side": "front",
+      "visibility": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "back_bodice",
+      "name": "Back Upper Panel",
+      "category": "bodice",
+      "side": "back",
+      "visibility": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "front_skirt",
+      "name": "Front Lower Panel",
+      "category": "skirt",
+      "side": "front",
+      "visibility": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "back_skirt",
+      "name": "Back Lower Panel",
+      "category": "skirt",
+      "side": "back",
+      "visibility": true,
+      "opacity": 1.0
+    }
+  ]
+}

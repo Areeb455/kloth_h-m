@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "garment_name": "Sleeveless Jersey Shift Dress",
+  "brand": "H&M",
+  "category": "Women's Dresses",
+  "base_size": "XS",
+  "supported_sizes": [
+    "XXS",
+    "XS",
+    "S",
+    "M"
+  ],
+  "created_at": "2026-09-29T10:46:29.652362Z",
+  "category_1_patterns_file": "patterns_2d.json",
+  "category_2_meshes_file": "meshes_panels.json",
+  "category_3_placement_file": "placement_3d.json",
+  "category_4_sewing_file": "sewing_connections.json",
+  "category_5_fabric_file": "fabric_properties.json",
+  "category_6_direction_file": "fabric_direction.json",
+  "category_7_mannequin_file": "mannequin_skeleton.json",
+  "category_8_grading_file": "grading_sizes.json",
+  "category_9_visibility_file": "visibility_settings.json",
+  "mannequin_mesh_file": "mannequin.glb",
+  "base_garment_obj_file": "garment_XS.obj"
+}

@@ -1,0 +1,184 @@
+[
+  {
+    "seam_id": "seam_shoulder_right",
+    "panel_a_id": "front_bodice",
+    "edge_a_name": "shoulder_right",
+    "edge_a_vertex_indices": [
+      9,
+      10
+    ],
+    "edge_a_length_cm": 7.43,
+    "panel_b_id": "back_bodice",
+    "edge_b_name": "shoulder_right",
+    "edge_b_vertex_indices": [
+      9,
+      10
+    ],
+    "edge_b_length_cm": 7.28,
+    "seam_order": 1,
+    "gather_ratio": 1.021,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_shoulder_left",
+    "panel_a_id": "front_bodice",
+    "edge_a_name": "shoulder_left",
+    "edge_a_vertex_indices": [
+      22,
+      23
+    ],
+    "edge_a_length_cm": 7.43,
+    "panel_b_id": "back_bodice",
+    "edge_b_name": "shoulder_left",
+    "edge_b_vertex_indices": [
+      22,
+      23
+    ],
+    "edge_b_length_cm": 7.28,
+    "seam_order": 2,
+    "gather_ratio": 1.021,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_bodice_side_right",
+    "panel_a_id": "front_bodice",
+    "edge_a_name": "side_seam_right",
+    "edge_a_vertex_indices": [
+      1,
+      2
+    ],
+    "edge_a_length_cm": 20.22,
+    "panel_b_id": "back_bodice",
+    "edge_b_name": "side_seam_right",
+    "edge_b_vertex_indices": [
+      1,
+      2
+    ],
+    "edge_b_length_cm": 22.2,
+    "seam_order": 3,
+    "gather_ratio": 0.911,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_bodice_side_left",
+    "panel_a_id": "front_bodice",
+    "edge_a_name": "side_seam_left",
+    "edge_a_vertex_indices": [
+      30,
+      31
+    ],
+    "edge_a_length_cm": 20.22,
+    "panel_b_id": "back_bodice",
+    "edge_b_name": "side_seam_left",
+    "edge_b_vertex_indices": [
+      30,
+      31
+    ],
+    "edge_b_length_cm": 22.2,
+    "seam_order": 4,
+    "gather_ratio": 0.911,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_waist_front",
+    "panel_a_id": "front_bodice",
+    "edge_a_name": "waist_right",
+    "edge_a_vertex_indices": [
+      0,
+      1
+    ],
+    "edge_a_length_cm": 17.5,
+    "panel_b_id": "front_skirt",
+    "edge_b_name": "waist_top_right",
+    "edge_b_vertex_indices": [
+      0,
+      1
+    ],
+    "edge_b_length_cm": 17.5,
+    "seam_order": 5,
+    "gather_ratio": 1.0,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_waist_back",
+    "panel_a_id": "back_bodice",
+    "edge_a_name": "waist_right",
+    "edge_a_vertex_indices": [
+      0,
+      1
+    ],
+    "edge_a_length_cm": 17.5,
+    "panel_b_id": "back_skirt",
+    "edge_b_name": "waist_top_right",
+    "edge_b_vertex_indices": [
+      0,
+      1
+    ],
+    "edge_b_length_cm": 17.5,
+    "seam_order": 6,
+    "gather_ratio": 1.0,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_skirt_side_right",
+    "panel_a_id": "front_skirt",
+    "edge_a_name": "skirt_side_right",
+    "edge_a_vertex_indices": [
+      1,
+      238,
+      237,
+      244,
+      3
+    ],
+    "edge_a_length_cm": 50.99,
+    "panel_b_id": "back_skirt",
+    "edge_b_name": "skirt_side_right",
+    "edge_b_vertex_indices": [
+      1,
+      238,
+      237,
+      244,
+      3
+    ],
+    "edge_b_length_cm": 50.99,
+    "seam_order": 7,
+    "gather_ratio": 1.0,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  },
+  {
+    "seam_id": "seam_skirt_side_left",
+    "panel_a_id": "front_skirt",
+    "edge_a_name": "skirt_side_left",
+    "edge_a_vertex_indices": [
+      5,
+      11,
+      20,
+      21,
+      35,
+      7
+    ],
+    "edge_a_length_cm": 50.99,
+    "panel_b_id": "back_skirt",
+    "edge_b_name": "skirt_side_left",
+    "edge_b_vertex_indices": [
+      5,
+      11,
+      20,
+      21,
+      35,
+      7
+    ],
+    "edge_b_length_cm": 50.99,
+    "seam_order": 8,
+    "gather_ratio": 1.0,
+    "is_valid": true,
+    "tolerance_cm": 0.5
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "front_bodice": {
+    "panel_id": "front_bodice",
+    "grainline_angle_deg": 0.0,
+    "grainline_vector": [
+      0.0,
+      1.0
+    ],
+    "warp_stretch_along_grain": 15.0,
+    "weft_stretch_across_grain": 28.0,
+    "source": "default"
+  },
+  "back_bodice": {
+    "panel_id": "back_bodice",
+    "grainline_angle_deg": 0.0,
+    "grainline_vector": [
+      0.0,
+      1.0
+    ],
+    "warp_stretch_along_grain": 15.0,
+    "weft_stretch_across_grain": 28.0,
+    "source": "default"
+  },
+  "front_skirt": {
+    "panel_id": "front_skirt",
+    "grainline_angle_deg": 0.0,
+    "grainline_vector": [
+      0.0,
+      1.0
+    ],
+    "warp_stretch_along_grain": 15.0,
+    "weft_stretch_across_grain": 28.0,
+    "source": "default"
+  },
+  "back_skirt": {
+    "panel_id": "back_skirt",
+    "grainline_angle_deg": 0.0,
+    "grainline_vector": [
+      0.0,
+      1.0
+    ],
+    "warp_stretch_along_grain": 15.0,
+    "weft_stretch_across_grain": 28.0,
+    "source": "default"
+  }
+}

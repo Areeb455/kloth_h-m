@@ -1,0 +1,103 @@
+{
+  "base_size": "XS",
+  "supported_sizes": [
+    "XXS",
+    "XS",
+    "S",
+    "M"
+  ],
+  "size_meshes": {
+    "XXS": {
+      "size_label": "XXS",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 78.0,
+        "waist_circ": 68.0,
+        "hip_circ": 86.0,
+        "hem_circ": 104.0,
+        "front_length": 86.0,
+        "back_length": 88.0,
+        "shoulder_width": 31.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": -4.0,
+        "waist_delta_cm": -2.0,
+        "hip_delta_cm": -4.0,
+        "hem_delta_cm": -6.0,
+        "length_delta_cm": -2.0
+      },
+      "mesh_obj_filename": "garment_XXS.obj",
+      "vertex_count": 750,
+      "face_count": 1412
+    },
+    "XS": {
+      "size_label": "XS",
+      "is_base_size": true,
+      "dimensions_cm": {
+        "bust_circ": 82.0,
+        "waist_circ": 70.0,
+        "hip_circ": 90.0,
+        "hem_circ": 110.0,
+        "front_length": 88.0,
+        "back_length": 90.0,
+        "shoulder_width": 32.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 0.0,
+        "waist_delta_cm": 0.0,
+        "hip_delta_cm": 0.0,
+        "hem_delta_cm": 0.0,
+        "length_delta_cm": 0.0
+      },
+      "mesh_obj_filename": "garment_XS.obj",
+      "vertex_count": 809,
+      "face_count": 1530
+    },
+    "S": {
+      "size_label": "S",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 86.0,
+        "waist_circ": 74.0,
+        "hip_circ": 96.0,
+        "hem_circ": 118.0,
+        "front_length": 90.0,
+        "back_length": 92.0,
+        "shoulder_width": 33.5
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 4.0,
+        "waist_delta_cm": 4.0,
+        "hip_delta_cm": 6.0,
+        "hem_delta_cm": 8.0,
+        "length_delta_cm": 2.0
+      },
+      "mesh_obj_filename": "garment_S.obj",
+      "vertex_count": 886,
+      "face_count": 1684
+    },
+    "M": {
+      "size_label": "M",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 94.0,
+        "waist_circ": 82.0,
+        "hip_circ": 104.0,
+        "hem_circ": 128.0,
+        "front_length": 92.0,
+        "back_length": 94.0,
+        "shoulder_width": 35.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 12.0,
+        "waist_delta_cm": 12.0,
+        "hip_delta_cm": 14.0,
+        "hem_delta_cm": 18.0,
+        "length_delta_cm": 4.0
+      },
+      "mesh_obj_filename": "garment_M.obj",
+      "vertex_count": 968,
+      "face_count": 1848
+    }
+  }
+}

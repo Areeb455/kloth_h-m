@@ -1,0 +1,120 @@
+{
+  "brand": "H&M",
+  "category": "Women's Dresses",
+  "measurement_criteria_source": "H&M How to Measure Guide (Chest over fullest bust, Waist at narrowest point, Low Hip around fullest part)",
+  "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78)",
+  "primary_base_size": "XS",
+  "supported_sizes": ["XXS", "XS", "S", "M"],
+  "sizes": {
+    "XXS": {
+      "eur_size": 32,
+      "uk_size": 4,
+      "raw_ranges": {
+        "chest": "74-78",
+        "waist": "62-64",
+        "low_hip": "79-83",
+        "inside_leg": "71"
+      },
+      "body_measurements_cm": {
+        "chest": 74.0,
+        "waist": 62.0,
+        "low_hip": 79.0,
+        "inside_leg": 71.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 78.0,
+        "waist_circ": 68.0,
+        "hip_circ": 86.0,
+        "hem_circ": 104.0,
+        "front_length": 86.0,
+        "back_length": 88.0,
+        "shoulder_width": 31.0
+      }
+    },
+    "XS": {
+      "eur_size": 34,
+      "uk_size": 6,
+      "raw_ranges": {
+        "chest": "78-82",
+        "waist": "64-66",
+        "low_hip": "83-87",
+        "inside_leg": "71.5"
+      },
+      "body_measurements_cm": {
+        "chest": 78.0,
+        "waist": 64.0,
+        "low_hip": 83.0,
+        "inside_leg": 71.5
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 82.0,
+        "waist_circ": 70.0,
+        "hip_circ": 90.0,
+        "hem_circ": 110.0,
+        "front_length": 88.0,
+        "back_length": 90.0,
+        "shoulder_width": 32.0
+      }
+    },
+    "S": {
+      "eur_size": 36,
+      "uk_size": 8,
+      "raw_ranges": {
+        "chest": "82-90",
+        "waist": "66-74",
+        "low_hip": "87-94.5",
+        "inside_leg": "73"
+      },
+      "body_measurements_cm": {
+        "chest": 82.0,
+        "waist": 66.0,
+        "low_hip": 87.0,
+        "inside_leg": 73.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 86.0,
+        "waist_circ": 74.0,
+        "hip_circ": 96.0,
+        "hem_circ": 118.0,
+        "front_length": 90.0,
+        "back_length": 92.0,
+        "shoulder_width": 33.5
+      }
+    },
+    "M": {
+      "eur_size": 40,
+      "uk_size": 12,
+      "raw_ranges": {
+        "chest": "90-98",
+        "waist": "74-82",
+        "low_hip": "95-102",
+        "inside_leg": "74"
+      },
+      "body_measurements_cm": {
+        "chest": 90.0,
+        "waist": 74.0,
+        "low_hip": 95.0,
+        "inside_leg": 74.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 94.0,
+        "waist_circ": 82.0,
+        "hip_circ": 104.0,
+        "hem_circ": 128.0,
+        "front_length": 92.0,
+        "back_length": 94.0,
+        "shoulder_width": 35.0
+      }
+    }
+  },
+  "ease_allowances_cm": {
+    "bust_ease": 4.0,
+    "waist_ease": 6.0,
+    "hip_ease": 7.0,
+    "rationale": "Moderate relaxed fit for single jersey knit with 15% stretch, allowing comfort without excessive baggy draping."
+  },
+  "length_assumptions": {
+    "back_vs_front_delta_cm": 2.0,
+    "rationale": "Back length is engineered 2.0 cm longer than front to account for the dorsal spinal curvature and shoulder slope."
+  }
+}

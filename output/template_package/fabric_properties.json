@@ -1,0 +1,46 @@
+{
+  "front_bodice": {
+    "panel_id": "front_bodice",
+    "material_name": "Cotton Jersey 95/5",
+    "stretch_warp_percent": 15.0,
+    "stretch_weft_percent": 28.0,
+    "bending_stiffness_Nm": 0.045,
+    "shear_stiffness_N_m": 0.065,
+    "weight_gsm": 180.0,
+    "density_kg_m3": 450.0,
+    "source": "estimated"
+  },
+  "back_bodice": {
+    "panel_id": "back_bodice",
+    "material_name": "Cotton Jersey 95/5",
+    "stretch_warp_percent": 15.0,
+    "stretch_weft_percent": 28.0,
+    "bending_stiffness_Nm": 0.045,
+    "shear_stiffness_N_m": 0.065,
+    "weight_gsm": 180.0,
+    "density_kg_m3": 450.0,
+    "source": "estimated"
+  },
+  "front_skirt": {
+    "panel_id": "front_skirt",
+    "material_name": "Cotton Jersey 95/5",
+    "stretch_warp_percent": 15.0,
+    "stretch_weft_percent": 28.0,
+    "bending_stiffness_Nm": 0.045,
+    "shear_stiffness_N_m": 0.065,
+    "weight_gsm": 180.0,
+    "density_kg_m3": 450.0,
+    "source": "estimated"
+  },
+  "back_skirt": {
+    "panel_id": "back_skirt",
+    "material_name": "Cotton Jersey 95/5",
+    "stretch_warp_percent": 15.0,
+    "stretch_weft_percent": 28.0,
+    "bending_stiffness_Nm": 0.045,
+    "shear_stiffness_N_m": 0.065,
+    "weight_gsm": 180.0,
+    "density_kg_m3": 450.0,
+    "source": "estimated"
+  }
+}

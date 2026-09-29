@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kloth 3D Garment Template Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Three.js + OrbitControls + OBJLoader + GLTFLoader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <span class="logo-badge">KLOTH</span>
+        <h1>3D Garment Template Generator</h1>
+        <span class="version-tag">v1.0.0</span>
+      </div>
+      <div class="nav-actions">
+        <div class="size-selector-group">
+          <label>ACTIVE SIZE:</label>
+          <div class="size-pill-group">
+            <button class="size-pill" data-size="XXS">XXS</button>
+            <button class="size-pill active" data-size="XS">XS <span class="base-badge">BASE</span></button>
+            <button class="size-pill" data-size="S">S</button>
+            <button class="size-pill" data-size="M">M</button>
+          </div>
+        </div>
+        <a href="/output/garment_template_package.zip" download class="btn btn-primary" id="btnDownloadPkg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Package (.zip)
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="main-layout">
+      <!-- Left Column: 2D Patterns & Input Images -->
+      <section class="panel-column left-column">
+        <!-- Input Assets Card -->
+        <div class="card glass-card">
+          <div class="card-header">
+            <h3>Garment Inputs & Silhouette</h3>
+            <span class="chip chip-info">H&M Women's Dress</span>
+          </div>
+          <div class="image-dual-view">
+            <div class="img-box">
+              <img src="/samples/front.jpg" alt="Front View" id="frontImg">
+              <span class="img-label">Front (Studio Flat)</span>
+            </div>
+            <div class="img-box">
+              <img src="/samples/back.jpg" alt="Back View" id="backImg">
+              <span class="img-label">Back (AI Inferred)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2D Parametric Patterns Card -->
+        <div class="card glass-card fill-remaining">
+          <div class="card-header">
+            <h3>Parametric 2D Patterns (Category 1)</h3>
+            <span class="chip chip-success" id="patternDimsBadge">Unstretched [cm]</span>
+          </div>
+          <div class="canvas-container">
+            <canvas id="patternCanvas"></canvas>
+            <div class="canvas-legend">
+              <span><i class="dot front-bodice"></i> Front Bodice</span>
+              <span><i class="dot back-bodice"></i> Back Bodice</span>
+              <span><i class="dot front-skirt"></i> Front Skirt</span>
+              <span><i class="dot back-skirt"></i> Back Skirt</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Column: Interactive 3D Mannequin Viewport -->
+      <section class="panel-column center-column">
+        <div class="card glass-card viewport-card">
+          <div class="viewport-toolbar">
+            <div class="tool-group">
+              <button class="tool-btn active" id="btnToggleMannequin" title="Toggle Mannequin Mesh">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Avatar
+              </button>
+              <button class="tool-btn" id="btnToggleWireframe" title="Toggle Wireframe">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                Wireframe
+              </button>
+              <button class="tool-btn" id="btnToggleTurntable" title="Toggle Auto Rotation">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Turntable
+              </button>
+              <button class="tool-btn" id="btnResetCamera" title="Reset View">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+                Reset
+              </button>
+            </div>
+            <div class="status-indicator">
+              <span class="status-pulse"></span>
+              <span id="viewportStatusText">Ready (OrbitControls Active)</span>
+            </div>
+          </div>
+          <div id="threeContainer"></div>
+          <div class="viewport-overlay-stats">
+            <div class="stat-pill"><span class="label">Avatar:</span> <span class="val">SMPL-X (52 Joints)</span></div>
+            <div class="stat-pill"><span class="label">Garment:</span> <span class="val" id="statVertices">809 Verts</span></div>
+            <div class="stat-pill"><span class="label">Seams:</span> <span class="val">8 Paired (1:1)</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Inspector, Sewing, Fabric & Validation -->
+      <section class="panel-column right-column">
+        <!-- Tabs Header -->
+        <div class="tab-header">
+          <button class="tab-btn active" data-tab="tab-sewing">Sewing (Cat 4)</button>
+          <button class="tab-btn" data-tab="tab-fabric">Fabric & Grain (Cat 5,6)</button>
+          <button class="tab-btn" data-tab="tab-grading">Grading (Cat 8)</button>
+          <button class="tab-btn" data-tab="tab-validation">Validation (31/31)</button>
+        </div>
+
+        <div class="tab-content-container glass-card">
+          <!-- Sewing Tab -->
+          <div class="tab-pane active" id="tab-sewing">
+            <h4>Sewing Connections Table</h4>
+            <div class="table-responsive">
+              <table class="data-table" id="sewingTable">
+                <thead>
+                  <tr>
+                    <th>Seam ID</th>
+                    <th>Edge A (Len)</th>
+                    <th>Edge B (Len)</th>
+                    <th>Gather Ratio</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="sewingTableBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Fabric Tab -->
+          <div class="tab-pane" id="tab-fabric">
+            <h4>Fabric Parameters & Direction</h4>
+            <div class="property-grid">
+              <div class="prop-item"><span class="p-label">Material</span><span class="p-val">Cotton Jersey 95/5</span></div>
+              <div class="prop-item"><span class="p-label">Weight</span><span class="p-val">180 GSM</span></div>
+              <div class="prop-item"><span class="p-label">Stretch Warp (Along Grain)</span><span class="p-val">15.0%</span></div>
+              <div class="prop-item"><span class="p-label">Stretch Weft (Cross Grain)</span><span class="p-val">28.0%</span></div>
+              <div class="prop-item"><span class="p-label">Bending Stiffness</span><span class="p-val">0.045 N·m</span></div>
+              <div class="prop-item"><span class="p-label">Shear Stiffness</span><span class="p-val">0.065 N/m</span></div>
+              <div class="prop-item"><span class="p-label">Grainline Vector</span><span class="p-val">[0.0, 1.0] (0°)</span></div>
+              <div class="prop-item"><span class="p-label">Coefficients Source</span><span class="p-val tag-estimated">ESTIMATED</span></div>
+            </div>
+          </div>
+
+          <!-- Grading Tab -->
+          <div class="tab-pane" id="tab-grading">
+            <h4>Multi-Size Grading Matrix</h4>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Size</th>
+                    <th>Bust Δ</th>
+                    <th>Waist Δ</th>
+                    <th>Hip Δ</th>
+                    <th>Length Δ</th>
+                    <th>Mesh File</th>
+                  </tr>
+                </thead>
+                <tbody id="gradingTableBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Validation Tab -->
+          <div class="tab-pane" id="tab-validation">
+            <div class="val-header">
+              <h4>Automated Validation Checks</h4>
+              <span class="badge-pass" id="valSummaryBadge">ALL PASS</span>
+            </div>
+            <div class="val-list" id="validationList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
