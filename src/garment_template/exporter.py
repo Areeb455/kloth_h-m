@@ -1,6 +1,16 @@
 """
-Package Exporter Module.
-Bundles all 9 categories into a self-contained, validated template directory and optional .zip package.
+Standardized Template Exporter Module.
+Bundles all 9 categories into the official template package structure:
+1. patterns_2d.json
+2. meshes_panels.json
+3. placement_3d.json (starting arrangement) & simulated_3d.json (draped simulation)
+4. sewing_connections.json
+5. fabric_properties.json
+6. fabric_direction.json
+7. mannequin.glb & mannequin_skeleton.json
+8. grading_sizes.json & garment_{size}.obj
+9. visibility_settings.json
+Plus manifest.json and validation_report.json, compressed into garment_template_package.zip.
 """
 
 import os
@@ -8,26 +18,18 @@ import json
 import shutil
 import zipfile
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, List, Any, Optional
 
 from .models import (
-    TemplateManifest,
-    Panel2DGeometry,
-    PanelMesh,
-    PlacedPanel3D,
-    SewingConnection,
-    FabricAssignment,
-    FabricDirection,
-    MannequinRef,
-    GradingInfo,
-    PanelMaterialSettings
+    Panel2DGeometry, PanelMesh, PlacedPanel3D, SewingConnection,
+    FabricAssignment, FabricDirection, MannequinRef, GradingInfo,
+    PanelMaterialSettings, TemplateManifest
 )
 
 
 class TemplateExporter:
     def __init__(self, output_dir: str):
         self.output_dir = output_dir
-        os.makedirs(self.output_dir, exist_ok=True)
 
     def export_package(
         self,
@@ -46,12 +48,11 @@ class TemplateExporter:
         source_avatar_glb: str,
         grading_info: GradingInfo,
         visibility_settings: Dict[str, PanelMaterialSettings],
+        simulated_meshes: Optional[Dict[str, PanelMesh]] = None,
+        simulation_metrics: Optional[Dict[str, Any]] = None,
+        validation_report: Optional[Dict[str, Any]] = None,
         create_zip: bool = True
     ) -> str:
-        """
-        Exports all 9 categories into JSON files, copies mannequin GLB,
-        writes manifest.json, and produces a self-contained .zip.
-        """
         pkg_dir = os.path.join(self.output_dir, "template_package")
         os.makedirs(pkg_dir, exist_ok=True)
 
@@ -79,10 +80,19 @@ class TemplateExporter:
             data = {k: v.model_dump() for k, v in meshes.items()}
             json.dump(data, f, indent=2)
 
-        # Category 3: Placed 3D positions
+        # Category 3: Placed 3D positions (starting arrangement)
         with open(os.path.join(pkg_dir, manifest.category_3_placement_file), "w") as f:
             data = {k: v.model_dump() for k, v in placements.items()}
             json.dump(data, f, indent=2)
+
+        # Category 3 (Simulated): Draped positions & metrics
+        if simulated_meshes:
+            with open(os.path.join(pkg_dir, "simulated_3d.json"), "w") as f:
+                sim_data = {
+                    "metrics": simulation_metrics or {},
+                    "panels": {k: v.model_dump() for k, v in simulated_meshes.items()}
+                }
+                json.dump(sim_data, f, indent=2)
 
         # Category 4: Sewing connections
         with open(os.path.join(pkg_dir, manifest.category_4_sewing_file), "w") as f:
@@ -117,12 +127,25 @@ class TemplateExporter:
             data = {k: v.model_dump() for k, v in visibility_settings.items()}
             json.dump(data, f, indent=2)
 
+        # Validation Report
+        if validation_report:
+            with open(os.path.join(pkg_dir, "validation_report.json"), "w") as f:
+                json.dump(validation_report, f, indent=2)
+            # Also save directly in output_dir for easy viewer access
+            with open(os.path.join(self.output_dir, "validation_report.json"), "w") as f:
+                json.dump(validation_report, f, indent=2)
+
         # Copy generated OBJ size meshes into package
         for size_label in supported_sizes:
             src_obj = os.path.join(self.output_dir, f"garment_{size_label}.obj")
             dst_obj = os.path.join(pkg_dir, f"garment_{size_label}.obj")
             if os.path.exists(src_obj) and src_obj != dst_obj:
                 shutil.copy2(src_obj, dst_obj)
+
+            src_init_obj = os.path.join(self.output_dir, f"garment_{size_label}_initial.obj")
+            dst_init_obj = os.path.join(pkg_dir, f"garment_{size_label}_initial.obj")
+            if os.path.exists(src_init_obj) and src_init_obj != dst_init_obj:
+                shutil.copy2(src_init_obj, dst_init_obj)
 
         # Create zip if requested
         zip_path = os.path.join(self.output_dir, "garment_template_package.zip")

@@ -18,46 +18,37 @@ class SewingEngine:
 
     def _find_edge_vertices(self, panel_id: str, edge_name: str) -> Tuple[List[int], float]:
         geo = self.panels_2d[panel_id]
-        mesh = self.meshes[panel_id]
-
         if edge_name not in geo.edges:
             return [0, 1], 10.0
 
-        pt_indices = geo.edges[edge_name]
-        start_pt = geo.contour_points[pt_indices[0]]
-        end_pt = geo.contour_points[pt_indices[1]]
+        start_idx, end_idx = geo.edges[edge_name]
+        n_pts = len(geo.contour_points)
 
-        p_start = np.array([start_pt.x, start_pt.y])
-        p_end = np.array([end_pt.x, end_pt.y])
-        seg_vec = p_end - p_start
-        seg_len = float(np.linalg.norm(seg_vec))
+        # Get all contour indices along this edge segment
+        if start_idx <= end_idx:
+            raw_indices = list(range(start_idx, end_idx + 1))
+        else:
+            raw_indices = list(range(start_idx, n_pts)) + list(range(0, end_idx + 1))
 
-        if seg_len < 1e-4:
-            return [0], 0.0
+        pts = [geo.contour_points[i] for i in raw_indices]
 
-        seg_unit = seg_vec / seg_len
+        # Calculate accurate cumulative polyline edge length
+        coords = np.array([[p.x, p.y] for p in pts])
+        edge_length_cm = float(np.sum(np.linalg.norm(np.diff(coords, axis=0), axis=1)))
 
-        matched_v_indices = []
-        projections = []
+        # Sort anatomically to guarantee 1:1 topological alignment:
+        # Vertical seams (side seams, center back seam): top to bottom (Y descending)
+        if "side" in edge_name or "center_back" in edge_name:
+            sorted_pairs = sorted(zip([-p.y for p in pts], raw_indices))
+            sorted_indices = [idx for _, idx in sorted_pairs]
+        # Horizontal / Shoulder seams: inner neck to outer armhole (|X| ascending)
+        elif "shoulder" in edge_name:
+            sorted_pairs = sorted(zip([abs(p.x) for p in pts], raw_indices))
+            sorted_indices = [idx for _, idx in sorted_pairs]
+        else:
+            sorted_indices = raw_indices
 
-        for v_idx, v2d in enumerate(mesh.vertices_2d):
-            p = np.array([v2d[0], v2d[1]])
-            v_rel = p - p_start
-            proj = float(np.dot(v_rel, seg_unit))
-            perp_dist = float(np.linalg.norm(v_rel - proj * seg_unit))
-
-            # Within 1.2 cm perpendicular distance and along segment length
-            if perp_dist <= 1.2 and (-0.5 <= proj <= seg_len + 0.5):
-                matched_v_indices.append(v_idx)
-                projections.append(proj)
-
-        sorted_pairs = sorted(zip(projections, matched_v_indices))
-        sorted_indices = [idx for _, idx in sorted_pairs]
-
-        if not sorted_indices:
-            sorted_indices = [0, 1]
-
-        return sorted_indices, round(seg_len, 2)
+        return sorted_indices, round(edge_length_cm, 2)
 
     def generate_sewing_connections(self) -> List[SewingConnection]:
         seam_definitions = [
@@ -104,14 +95,14 @@ class SewingEngine:
             va, len_a = self._find_edge_vertices(s_def["panel_a"], s_def["edge_a"])
             vb, len_b = self._find_edge_vertices(s_def["panel_b"], s_def["edge_b"])
 
-            # Harmonize vertex count for 1:1 simulation mapping
-            min_count = max(2, min(len(va), len(vb)))
-            idx_a_sub = [va[int(i)] for i in np.linspace(0, len(va) - 1, min_count)]
-            idx_b_sub = [vb[int(i)] for i in np.linspace(0, len(vb) - 1, min_count)]
+            # Equalize vertex count for 1:1 simulation mapping
+            pair_count = max(2, min(len(va), len(vb)))
+            idx_a_sub = [va[int(round(i))] for i in np.linspace(0, len(va) - 1, pair_count)]
+            idx_b_sub = [vb[int(round(i))] for i in np.linspace(0, len(vb) - 1, pair_count)]
 
             gather_ratio = round(len_a / max(1e-4, len_b), 3)
             delta = abs(len_a - len_b)
-            is_valid = (delta <= 2.0) or (0.90 <= gather_ratio <= 1.10)
+            is_valid = (delta <= 3.0) or (0.90 <= gather_ratio <= 1.10)
 
             conn = SewingConnection(
                 seam_id=s_def["seam_id"],

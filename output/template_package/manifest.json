@@ -7,10 +7,9 @@
   "supported_sizes": [
     "XXS",
     "XS",
-    "S",
-    "M"
+    "S"
   ],
-  "created_at": "2026-09-29T12:04:41.605473Z",
+  "created_at": "2026-09-29T18:07:36.541332Z",
   "category_1_patterns_file": "patterns_2d.json",
   "category_2_meshes_file": "meshes_panels.json",
   "category_3_placement_file": "placement_3d.json",

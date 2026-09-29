@@ -21,16 +21,15 @@
       <div class="nav-brand">
         <span class="logo-badge">KLOTH</span>
         <h1>3D Garment Template Generator</h1>
-        <span class="version-tag">v1.0.0</span>
+        <span class="version-tag" id="versionTag">v2.0.0</span>
       </div>
       <div class="nav-actions">
         <div class="size-selector-group">
           <label>ACTIVE SIZE:</label>
-          <div class="size-pill-group">
+          <div class="size-pill-group" id="sizePillGroup">
             <button class="size-pill" data-size="XXS">XXS</button>
             <button class="size-pill active" data-size="XS">XS <span class="base-badge">BASE</span></button>
             <button class="size-pill" data-size="S">S</button>
-            <button class="size-pill" data-size="M">M</button>
           </div>
         </div>
         <a href="/output/garment_template_package.zip" download class="btn btn-primary" id="btnDownloadPkg">
@@ -111,7 +110,7 @@
           <div class="viewport-overlay-stats">
             <div class="stat-pill"><span class="label">Avatar:</span> <span class="val">SMPL-X (52 Joints)</span></div>
             <div class="stat-pill"><span class="label">Garment:</span> <span class="val" id="statVertices">809 Verts</span></div>
-            <div class="stat-pill"><span class="label">Seams:</span> <span class="val">8 Paired (1:1)</span></div>
+            <div class="stat-pill"><span class="label">Seams:</span> <span class="val" id="statSeams">5 Paired (1:1)</span></div>
           </div>
         </div>
       </section>
@@ -123,7 +122,7 @@
           <button class="tab-btn active" data-tab="tab-sewing">Sewing (Cat 4)</button>
           <button class="tab-btn" data-tab="tab-fabric">Fabric & Grain (Cat 5,6)</button>
           <button class="tab-btn" data-tab="tab-grading">Grading (Cat 8)</button>
-          <button class="tab-btn" data-tab="tab-validation">Validation (31/31)</button>
+          <button class="tab-btn" data-tab="tab-validation" id="tabValidationBtn">Validation (27/27)</button>
         </div>
 
         <div class="tab-content-container glass-card">

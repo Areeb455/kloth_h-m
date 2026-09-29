@@ -18,7 +18,7 @@ class SizingEngine:
             self.raw_data = json.load(f)
 
         self.primary_base_size = self.raw_data.get("primary_base_size", "XS")
-        self.supported_sizes = self.raw_data.get("supported_sizes", ["XXS", "XS", "S", "M"])
+        self.supported_sizes = self.raw_data.get("supported_sizes", ["XXS", "XS", "S"])
         self.sizes_data = self.raw_data["sizes"]
         self.ease_allowances = self.raw_data.get("ease_allowances_cm", {
             "bust_ease": 4.0,

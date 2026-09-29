@@ -4,10 +4,9 @@
   "measurement_criteria_source": "H&M How to Measure Guide (Chest over fullest bust, Waist at narrowest point, Low Hip around fullest part)",
   "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78)",
   "primary_base_size": "XS",
-  "supported_sizes": ["XXS", "XS", "S", "M"],
+  "supported_sizes": ["XXS", "XS", "S"],
   "source_breakdown": {
-    "XXS_to_S": "Directly extracted from the reviewer-provided H&M size chart screenshot (REGULAR XXS-S).",
-    "M": "Extrapolated from standard H&M Women's Size Guide (Chest 90-98, Waist 74-82, Low Hip 95-102)."
+    "XXS_to_S": "Directly extracted from the reviewer-provided H&M size chart screenshot (REGULAR XXS-S)."
   },
   "sizes": {
     "XXS": {
@@ -86,32 +85,6 @@
         "front_length": 90.0,
         "back_length": 92.0,
         "shoulder_width": 33.5
-      }
-    },
-    "M": {
-      "eur_size": 40,
-      "uk_size": 12,
-      "source": "hm_standard_extrapolation",
-      "raw_ranges": {
-        "chest": "90-98",
-        "waist": "74-82",
-        "low_hip": "95-102",
-        "inside_leg": "74"
-      },
-      "body_measurements_cm": {
-        "chest": 90.0,
-        "waist": 74.0,
-        "low_hip": 95.0,
-        "inside_leg": 74.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 94.0,
-        "waist_circ": 82.0,
-        "hip_circ": 104.0,
-        "hem_circ": 128.0,
-        "front_length": 92.0,
-        "back_length": 94.0,
-        "shoulder_width": 35.0
       }
     }
   },

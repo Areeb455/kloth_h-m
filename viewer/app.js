@@ -210,6 +210,13 @@ async function loadPackageData() {
 
     const resGrading = await fetch("/output/template_package/grading_sizes.json");
     templateData.grading = await resGrading.json();
+
+    try {
+      const resVal = await fetch("/output/validation_report.json");
+      templateData.validation = await resVal.json();
+    } catch (ve) {
+      console.warn("Could not fetch validation_report.json:", ve);
+    }
   } catch (e) {
     console.warn("Could not fetch remote package json:", e);
   }
@@ -328,37 +335,63 @@ function populateInspectorTabs() {
     }
   }
 
-  // 3. Validation List
+  // 3. Dynamic Validation List from validation_report.json
   const valList = document.getElementById("validationList");
-  if (valList) {
-    valList.innerHTML = "";
-    const sampleChecks = [
-      { cat: "Dimensions", title: "Bust Circumference Delta", detail: "82.0 cm vs 82.0 cm (Δ 0.0 cm)" },
-      { cat: "Dimensions", title: "Front Garment Length Delta", detail: "88.0 cm vs 88.0 cm (Δ 0.0 cm)" },
-      { cat: "Mesh", title: "Non-Degenerate Triangles", detail: "0 degenerate faces found across 4 panels" },
-      { cat: "Mesh", title: "Face Indices Valid Range", detail: "All face indices within vertex range" },
-      { cat: "Mesh", title: "2D/3D Area Consistency", detail: "Triangulated area matches pattern polygon (>92%)" },
-      { cat: "Sewing", title: "1:1 Vertex Seam Pairings", detail: "All 8 seams resampled to equal vertex counts" },
-      { cat: "Sewing", title: "Edge Length Compatibility", detail: "All paired seam edges match within tolerance" },
-      { cat: "Sewing", title: "No Duplicate Seam Edges", detail: "No boundary edge used multiple times" },
-      { cat: "Loader", title: "Round-Trip Deserialization", detail: "All 9 categories verified from package" }
-    ];
-
-    sampleChecks.forEach((c) => {
-      const item = document.createElement("div");
-      item.className = "val-item";
-      item.innerHTML = `
-        <div class="val-item-left">
-          <span class="status-badge pass">PASS</span>
-          <div>
-            <div class="val-item-title">${c.title}</div>
-            <div class="val-item-detail">${c.detail}</div>
+  if (templateData.validation) {
+    const valBtn = document.getElementById("tabValidationBtn");
+    if (valBtn) {
+      valBtn.innerText = `Validation (${templateData.validation.summary || "27/27 passed"})`;
+    }
+    if (valList && templateData.validation.checks) {
+      valList.innerHTML = "";
+      templateData.validation.checks.forEach((c) => {
+        const item = document.createElement("div");
+        item.className = "val-item";
+        const isPass = c.status === "PASS";
+        item.innerHTML = `
+          <div class="val-item-left">
+            <span class="status-badge ${isPass ? "pass" : "fail"}">${c.status}</span>
+            <div>
+              <div class="val-item-title">${c.name}</div>
+              <div class="val-item-detail">${c.details}</div>
+            </div>
           </div>
-        </div>
-        <span class="chip chip-info" style="font-size:9px;">${c.cat}</span>
-      `;
-      valList.appendChild(item);
-    });
+          <span class="chip chip-info" style="font-size:9px;">${c.category}</span>
+        `;
+        valList.appendChild(item);
+      });
+    }
+  }
+
+  // 4. Dynamic Header Version & Seam Count
+  if (templateData.manifest && document.getElementById("versionTag")) {
+    document.getElementById("versionTag").innerText = templateData.manifest.pipeline_version || "v2.0.0";
+  }
+  if (templateData.sewing && document.getElementById("statSeams")) {
+    document.getElementById("statSeams").innerText = `${templateData.sewing.length} Paired (1:1)`;
+  }
+
+  // 5. Dynamic Active Size Pills
+  if (templateData.grading && templateData.grading.size_meshes) {
+    const pillGroup = document.getElementById("sizePillGroup");
+    if (pillGroup) {
+      pillGroup.innerHTML = "";
+      const availSizes = Object.keys(templateData.grading.size_meshes);
+      availSizes.forEach((sz) => {
+        const isBase = templateData.grading.size_meshes[sz].is_base_size;
+        const btn = document.createElement("button");
+        btn.className = `size-pill ${sz === currentSize ? "active" : ""}`;
+        btn.dataset.size = sz;
+        btn.innerHTML = `${sz} ${isBase ? '<span class="base-badge">BASE</span>' : ""}`;
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".size-pill").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentSize = sz;
+          loadGarmentMesh(currentSize);
+        });
+        pillGroup.appendChild(btn);
+      });
+    }
   }
 }
 

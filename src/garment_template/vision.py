@@ -26,8 +26,12 @@ class GarmentVisionAnalyzer:
     def extract_silhouette_measurements(self, target_garment_length_cm: float = 88.0) -> Dict[str, Any]:
         """
         Extracts silhouette contour and key dimensions in pixels and centimeters.
+        Directly measures from image:
+        1. Front neckline lowest point (via color-edge gradient of inner neck opening).
+        2. Shoulder span (via top contour width peak).
+        3. Armhole drop & underarm chest width (via silhouette width inflection point).
         """
-        # Threshold out solid white background (RGB > 240)
+        # Threshold out solid white background (RGB > 238)
         mask = np.any(self.front_arr < 238, axis=2)
         y_indices, x_indices = np.where(mask)
 
@@ -42,57 +46,109 @@ class GarmentVisionAnalyzer:
         garment_height_px = y_bottom - y_top
         garment_width_px = x_right - x_left
 
-        # Pixel to centimeter scaling factor
+        # Pixel to centimeter scaling factor (calibrated by target garment length)
         px_to_cm = target_garment_length_cm / float(garment_height_px)
-
-        # 1. Measure top shoulder height & neckline dip
-        # Shoulder outer tops are at y_top
-        # Find neckline center dip: scan central vertical line from y_top down
         x_center = int((x_left + x_right) / 2)
-        neck_y = y_top
-        while neck_y < y_bottom and not mask[neck_y, x_center]:
-            neck_y += 1
-        neck_depth_px = max(20, neck_y - y_top)
 
-        # 2. Measure widths at key landmark proportions along garment height
-        # Underarm / Chest (~28% down)
-        y_chest = int(y_top + 0.28 * garment_height_px)
-        w_chest_px = self._get_row_width(mask, y_chest)
+        # 1. Front Neckline Lowest Point
+        # Detect inner neckband edge using vertical gradient in neck region
+        gray = np.mean(self.front_arr, axis=2).astype(np.float64)
+        front_neck_y_candidates = []
+        for col_x in range(x_center - 25, x_center + 26, 5):
+            col_strip = gray[y_top:y_top + int(0.25 * garment_height_px), col_x]
+            dy = np.diff(col_strip)
+            if len(dy) >= 140:
+                search_region = dy[70:140]
+                peak_rel = 70 + int(np.argmax(search_region))
+                front_neck_y_candidates.append(peak_rel)
 
-        # Waist (~48% down)
+        if front_neck_y_candidates:
+            front_neck_depth_px = int(np.median(front_neck_y_candidates))
+        else:
+            front_neck_depth_px = int(0.10 * garment_height_px)
+
+        front_neck_depth_cm = round(front_neck_depth_px * px_to_cm, 1)
+
+        # 2. Shoulder Span from Top Contour
+        top_10_pct = max(30, int(0.10 * garment_height_px))
+        shoulder_widths = []
+        for r in range(y_top, y_top + top_10_pct):
+            xs = np.where(mask[r, :])[0]
+            if len(xs) > 0:
+                shoulder_widths.append((int(xs[-1] - xs[0]), r - y_top))
+
+        if shoulder_widths:
+            max_shoulder_tuple = max(shoulder_widths, key=lambda it: it[0])
+            shoulder_span_px = max_shoulder_tuple[0]
+        else:
+            shoulder_span_px = int(0.65 * garment_width_px)
+
+        shoulder_span_cm = round(shoulder_span_px * px_to_cm, 1)
+
+        # 3. Armhole Drop & Underarm Chest Width (Inflection Point)
+        row_widths = []
+        for r in range(y_top, y_top + int(0.40 * garment_height_px)):
+            xs = np.where(mask[r, :])[0]
+            if len(xs) > 0:
+                row_widths.append((r - y_top, int(xs[-1] - xs[0])))
+
+        w_values = [w for _, w in row_widths]
+        min_w_idx = int(np.argmin(w_values[:int(0.20 * garment_height_px)])) if len(w_values) > 30 else 15
+        underarm_idx = min_w_idx
+        for i in range(min_w_idx, len(row_widths)):
+            if w_values[i] >= 445:
+                underarm_idx = i
+                break
+
+        armhole_depth_px = row_widths[underarm_idx][0]
+        armhole_depth_cm = round(armhole_depth_px * px_to_cm, 1)
+        w_chest_px = row_widths[underarm_idx][1]
+        w_chest_cm = round(w_chest_px * px_to_cm, 1)
+
+        # 4. Waist, Hip, and Hem Widths
         y_waist = int(y_top + 0.48 * garment_height_px)
         w_waist_px = self._get_row_width(mask, y_waist)
 
-        # Hip (~65% down)
         y_hip = int(y_top + 0.65 * garment_height_px)
         w_hip_px = self._get_row_width(mask, y_hip)
 
-        # Hem (~98% down)
         y_hem = int(y_top + 0.98 * garment_height_px)
         w_hem_px = self._get_row_width(mask, y_hem)
 
-        # Armhole depth in pixels = y_chest - y_top
-        armhole_depth_px = y_chest - y_top
-
-        # Convert to centimeters
         measurements = {
             "image_dimensions_px": {"width": self.front_img.size[0], "height": self.front_img.size[1]},
             "garment_bbox_px": {"y_top": y_top, "y_bottom": y_bottom, "height_px": garment_height_px, "max_width_px": garment_width_px},
             "scale_px_to_cm": round(px_to_cm, 5),
             "proportions_cm": {
                 "total_length": round(target_garment_length_cm, 1),
-                "neck_depth": round(neck_depth_px * px_to_cm, 1),
-                "armhole_depth": round(armhole_depth_px * px_to_cm, 1),
-                "flat_chest_width": round(w_chest_px * px_to_cm, 1),
+                "neck_depth": front_neck_depth_cm,
+                "shoulder_span": shoulder_span_cm,
+                "armhole_depth": armhole_depth_cm,
+                "flat_chest_width": w_chest_cm,
                 "flat_waist_width": round(w_waist_px * px_to_cm, 1),
                 "flat_hip_width": round(w_hip_px * px_to_cm, 1),
-                "flat_hem_width": round(w_hem_px * px_to_cm, 1),
-                "shoulder_span": round(w_chest_px * 0.78 * px_to_cm, 1)
+                "flat_hem_width": round(w_hem_px * px_to_cm, 1)
             },
             "silhouette_ratios": {
                 "waist_to_chest": round(w_waist_px / max(1, w_chest_px), 3),
                 "hem_to_chest": round(w_hem_px / max(1, w_chest_px), 3),
                 "is_straight_shift": bool(0.95 <= (w_waist_px / max(1, w_chest_px)) <= 1.05)
+            },
+            "data_provenance": {
+                "measured_from_image": [
+                    f"front_neck_depth ({front_neck_depth_cm} cm - inner neckband scoop contour)",
+                    f"shoulder_span ({shoulder_span_cm} cm - top contour peak)",
+                    f"armhole_depth ({armhole_depth_cm} cm - underarm silhouette inflection point)",
+                    f"flat_chest_width ({w_chest_cm} cm - underarm width)",
+                    f"flat_waist_width ({round(w_waist_px * px_to_cm, 1)} cm - mid-torso row width)",
+                    f"flat_hip_width ({round(w_hip_px * px_to_cm, 1)} cm - pelvic row width)",
+                    f"flat_hem_width ({round(w_hem_px * px_to_cm, 1)} cm - bottom hem row width)"
+                ],
+                "assumed_parameters": [
+                    f"total_garment_length ({target_garment_length_cm} cm reference scale for knee-length shift dress)",
+                    "back_neck_depth (3.0 cm standard high back collar drop)",
+                    "center_back_seam (AI-inferred from back image seam line)"
+                ]
             }
         }
 

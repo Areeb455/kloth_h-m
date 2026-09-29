@@ -11,8 +11,8 @@
     "panel_b_id": "back_right_panel",
     "edge_b_name": "shoulder_right",
     "edge_b_vertex_indices": [
-      12,
-      13
+      13,
+      12
     ],
     "edge_b_length_cm": 7.76,
     "seam_order": 1,
@@ -25,8 +25,8 @@
     "panel_a_id": "front_panel",
     "edge_a_name": "shoulder_left",
     "edge_a_vertex_indices": [
-      23,
-      24
+      24,
+      23
     ],
     "edge_a_length_cm": 7.91,
     "panel_b_id": "back_left_panel",
@@ -46,8 +46,8 @@
     "panel_a_id": "back_left_panel",
     "edge_a_name": "center_back_seam",
     "edge_a_vertex_indices": [
-      17,
-      0
+      0,
+      17
     ],
     "edge_a_length_cm": 87.1,
     "panel_b_id": "back_right_panel",
@@ -68,18 +68,22 @@
     "edge_a_name": "side_seam_right",
     "edge_a_vertex_indices": [
       8,
+      9,
+      10,
       11
     ],
-    "edge_a_length_cm": 63.79,
+    "edge_a_length_cm": 67.06,
     "panel_b_id": "back_right_panel",
     "edge_b_name": "side_seam_right",
     "edge_b_vertex_indices": [
-      2,
-      5
+      5,
+      4,
+      3,
+      2
     ],
-    "edge_b_length_cm": 65.77,
+    "edge_b_length_cm": 69.02,
     "seam_order": 4,
-    "gather_ratio": 0.97,
+    "gather_ratio": 0.972,
     "is_valid": true,
     "tolerance_cm": 1.0
   },
@@ -88,19 +92,23 @@
     "panel_a_id": "front_panel",
     "edge_a_name": "side_seam_left",
     "edge_a_vertex_indices": [
-      13,
-      16
+      16,
+      15,
+      14,
+      13
     ],
-    "edge_a_length_cm": 63.79,
+    "edge_a_length_cm": 67.06,
     "panel_b_id": "back_left_panel",
     "edge_b_name": "side_seam_left",
     "edge_b_vertex_indices": [
       13,
+      14,
+      15,
       16
     ],
-    "edge_b_length_cm": 65.77,
+    "edge_b_length_cm": 69.02,
     "seam_order": 5,
-    "gather_ratio": 0.97,
+    "gather_ratio": 0.972,
     "is_valid": true,
     "tolerance_cm": 1.0
   }

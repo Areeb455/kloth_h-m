@@ -1,0 +1,281 @@
+{
+  "overall_status": "PASS",
+  "summary": "27/27 checks passed",
+  "passed_checks": 27,
+  "total_checks": 27,
+  "checks": [
+    {
+      "category": "3D Avatar Fit",
+      "name": "3D Simulated Chest Perimeter Ease",
+      "status": "PASS",
+      "details": "3D Mesh Chest Perimeter: 104.0 cm vs Avatar Body: 78.0 cm (3D Ease: +26.0 cm)",
+      "metrics": {
+        "body_chest_cm": 78.0,
+        "mesh_3d_perimeter_cm": 104.0,
+        "ease_cm": 26.0
+      }
+    },
+    {
+      "category": "Vision Verification",
+      "name": "Front Neckline Depth Match",
+      "status": "PASS",
+      "details": "Pattern Neckline Dip: 7.4 cm vs Vision: 7.4 cm (\u0394: 0.0 cm <= 1.5 cm)",
+      "metrics": {
+        "pattern_neck_cm": 7.4,
+        "vision_neck_cm": 7.4,
+        "delta_cm": 0.0
+      }
+    },
+    {
+      "category": "Vision Verification",
+      "name": "Chest Width Image Consistency",
+      "status": "PASS",
+      "details": "Image-derived: 36.8 cm vs Pattern: 41.0 cm (\u0394: 4.2 cm <= 5.0 cm)",
+      "metrics": {
+        "image_width_cm": 36.8,
+        "pattern_width_cm": 41.0,
+        "delta_cm": 4.2
+      }
+    },
+    {
+      "category": "Cloth Simulation",
+      "name": "Seam Assembly Gap (< 5 mm)",
+      "status": "PASS",
+      "details": "Max seam gap: 0.00 mm, Average gap: 0.00 mm (Threshold: < 5.0 mm)",
+      "metrics": {
+        "max_gap_mm": 0.0,
+        "avg_gap_mm": 0.0
+      }
+    },
+    {
+      "category": "Cloth Simulation",
+      "name": "Simulation Stability (No NaN)",
+      "status": "PASS",
+      "details": "All vertex positions and velocities are finite real numbers",
+      "metrics": {
+        "has_nan": false
+      }
+    },
+    {
+      "category": "Cloth Simulation",
+      "name": "Simulation Equilibrium Settling",
+      "status": "PASS",
+      "details": "Final kinetic energy: 0.000054 J, Max step displacement: 0.697 mm",
+      "metrics": {
+        "final_ke": 5.4e-05,
+        "max_displacement_mm": 0.697
+      }
+    },
+    {
+      "category": "Mannequin Fit",
+      "name": "Avatar Torso Non-Penetration",
+      "status": "PASS",
+      "details": "Zero body penetration verified across 402 torso vertices (min clearance: 0.4 cm)",
+      "metrics": {
+        "penetration_count": 0,
+        "min_clearance_cm": 0.43
+      }
+    },
+    {
+      "category": "Area Strain Preservation",
+      "name": "front_panel - Area Strain (<= 35% knit limit)",
+      "status": "PASS",
+      "details": "3D Area: 4082.7 cm2 vs 2D Area: 3622.6 cm2 (Strain: 12.7% within 35% jersey knit elastic stretch limit)",
+      "metrics": {
+        "area_3d_sq_cm": 4082.7,
+        "area_2d_sq_cm": 3622.57,
+        "strain_pct": 12.7
+      }
+    },
+    {
+      "category": "Area Strain Preservation",
+      "name": "back_left_panel - Area Strain (<= 35% knit limit)",
+      "status": "PASS",
+      "details": "3D Area: 2408.1 cm2 vs 2D Area: 1872.1 cm2 (Strain: 28.6% within 35% jersey knit elastic stretch limit)",
+      "metrics": {
+        "area_3d_sq_cm": 2408.1,
+        "area_2d_sq_cm": 1872.09,
+        "strain_pct": 28.6
+      }
+    },
+    {
+      "category": "Area Strain Preservation",
+      "name": "back_right_panel - Area Strain (<= 35% knit limit)",
+      "status": "PASS",
+      "details": "3D Area: 2491.5 cm2 vs 2D Area: 1872.1 cm2 (Strain: 33.1% within 35% jersey knit elastic stretch limit)",
+      "metrics": {
+        "area_3d_sq_cm": 2491.5,
+        "area_2d_sq_cm": 1872.09,
+        "strain_pct": 33.1
+      }
+    },
+    {
+      "category": "Mesh Topology",
+      "name": "front_panel - Face Indices In-Range",
+      "status": "PASS",
+      "details": "All 772 face indices within [0, 404]",
+      "metrics": {
+        "face_count": 772
+      }
+    },
+    {
+      "category": "Mesh Topology",
+      "name": "front_panel - Non-Degenerate Triangles",
+      "status": "PASS",
+      "details": "Found 0 degenerate faces out of 772",
+      "metrics": {
+        "degenerate_count": 0
+      }
+    },
+    {
+      "category": "Mesh Topology",
+      "name": "back_left_panel - Face Indices In-Range",
+      "status": "PASS",
+      "details": "All 360 face indices within [0, 189]",
+      "metrics": {
+        "face_count": 360
+      }
+    },
+    {
+      "category": "Mesh Topology",
+      "name": "back_left_panel - Non-Degenerate Triangles",
+      "status": "PASS",
+      "details": "Found 0 degenerate faces out of 360",
+      "metrics": {
+        "degenerate_count": 0
+      }
+    },
+    {
+      "category": "Mesh Topology",
+      "name": "back_right_panel - Face Indices In-Range",
+      "status": "PASS",
+      "details": "All 368 face indices within [0, 193]",
+      "metrics": {
+        "face_count": 368
+      }
+    },
+    {
+      "category": "Mesh Topology",
+      "name": "back_right_panel - Non-Degenerate Triangles",
+      "status": "PASS",
+      "details": "Found 0 degenerate faces out of 368",
+      "metrics": {
+        "degenerate_count": 0
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_shoulder_right - 1:1 Vertex Count",
+      "status": "PASS",
+      "details": "front_panel (2 v) <-> back_right_panel (2 v)",
+      "metrics": {
+        "count_a": 2,
+        "count_b": 2
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_shoulder_right - Gather Ratio",
+      "status": "PASS",
+      "details": "Len A: 7.91 cm, Len B: 7.76 cm (ratio: 1.02)",
+      "metrics": {
+        "length_a": 7.91,
+        "length_b": 7.76,
+        "ratio": 1.019
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_shoulder_left - 1:1 Vertex Count",
+      "status": "PASS",
+      "details": "front_panel (2 v) <-> back_left_panel (2 v)",
+      "metrics": {
+        "count_a": 2,
+        "count_b": 2
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_shoulder_left - Gather Ratio",
+      "status": "PASS",
+      "details": "Len A: 7.91 cm, Len B: 7.76 cm (ratio: 1.02)",
+      "metrics": {
+        "length_a": 7.91,
+        "length_b": 7.76,
+        "ratio": 1.019
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_center_back - 1:1 Vertex Count",
+      "status": "PASS",
+      "details": "back_left_panel (2 v) <-> back_right_panel (2 v)",
+      "metrics": {
+        "count_a": 2,
+        "count_b": 2
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_center_back - Gather Ratio",
+      "status": "PASS",
+      "details": "Len A: 87.1 cm, Len B: 87.1 cm (ratio: 1.00)",
+      "metrics": {
+        "length_a": 87.1,
+        "length_b": 87.1,
+        "ratio": 1.0
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_side_right - 1:1 Vertex Count",
+      "status": "PASS",
+      "details": "front_panel (4 v) <-> back_right_panel (4 v)",
+      "metrics": {
+        "count_a": 4,
+        "count_b": 4
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_side_right - Gather Ratio",
+      "status": "PASS",
+      "details": "Len A: 67.06 cm, Len B: 69.02 cm (ratio: 0.97)",
+      "metrics": {
+        "length_a": 67.06,
+        "length_b": 69.02,
+        "ratio": 0.972
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_side_left - 1:1 Vertex Count",
+      "status": "PASS",
+      "details": "front_panel (4 v) <-> back_left_panel (4 v)",
+      "metrics": {
+        "count_a": 4,
+        "count_b": 4
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "seam_side_left - Gather Ratio",
+      "status": "PASS",
+      "details": "Len A: 67.06 cm, Len B: 69.02 cm (ratio: 0.97)",
+      "metrics": {
+        "length_a": 67.06,
+        "length_b": 69.02,
+        "ratio": 0.972
+      }
+    },
+    {
+      "category": "Sewing Integrity",
+      "name": "No Duplicate Seam Edges",
+      "status": "PASS",
+      "details": "Duplicate edge usages: None",
+      "metrics": {
+        "duplicates": []
+      }
+    }
+  ]
+}

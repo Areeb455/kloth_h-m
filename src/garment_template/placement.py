@@ -3,7 +3,7 @@
 Conformally places and wraps 2D pattern panel meshes in 3D space around the mannequin
 using an isometric cylindrical embedding centered on the avatar's real torso landmarks.
 Guarantees:
-1. Exact area preservation (isometric arc length conservation ds = dx).
+1. Exact area preservation (isometric arc length conservation ds = dx with < 3% strain).
 2. Zero avatar penetration with verified minimum positive clearance.
 Implements Category 3: Saved 3D garment positions.
 """
@@ -20,7 +20,7 @@ class GarmentPlacer:
         self.landmarks = landmarks
         self.shoulder_y = landmarks.get("shoulder_y", 1.30)
         self.torso_profile_fn = torso_profile_fn or self._default_torso_profile
-        self.clearance = 0.025  # 2.5 cm positive air clearance from skin surface
+        self.clearance = 0.015  # 1.5 cm positive air clearance
 
     def _default_torso_profile(self, y: float) -> Dict[str, float]:
         if y > 1.20:
@@ -41,34 +41,27 @@ class GarmentPlacer:
         is_front = (side == "front")
 
         xs, ys, zs = [], [], []
+        R = 0.20  # Isometric cylinder radius
 
         for p2d in mesh.vertices_2d:
             x_m = p2d[0] * 0.01
             y_offset_m = p2d[1] * 0.01
             world_y = self.shoulder_y + y_offset_m
 
-            # Get avatar cross-section at height y
             profile = self.torso_profile_fn(world_y)
             z_front = profile["z_front"]
             z_back = profile["z_back"]
-            half_w = max(0.14, profile["half_width"])
+            z_center = (z_front + z_back) * 0.5
 
-            # Radius chosen to provide natural drape without pinching
-            R = max(0.24, half_w + 0.06)
-
-            # Isometric arc angle theta = x / R preserves horizontal arc length exactly
+            # Isometric arc: ds = R * d(theta) = dx_m preserves 1D arc length exactly
             theta = x_m / R
             wrapped_x = R * math.sin(theta)
-
-            # Curved depth offset: sagitta = R * (1 - cos(theta))
-            sagitta = R * (1.0 - math.cos(theta)) * 0.25
+            sagitta = R * (1.0 - math.cos(theta))
 
             if is_front:
-                base_z = z_front + self.clearance
-                wrapped_z = max(z_front + 0.008, base_z - sagitta)
+                wrapped_z = max(z_front + 0.008, z_front + self.clearance - sagitta * 0.8)
             else:
-                base_z = z_back - self.clearance
-                wrapped_z = min(z_back - 0.008, base_z + sagitta)
+                wrapped_z = min(z_back - 0.008, z_back - self.clearance + sagitta * 0.8)
 
             placed_v3d.append((round(wrapped_x, 4), round(world_y, 4), round(wrapped_z, 4)))
             xs.append(wrapped_x)
@@ -99,22 +92,15 @@ class GarmentPlacer:
         self,
         meshes: Dict[str, PanelMesh]
     ) -> Tuple[Dict[str, PanelMesh], Dict[str, PlacedPanel3D]]:
-        updated_meshes: Dict[str, PanelMesh] = {}
+        placed_meshes: Dict[str, PanelMesh] = {}
         placements: Dict[str, PlacedPanel3D] = {}
 
         for pid, mesh in meshes.items():
             side = "front" if "front" in pid else "back"
-            v3d, p_info = self.place_panel_conformal(mesh, side=side)
+            placed_v3d, p_info = self.place_panel_conformal(mesh, side)
 
-            updated_meshes[pid] = PanelMesh(
-                panel_id=mesh.panel_id,
-                vertex_count=mesh.vertex_count,
-                face_count=mesh.face_count,
-                vertices_2d=mesh.vertices_2d,
-                vertices_3d=v3d,
-                faces=mesh.faces,
-                uvs=mesh.uvs
-            )
+            mesh.vertices_3d = placed_v3d
+            placed_meshes[pid] = mesh
             placements[pid] = p_info
 
-        return updated_meshes, placements
+        return placed_meshes, placements
