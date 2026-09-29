@@ -117,15 +117,15 @@ function loadAvatar() {
       avatarGroup.clear();
       const model = gltf.scene;
 
-      // Soft mannequin material
+      // Elegant alabaster / porcelain female mannequin material
       model.traverse((child) => {
         if (child.isMesh) {
           child.material = new THREE.MeshStandardMaterial({
-            color: 0x94a3b8,
-            roughness: 0.6,
-            metalness: 0.1,
+            color: 0xf5f3ee,
+            roughness: 0.35,
+            metalness: 0.05,
             transparent: true,
-            opacity: 0.85
+            opacity: 0.94
           });
         }
       });

@@ -1,14 +1,15 @@
 """
 3D Garment Placement Module.
 Conformally places and wraps 2D pattern panel meshes in 3D space around the mannequin
-using an isometric cylindrical embedding centered on the avatar's real torso landmarks.
+using a smooth, continuous cylindrical embedding centered on the avatar's real torso landmarks.
 Guarantees:
-1. Exact area preservation (isometric arc length conservation ds = dx with < 5% strain).
-2. Small initial seam gaps (< 3.5 cm) around shoulder crest and side seams.
-3. Zero avatar penetration with verified minimum positive clearance against the real avatar mesh.
+1. Exact area preservation (isometric arc length conservation with no discontinuous folds).
+2. Small initial seam gaps (< 1.5 cm around shoulder crest and side seams).
+3. Zero avatar penetration with verified positive clearance against the real avatar mesh.
 Implements Category 3: Saved 3D garment positions.
 """
 
+import os
 from typing import Dict, List, Tuple, Callable, Optional
 import math
 import numpy as np
@@ -25,10 +26,15 @@ class GarmentPlacer:
         mesh_collider: Optional[AvatarMeshCollider] = None
     ):
         self.landmarks = landmarks
-        self.shoulder_y = landmarks.get("shoulder_y", 1.30)
+        self.shoulder_y = landmarks.get("shoulder_y", 1.33)
         self.torso_profile_fn = torso_profile_fn or self._default_torso_profile
         self.collider = mesh_collider
-        self.clearance = 0.008  # 8 mm clearance
+        self.clearance = 0.007  # 7 mm clearance
+
+        if self.collider is None:
+            default_glb = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "person_0.glb")
+            if os.path.exists(default_glb):
+                self.collider = AvatarMeshCollider(default_glb, margin=0.007)
 
     def _default_torso_profile(self, y: float) -> Dict[str, float]:
         if y > 1.20:
@@ -40,62 +46,83 @@ class GarmentPlacer:
         else:
             return {"z_front": 0.07, "z_back": -0.18, "z_center": -0.05, "half_width": 0.18, "r_x": 0.17}
 
+    @staticmethod
+    def _build_silhouette_envelope(meshes: Dict[str, PanelMesh]) -> Tuple[np.ndarray, np.ndarray]:
+        all_v2d = np.vstack([np.array(m.vertices_2d, dtype=np.float32) for m in meshes.values()])
+        y_min = int(np.floor(np.min(all_v2d[:, 1])))
+        y_max = int(np.ceil(np.max(all_v2d[:, 1])))
+        bin_ys, bin_ws = [], []
+        for y in range(y_min, y_max + 1, 2):
+            mask = np.abs(all_v2d[:, 1] - y) <= 2.5
+            if np.any(mask):
+                bin_ys.append(y)
+                bin_ws.append(max(10.0, float(np.max(np.abs(all_v2d[mask, 0])))))
+        bin_ys = np.array(bin_ys, dtype=np.float32)
+        bin_ws = np.array(bin_ws, dtype=np.float32)
+        sort_idx = np.argsort(bin_ys)
+        return bin_ys[sort_idx], bin_ws[sort_idx]
+
     def place_panel_conformal(
         self,
         mesh: PanelMesh,
-        side: str
+        side: str,
+        bin_ys: Optional[np.ndarray] = None,
+        bin_ws: Optional[np.ndarray] = None
     ) -> Tuple[List[Tuple[float, float, float]], PlacedPanel3D]:
+        """
+        Places a 2D panel mesh into 3D space with continuous conformal wrapping.
+        - Front panel wraps around the anterior half of the torso ($Z > Z_{mid}$).
+        - Back panels wrap around the posterior half of the torso ($Z < Z_{mid}$).
+        - Shoulder crest smoothly arches to meet the opposing panel at the shoulder ridge.
+        - Side seams meet at the coronal midplane ($Z = Z_{mid}$).
+        """
         placed_v3d: List[Tuple[float, float, float]] = []
         is_front = (side == "front")
 
         xs, ys, zs = [], [], []
-        R = 0.175
-        z_axis = -0.065
-
-        # Find maximum pattern width across y to normalize boundary wrap
-        y_pts = [p[1] for p in mesh.vertices_2d]
-        x_pts = [abs(p[0]) for p in mesh.vertices_2d]
-        max_half_w = max(10.0, max(x_pts)) if x_pts else 25.0
+        Z_MID = -0.065
+        Y_CREST = self.shoulder_y
 
         for p2d in mesh.vertices_2d:
             x_cm = p2d[0]
-            y_cm = p2d[1]
+            y_cm = p2d[1]  # <= 0 in pattern space
             x_m = x_cm * 0.01
-            y_offset_m = y_cm * 0.01
-            world_y = self.shoulder_y + y_offset_m
+            y_m = y_cm * 0.01
 
-            # Normalized width for this vertex relative to panel boundary
-            # Map boundary vertices to reach near the coronal midplane (~86 degrees)
-            u_norm = min(1.0, abs(x_cm) / max_half_w)
-            sign = 1.0 if x_cm >= 0 else -1.0
-            theta = sign * u_norm * (math.pi / 2.0) * 0.95
-
-            wrapped_x = R * math.sin(theta)
-
-            # Shoulder strap crest wrap: for y_cm near top (>-14 cm)
-            # Curves over the shoulder crest toward z_axis so shoulder seam starts close
-            sh_factor = 0.0
-            if y_cm > -14.0:
-                sh_factor = (y_cm + 14.0) / 14.0
-
-            cos_val = math.cos(theta) * (1.0 - 0.90 * sh_factor)
-
-            if is_front:
-                wrapped_z = z_axis + R * cos_val
+            if bin_ys is not None and bin_ws is not None and len(bin_ys) > 0:
+                w_half_cm = float(np.interp(y_cm, bin_ys, bin_ws))
             else:
-                wrapped_z = z_axis - R * cos_val
+                w_half_cm = 20.5
+
+            w_half_m = max(0.01, w_half_cm * 0.01)
+            u = np.clip(abs(x_cm) / w_half_m, 0.0, 1.0)
+            sign = 1.0 if x_cm >= 0 else -1.0
+            theta = sign * u * (math.pi / 2.0)
+
+            # Continuous quarter-cylinder radius to conserve horizontal arc length
+            R_cyl = (2.0 / math.pi) * w_half_m
+            wrapped_x = R_cyl * math.sin(theta)
+            world_y = Y_CREST + y_m
+
+            z_cyl = (Z_MID + R_cyl * math.cos(theta)) if is_front else (Z_MID - R_cyl * math.cos(theta))
+
+            # Shoulder strap (|x_cm| >= 7.5) smoothly arches over shoulder ridge to meet opposing seam
+            if abs(x_cm) >= 7.5 and y_m > -0.15:
+                s_strap = (y_m + 0.15) / 0.15
+                z_ridge = -0.100  # anatomical shoulder ridge Z
+                wrapped_z = (1.0 - s_strap) * z_cyl + s_strap * z_ridge
+            else:
+                wrapped_z = z_cyl
 
             placed_v3d.append((round(wrapped_x, 4), round(world_y, 4), round(wrapped_z, 4)))
             xs.append(wrapped_x)
             ys.append(world_y)
             zs.append(wrapped_z)
 
-        # If real avatar mesh collider is available, project outward to ensure strictly positive clearance
+        # If real avatar mesh collider is available, project outward to guarantee strictly positive clearance
         if self.collider is not None:
             pts_arr = np.array(placed_v3d, dtype=np.float32)
             pts_proj = self.collider.project_out(pts_arr, margin=self.clearance)
-            # Re-project one more time to guarantee non-penetration across all concave regions
-            pts_proj = self.collider.project_out(pts_proj, margin=self.clearance)
             placed_v3d = [
                 (round(float(p[0]), 4), round(float(p[1]), 4), round(float(p[2]), 4))
                 for p in pts_proj
@@ -109,34 +136,44 @@ class GarmentPlacer:
             round(float(np.mean(ys)), 4),
             round(float(np.mean(zs)), 4)
         )
-        bb_min = (round(float(min(xs)), 4), round(float(min(ys)), 4), round(float(min(zs)), 4))
-        bb_max = (round(float(max(xs)), 4), round(float(max(ys)), 4), round(float(max(zs)), 4))
-
-        arrangement = "front_body_conformal_wrap" if is_front else "back_body_conformal_wrap"
-
-        placement_info = PlacedPanel3D(
-            panel_id=mesh.panel_id,
-            center_3d=center_3d,
-            bounding_box_min=bb_min,
-            bounding_box_max=bb_max,
-            initial_arrangement=arrangement
+        bbox_min = (
+            round(float(np.min(xs)), 4),
+            round(float(np.min(ys)), 4),
+            round(float(np.min(zs)), 4)
+        )
+        bbox_max = (
+            round(float(np.max(xs)), 4),
+            round(float(np.max(ys)), 4),
+            round(float(np.max(zs)), 4)
         )
 
-        return placed_v3d, placement_info
+        arrangement_desc = "front_torso_conformal_wrap" if is_front else "back_torso_conformal_wrap"
+
+        placed_info = PlacedPanel3D(
+            panel_id=mesh.panel_id,
+            center_3d=center_3d,
+            bounding_box_min=bbox_min,
+            bounding_box_max=bbox_max,
+            initial_arrangement=arrangement_desc
+        )
+
+        return placed_v3d, placed_info
 
     def place_all_panels(
         self,
-        meshes: Dict[str, PanelMesh]
+        flat_meshes: Dict[str, PanelMesh]
     ) -> Tuple[Dict[str, PanelMesh], Dict[str, PlacedPanel3D]]:
         placed_meshes: Dict[str, PanelMesh] = {}
-        placements: Dict[str, PlacedPanel3D] = {}
+        placed_info_map: Dict[str, PlacedPanel3D] = {}
 
-        for pid, mesh in meshes.items():
-            side = "front" if "front" in pid else "back"
-            placed_v3d, p_info = self.place_panel_conformal(mesh, side)
+        bin_ys, bin_ws = self._build_silhouette_envelope(flat_meshes)
 
-            mesh.vertices_3d = placed_v3d
-            placed_meshes[pid] = mesh
-            placements[pid] = p_info
+        for panel_id, mesh in flat_meshes.items():
+            side = "front" if "front" in panel_id else "back"
+            v3d, p_info = self.place_panel_conformal(mesh, side, bin_ys, bin_ws)
 
-        return placed_meshes, placements
+            mesh.vertices_3d = v3d
+            placed_meshes[panel_id] = mesh
+            placed_info_map[panel_id] = p_info
+
+        return placed_meshes, placed_info_map

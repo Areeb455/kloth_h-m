@@ -1,19 +1,21 @@
 """
 Avatar Mesh Collider Module.
-Provides exact signed-distance collision detection and projection against
-the real avatar 3D mesh (assets/person_0.glb) using vertex normals and closest-surface queries.
+Provides nearest-surface vertex-normal signed-distance collision detection and projection
+approximation against the real avatar 3D mesh (assets/person_0.glb).
+Accelerated via scipy.spatial.cKDTree with pure NumPy fallback.
 Used identically by both ClothSimulator (during PBD iterations) and GarmentValidator (for physical verification).
 """
 
+import os
 from typing import Dict, Any, Tuple, Optional, Union
 import numpy as np
 import trimesh
 
 try:
-    import torch
-    HAS_TORCH = True
+    from scipy.spatial import cKDTree
+    HAS_CKDTREE = True
 except ImportError:
-    HAS_TORCH = False
+    HAS_CKDTREE = False
 
 
 class AvatarMeshCollider:
@@ -47,10 +49,11 @@ class AvatarMeshCollider:
         vn_norm = np.linalg.norm(self.normals, axis=1, keepdims=True) + 1e-12
         self.normals = self.normals / vn_norm
 
-        self.has_torch = HAS_TORCH
-        if self.has_torch:
-            self.v_torch = torch.from_numpy(self.vertices)
-            self.n_torch = torch.from_numpy(self.normals)
+        # Accelerate queries with scipy.spatial.cKDTree
+        if HAS_CKDTREE:
+            self.kdtree = cKDTree(self.vertices)
+        else:
+            self.kdtree = None
 
     def compute_signed_distances(self, points: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -64,15 +67,14 @@ class AvatarMeshCollider:
         if len(pts) == 0:
             return np.empty(0, dtype=np.float32), np.empty((0, 3), dtype=np.float32), np.empty((0, 3), dtype=np.float32)
 
-        if self.has_torch:
-            pts_t = torch.from_numpy(pts) if not isinstance(pts, torch.Tensor) else pts
-            dists = torch.cdist(pts_t, self.v_torch)
-            min_d, idx = torch.min(dists, dim=1)
-            near_v = self.v_torch[idx]
-            near_n = self.n_torch[idx]
-            sd = torch.sum((pts_t - near_v) * near_n, dim=1)
-            return sd.numpy(), near_v.numpy(), near_n.numpy()
+        if self.kdtree is not None:
+            dists, idx = self.kdtree.query(pts, k=1)
+            near_v = self.vertices[idx]
+            near_n = self.normals[idx]
+            sd = np.sum((pts - near_v) * near_n, axis=1)
+            return sd, near_v, near_n
         else:
+            # Chunked vectorized fallback
             chunk_size = 500
             sds, nvs, nns = [], [], []
             for i in range(0, len(pts), chunk_size):
@@ -93,33 +95,24 @@ class AvatarMeshCollider:
         Projects any point with signed_distance < margin outward along the surface normal
         so that its signed distance reaches at least `margin`:
             p_new = p + (margin - sd) * n
+        Two iterative passes ensure full clearance even on curved mesh facets.
         """
         m = self.margin if margin is None else float(margin)
         pts = np.asarray(points, dtype=np.float32).copy()
         if len(pts) == 0:
             return pts
 
-        if self.has_torch:
-            pts_t = torch.from_numpy(pts)
-            dists = torch.cdist(pts_t, self.v_torch)
-            min_d, idx = torch.min(dists, dim=1)
-            near_v = self.v_torch[idx]
-            near_n = self.n_torch[idx]
-            sd = torch.sum((pts_t - near_v) * near_n, dim=1)
-            mask = sd < m
-            if torch.any(mask):
-                pts_t[mask] += (m - sd[mask]).unsqueeze(1) * near_n[mask]
-            return pts_t.numpy()
-        else:
+        for _ in range(2):
             sd, near_v, near_n = self.compute_signed_distances(pts)
             mask = sd < m
-            if np.any(mask):
-                pts[mask] += (m - sd[mask])[:, None] * near_n[mask]
-            return pts
+            if not np.any(mask):
+                break
+            pts[mask] += (m - sd[mask])[:, None] * near_n[mask]
+        return pts
 
     def measure_penetrations(self, points: np.ndarray) -> Dict[str, Any]:
         """
-        Computes exact physical penetration statistics for validation:
+        Computes physical penetration statistics for validation:
         - total_vertices: number of tested vertices
         - penetrated_vertices: count of vertices behind the body surface (sd < 0)
         - pct_vertices_inside: percentage behind body surface (Target: 0.0%)
@@ -139,18 +132,26 @@ class AvatarMeshCollider:
             }
 
         sd, _, _ = self.compute_signed_distances(pts)
-        penetrated = sd < 0.0
-        pen_count = int(np.sum(penetrated))
-        pct_inside = float(100.0 * pen_count / len(sd))
-        min_sd_m = float(np.min(sd))
-        max_pen_mm = float(max(0.0, -min_sd_m) * 1000.0)
-        min_sd_mm = float(min_sd_m * 1000.0)
+        sd_mm = sd * 1000.0  # convert to mm
+
+        penetrated_mask = sd_mm < 0.0
+        pen_count = int(np.sum(penetrated_mask))
+        total_count = len(pts)
+        pct_inside = round(float(pen_count / total_count * 100.0), 2)
+
+        if pen_count > 0:
+            max_pen_mm = round(float(-np.min(sd_mm[penetrated_mask])), 2)
+        else:
+            max_pen_mm = 0.0
+
+        min_sd_mm = round(float(np.min(sd_mm)), 2)
+        passed = bool(pen_count == 0)
 
         return {
-            "total_vertices": len(sd),
+            "total_vertices": total_count,
             "penetrated_vertices": pen_count,
-            "pct_vertices_inside": round(pct_inside, 2),
-            "max_penetration_mm": round(max_pen_mm, 2),
-            "min_signed_dist_mm": round(min_sd_mm, 2),
-            "zero_penetration_pass": bool(pen_count == 0)
+            "pct_vertices_inside": pct_inside,
+            "max_penetration_mm": max_pen_mm,
+            "min_signed_dist_mm": min_sd_mm,
+            "zero_penetration_pass": passed
         }

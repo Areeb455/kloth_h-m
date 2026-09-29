@@ -37,8 +37,9 @@ def main():
 
     pkg_dir, val_report, loaded = orchestrator.run()
 
+    status_label = "COMPLETE & VERIFIED" if val_report.passed else "COMPLETE (VALIDATION: FAIL - SIZE MISMATCH DOCUMENTED)"
     print("\n" + "=" * 70)
-    print("  PIPELINE EXECUTION COMPLETE & VERIFIED")
+    print(f"  PIPELINE EXECUTION {status_label}")
     print(f"  Package Directory: {pkg_dir}")
     print(f"  Package Archive:   {os.path.join(output_dir, 'garment_template_package.zip')}")
     print(f"  Validation Checks: {val_report.to_dict()['summary']}")

@@ -4,9 +4,10 @@
   "measurement_criteria_source": "H&M How to Measure Guide (Chest over fullest bust, Waist at narrowest point, Low Hip around fullest part)",
   "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78)",
   "primary_base_size": "XS",
-  "supported_sizes": ["XXS", "XS", "S"],
+  "supported_sizes": ["XXS", "XS", "S", "M", "L"],
   "source_breakdown": {
-    "XXS_to_S": "Directly extracted from the reviewer-provided H&M size chart screenshot (REGULAR XXS-S)."
+    "XXS_to_S": "Directly extracted from the reviewer-provided H&M size chart screenshot (REGULAR XXS-S).",
+    "M_to_L": "Directly extracted from the user-provided H&M size chart screenshot (REGULAR M-XL)."
   },
   "sizes": {
     "XXS": {
@@ -85,6 +86,58 @@
         "front_length": 90.0,
         "back_length": 92.0,
         "shoulder_width": 33.5
+      }
+    },
+    "M": {
+      "eur_size": 40,
+      "uk_size": 12,
+      "source": "user_screenshot",
+      "raw_ranges": {
+        "chest": "90-98",
+        "waist": "74-82.5",
+        "low_hip": "94.5-100.5",
+        "inside_leg": "75"
+      },
+      "body_measurements_cm": {
+        "chest": 90.0,
+        "waist": 74.0,
+        "low_hip": 94.5,
+        "inside_leg": 75.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 94.0,
+        "waist_circ": 80.0,
+        "hip_circ": 101.5,
+        "hem_circ": 124.0,
+        "front_length": 91.0,
+        "back_length": 93.0,
+        "shoulder_width": 35.0
+      }
+    },
+    "L": {
+      "eur_size": 44,
+      "uk_size": 16,
+      "source": "user_screenshot",
+      "raw_ranges": {
+        "chest": "98-107",
+        "waist": "82.5-93",
+        "low_hip": "100.5-107.5",
+        "inside_leg": "77"
+      },
+      "body_measurements_cm": {
+        "chest": 98.0,
+        "waist": 82.5,
+        "low_hip": 100.5,
+        "inside_leg": 77.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 102.0,
+        "waist_circ": 88.5,
+        "hip_circ": 107.5,
+        "hem_circ": 130.0,
+        "front_length": 92.0,
+        "back_length": 94.0,
+        "shoulder_width": 36.5
       }
     }
   },

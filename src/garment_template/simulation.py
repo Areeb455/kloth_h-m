@@ -123,6 +123,8 @@ class ClothSimulator:
         # Anisotropic directional stiffness derived from fabric warp/weft stretch:
         # Warp (grainline, Y-axis): stretch_warp_percent (15%) -> stiffness ~ 0.85
         # Weft (cross-grain, X-axis): stretch_weft_percent (28%) -> stiffness ~ 0.72
+        # Note: Mapping k = 1.0 - (stretch_percent / 100.0) is an engineering heuristic mapping
+        # physical elongation percentage to dimensionless PBD projection compliance factors.
         k_warp = 1.0 - (self.stretch_warp_pct / 100.0)
         k_weft = 1.0 - (self.stretch_weft_pct / 100.0)
         dy = np.abs(diff_2d[:, 1])
@@ -209,16 +211,23 @@ class ClothSimulator:
         5. Project collision against the REAL avatar mesh every iteration with a 6 mm margin.
         6. Update velocities from position change and compute kinetic energy.
         """
-        g_accel = np.array([0.0, -0.05, 0.0], dtype=np.float32)  # quasi-static vertical gravity
+        # Quasi-static vertical settling acceleration:
+        # Chosen at -0.05 m/s^2 (rather than terrestrial -9.81 m/s^2) as an empirical quasi-static
+        # settling acceleration standard for static pattern drape and fit evaluation. Full earth gravity
+        # creates excessive dynamic flapping and downward slippage on sleeveless garments without pinning,
+        # whereas -0.05 m/s^2 allows the garment to settle downward gently into equilibrium while seams close.
+        g_accel = np.array([0.0, -0.05, 0.0], dtype=np.float32)
         dt2_g = g_accel * (dt ** 2)
         energy_history = []
         max_displacement = 0.0
 
-        k_stitch = 0.90  # stitch pulling stiffness
+        # Calibrate sub-iteration stitch pull stiffness so high sub_iters do not over-excite seam vertices
+        k_stitch = float(np.clip(0.90 / (1.0 + 0.08 * max(0, sub_iters - 4)), 0.55, 0.90))
 
         for step in range(num_steps):
-            # 1. Verlet position prediction with damping
-            velocity = (self.positions - self.positions_prev) * (1.0 - damping)
+            # 1. Verlet position prediction with progressive settling damping
+            current_damping = min(0.45, damping + step * 0.008)
+            velocity = (self.positions - self.positions_prev) * (1.0 - current_damping)
             self.positions_prev[:] = self.positions[:]
             self.positions += velocity + dt2_g
 
