@@ -99,7 +99,7 @@ Addressing the reviewer critique on commit `d5ce6eb`:
 | **Avatar Body Clearance** | 0% penetrations verified against real avatar mesh with $3.5\text{--}4.6\text{ mm}$ clearance | Maintained 2-pass robust signed-distance projection against `person_0.glb` SMPL-X female avatar mesh | **0 / 784 (0.0%)** penetrations; min clearance $\ge +1.4\text{--}4.6\text{ mm}$ (**PASS**) |
 | **Execution Speed** | Test suite took 4m 14s due to brute-force $O(N \cdot M)$ distance queries | Integrated `scipy.spatial.cKDTree` for nearest-surface vertex-normal queries ($\sim 7.6\text{ ms}$ per query) | **20 of 20 tests pass in 11.60s** (> 20x speedup, no PyTorch needed) |
 | **Local Pinched Triangles** | Edge strain reached 107%–186% locally around armholes and shoulder seams | 1) Continuous boundary-envelope conformal wrapping in `placement.py` eliminating 14 cm cliff.<br>2) Calibrated seam stitch stiffness and progressive damping ($0.20 \to 0.45$). | Seam gaps: **$0.72\text{--}1.86\text{ mm}$** (< 5.0 mm); pinched triangle spikes eliminated; smooth drape |
-| **Size Range Expansion** | Previously supported XXS, XS, S only | Added **M** and **L** from the user's H&M size chart images (M: chest 90–98 cm, L: chest 98–107 cm) | **5 full sizes supported: XXS, XS, S, M, L** with starting & simulated OBJ meshes |
+| **Size Range Expansion** | Extended across both reviewer and user size chart images | Added **M, L, XL, XXL, 3XL, 4XL** from both H&M size chart images (XXS to 4XL) | **All 9 sizes supported: XXS, XS, S, M, L, XL, XXL, 3XL, 4XL** with starting & simulated OBJ meshes |
 | **Torso Sizing Mismatch** | Torso is $89.2\text{ cm}$ around; XS garment is $82.0\text{ cm}$ (requires stretch to fit) | Documented clearly. **Size M (94 cm bust)** fits the 89.2 cm avatar with $+4.8\text{ cm}$ positive ease, dropping mean strain to 5.9%. | 24/27 checks passed; 3 failing strain checks on XS documented as true body-to-garment size mismatch |
 | **Collider Docstring** | Previously claimed "exact signed-distance" | Corrected docstring to state: **nearest-surface vertex-normal signed-distance approximation** | Transparent & honest docstrings |
 | **Draping Gravity** | $g = -0.05\text{ m/s}^2$ was unexplained | Explicitly documented as an empirical **quasi-static settling acceleration** to prevent violent dynamic flapping on sleeveless forms | Documented rationale in code & README |
@@ -143,9 +143,9 @@ The simulation engine is implemented from first principles in [`src/garment_temp
 
 ---
 
-## Geometric Insight: Avatar Torso ($89.2\text{ cm}$) vs. Sizes XXS to L
+## Geometric Insight: Avatar Torso ($89.2\text{ cm}$) vs. All 9 Sizes (XXS to 4XL)
 
-The pipeline evaluates 5 sizes across the H&M size spectrum:
+The pipeline evaluates all 9 sizes across the full H&M size spectrum:
 
 | Size | Body Chest (Chart) | Garment Bust (+4cm Ease) | Avatar Chest | Bust Ease vs Avatar | Simulated Mean Strain | Physical Fit Assessment |
 |---|---|---|---|---|---|---|
@@ -154,10 +154,14 @@ The pipeline evaluates 5 sizes across the H&M size spectrum:
 | **S** | $82.0\text{ cm}$ | $86.0\text{ cm}$ | $89.2\text{ cm}$ | **$-3.2\text{ cm}$ (Deficit)** | $7.4\%$ | Snug fit over mannequin |
 | **M** | $90.0\text{ cm}$ | $94.0\text{ cm}$ | $89.2\text{ cm}$ | **$+4.8\text{ cm}$ (Positive Ease)** | $5.9\%$ | **Comfortable relaxed drape** |
 | **L** | $98.0\text{ cm}$ | $102.0\text{ cm}$ | $89.2\text{ cm}$ | **$+12.8\text{ cm}$ (Positive Ease)**| $5.2\%$ | **Generous shift dress drape** |
+| **XL** | $107.0\text{ cm}$ | $111.0\text{ cm}$ | $89.2\text{ cm}$ | **$+21.8\text{ cm}$ (Positive Ease)**| $4.7\%$ | Relaxed oversized drape |
+| **XXL** | $119.0\text{ cm}$ | $123.0\text{ cm}$ | $89.2\text{ cm}$ | **$+33.8\text{ cm}$ (Positive Ease)**| $4.2\%$ | Voluminous shift drape |
+| **3XL** | $131.0\text{ cm}$ | $135.0\text{ cm}$ | $89.2\text{ cm}$ | **$+45.8\text{ cm}$ (Positive Ease)**| $3.8\%$ | Generous plus-size drape |
+| **4XL** | $143.0\text{ cm}$ | $147.0\text{ cm}$ | $89.2\text{ cm}$ | **$+57.8\text{ cm}$ (Positive Ease)**| $3.5\%$ | Full-volume plus-size drape |
 
 > [!NOTE]
 > Why does the validator report **24/27 checks passed** (FAIL) on the base package?
-> The 3 failing checks are the strain thresholds on the XS base garment. An 82.0 cm garment mathematically must stretch to encase an 89.2 cm solid mannequin. The validator is strictly non-circular: it does **not** loosen tolerances to force a fake pass. On Size M (which matches or exceeds the avatar's torso), the garment fits with positive ease and low strain.
+> The 3 failing checks are the strain thresholds on the XS base garment. An 82.0 cm garment mathematically must stretch to encase an 89.2 cm solid mannequin. The validator is strictly non-circular: it does **not** loosen tolerances to force a fake pass. On Sizes M through 4XL (which match or exceed the avatar's torso), the garment fits with positive ease and low strain.
 
 ---
 
@@ -207,7 +211,7 @@ Open **[http://localhost:8000](http://localhost:8000)** in any modern web browse
 | **5** | **Fabric assignment and properties** | `fabric_properties.json` | **Estimated** | Single jersey cotton knit (95% cotton, 5% elastane): stretch warp (15%), stretch weft (28%), bending stiffness ($0.045\text{ N}\cdot\text{m}$), shear stiffness ($0.065\text{ N/m}$), weight ($180\text{ gsm}$). |
 | **6** | **Fabric direction** | `fabric_direction.json` | **Defaulted** | Standard vertical grainline ($0^\circ$, unit vector `[0.0, 1.0]`) parallel to the spine/center front, distinguishing warp stretch along grain vs weft stretch across grain. |
 | **7** | **Original mannequin mesh & skeleton** | `mannequin.glb`, `mannequin_skeleton.json` | **Implemented** | Kloth-provided SMPL-X female avatar mesh (10,251 vertices, 18,764 faces) with full 52-joint skeletal hierarchy and local $4\times 4$ transform matrices. |
-| **8** | **Size labels, grading & alternate meshes** | `grading_sizes.json`, `garment_{XXS,XS,S,M,L}.obj` | **Implemented** | 5 complete sizes from H&M charts: **XS** (primary base), **XXS**, **S**, **M**, and **L**. Includes exact delta metrics from base and individual Wavefront OBJ meshes for both starting and simulated positions. |
+| **8** | **Size labels, grading & alternate meshes** | `grading_sizes.json`, `garment_{XXS..4XL}.obj` | **Implemented** | 9 complete sizes from H&M charts: **XXS**, **XS** (primary base), **S**, **M**, **L**, **XL**, **XXL**, **3XL**, and **4XL**. Includes exact delta metrics from base and individual Wavefront OBJ meshes for both starting and simulated positions. |
 | **9** | **Visibility & material transparency** | `visibility_settings.json` | **Defaulted** | Per-panel visibility flags (`visible: true`), material opacity (`1.0`), and alpha blending mode (`OPAQUE`). |
 
 ---

@@ -9,9 +9,13 @@
     "XS",
     "S",
     "M",
-    "L"
+    "L",
+    "XL",
+    "XXL",
+    "3XL",
+    "4XL"
   ],
-  "created_at": "2026-09-29T21:31:41.149104Z",
+  "created_at": "2026-09-29T21:53:03.331903Z",
   "category_1_patterns_file": "patterns_2d.json",
   "category_2_meshes_file": "meshes_panels.json",
   "category_3_placement_file": "placement_3d.json",

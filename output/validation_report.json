@@ -8,11 +8,11 @@
       "category": "3D Avatar Fit",
       "name": "3D Simulated Chest Perimeter Ease",
       "status": "PASS",
-      "details": "3D Mesh Chest Perimeter: 97.4 cm vs Avatar Body: 78.0 cm (3D Ease: +19.4 cm)",
+      "details": "3D Mesh Chest Perimeter: 97.9 cm vs Avatar Body: 78.0 cm (3D Ease: +19.9 cm)",
       "metrics": {
         "body_chest_cm": 78.0,
-        "mesh_3d_perimeter_cm": 97.4,
-        "ease_cm": 19.4
+        "mesh_3d_perimeter_cm": 97.9,
+        "ease_cm": 19.9
       }
     },
     {
@@ -41,10 +41,10 @@
       "category": "Cloth Simulation",
       "name": "Seam Assembly Gap (< 5 mm)",
       "status": "PASS",
-      "details": "Max residual seam gap: 1.85 mm, Average gap: 0.21 mm (Threshold: < 5.0 mm)",
+      "details": "Max residual seam gap: 0.02 mm, Average gap: 0.00 mm (Threshold: < 5.0 mm)",
       "metrics": {
-        "max_gap_mm": 1.85,
-        "avg_gap_mm": 0.21
+        "max_gap_mm": 0.02,
+        "avg_gap_mm": 0.0
       }
     },
     {
@@ -60,23 +60,23 @@
       "category": "Cloth Simulation",
       "name": "Simulation Equilibrium Settling",
       "status": "PASS",
-      "details": "Final kinetic energy: 0.000173 J, Max step displacement: 3.444 mm",
+      "details": "Final kinetic energy: 0.000075 J, Max step displacement: 0.784 mm",
       "metrics": {
-        "final_ke": 0.000173,
-        "max_displacement_mm": 3.444
+        "final_ke": 7.5e-05,
+        "max_displacement_mm": 0.784
       }
     },
     {
       "category": "Mannequin Fit",
       "name": "Avatar Real Mesh Non-Penetration",
       "status": "PASS",
-      "details": "Tested 789 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 1.45 mm, max penetration depth: 0.0 mm",
+      "details": "Tested 789 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 5.96 mm, max penetration depth: 0.0 mm",
       "metrics": {
         "total_vertices": 789,
         "penetrated_vertices": 0,
         "pct_vertices_inside": 0.0,
         "max_penetration_mm": 0.0,
-        "min_signed_dist_mm": 1.45,
+        "min_signed_dist_mm": 5.96,
         "zero_penetration_pass": true
       }
     },
@@ -84,33 +84,33 @@
       "category": "Edge Strain Preservation",
       "name": "front_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "front_panel per-edge stretch vs 2D rest: mean=18.72%, p95=64.44% (Limit: <= 15.0%), max=656.25% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
+      "details": "front_panel per-edge stretch vs 2D rest: mean=7.59%, p95=27.22% (Limit: <= 15.0%), max=115.34% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "mean_strain_pct": 18.72,
-        "p95_strain_pct": 64.44,
-        "max_strain_pct": 656.25
+        "mean_strain_pct": 7.59,
+        "p95_strain_pct": 27.22,
+        "max_strain_pct": 115.34
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_left_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_left_panel per-edge stretch vs 2D rest: mean=12.84%, p95=37.23% (Limit: <= 15.0%), max=852.91% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
+      "details": "back_left_panel per-edge stretch vs 2D rest: mean=8.80%, p95=32.33% (Limit: <= 15.0%), max=215.75% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "mean_strain_pct": 12.84,
-        "p95_strain_pct": 37.23,
-        "max_strain_pct": 852.91
+        "mean_strain_pct": 8.8,
+        "p95_strain_pct": 32.33,
+        "max_strain_pct": 215.75
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_right_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_right_panel per-edge stretch vs 2D rest: mean=11.34%, p95=27.26% (Limit: <= 15.0%), max=346.67% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
+      "details": "back_right_panel per-edge stretch vs 2D rest: mean=8.07%, p95=31.30% (Limit: <= 15.0%), max=203.86% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "mean_strain_pct": 11.34,
-        "p95_strain_pct": 27.26,
-        "max_strain_pct": 346.67
+        "mean_strain_pct": 8.07,
+        "p95_strain_pct": 31.3,
+        "max_strain_pct": 203.86
       }
     },
     {

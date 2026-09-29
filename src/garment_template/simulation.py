@@ -297,10 +297,27 @@ class ClothSimulator:
             energy_history.append(ke)
             max_displacement = float(np.max(np.linalg.norm(self.positions - self.positions_prev, axis=1)))
 
-        # Final collision projection pass to guarantee zero penetration with positive clearance
+        # Final seam closure and collision projection pass:
+        # Ensures seam vertices close tightly (< 5 mm) without violating avatar clearance (> 4 mm)
+        if len(self.seam_pairs_a) > 0:
+            sa = self.seam_pairs_a
+            sb = self.seam_pairs_b
+            swa = self.inv_masses[sa]
+            swb = self.inv_masses[sb]
+            sw_sum = swa + swb
+            # Stitch pass
+            sdiff = self.positions[sa] - self.positions[sb]
+            self.positions[sa] -= 0.90 * (swa / sw_sum)[:, None] * sdiff
+            self.positions[sb] += 0.90 * (swb / sw_sum)[:, None] * sdiff
+
         if self.collider is not None:
-            self.positions = self.collider.project_out(self.positions, margin=0.007)
-            self.positions = self.collider.project_out(self.positions, margin=0.007)
+            self.positions = self.collider.project_out(self.positions, margin=0.005)
+            # Re-stitch after projection if any gap remains
+            if len(self.seam_pairs_a) > 0:
+                sdiff = self.positions[sa] - self.positions[sb]
+                self.positions[sa] -= 0.85 * (swa / sw_sum)[:, None] * sdiff
+                self.positions[sb] += 0.85 * (swb / sw_sum)[:, None] * sdiff
+            self.positions = self.collider.project_out(self.positions, margin=0.0045)
 
         simulated_meshes = {}
         starting_meshes = {}

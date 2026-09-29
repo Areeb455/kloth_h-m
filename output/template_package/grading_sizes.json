@@ -5,7 +5,11 @@
     "XS",
     "S",
     "M",
-    "L"
+    "L",
+    "XL",
+    "XXL",
+    "3XL",
+    "4XL"
   ],
   "size_meshes": {
     "XXS": {
@@ -122,6 +126,98 @@
       "mesh_obj_filename": "garment_L.obj",
       "vertex_count": 1013,
       "face_count": 1948
+    },
+    "XL": {
+      "size_label": "XL",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 111.0,
+        "waist_circ": 99.0,
+        "hip_circ": 114.5,
+        "hem_circ": 138.0,
+        "front_length": 93.0,
+        "back_length": 95.0,
+        "shoulder_width": 38.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 29.0,
+        "waist_delta_cm": 29.0,
+        "hip_delta_cm": 24.5,
+        "hem_delta_cm": 28.0,
+        "length_delta_cm": 5.0
+      },
+      "mesh_obj_filename": "garment_XL.obj",
+      "vertex_count": 1114,
+      "face_count": 2150
+    },
+    "XXL": {
+      "size_label": "XXL",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 123.0,
+        "waist_circ": 111.0,
+        "hip_circ": 124.5,
+        "hem_circ": 148.0,
+        "front_length": 94.0,
+        "back_length": 96.0,
+        "shoulder_width": 40.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 41.0,
+        "waist_delta_cm": 41.0,
+        "hip_delta_cm": 34.5,
+        "hem_delta_cm": 38.0,
+        "length_delta_cm": 6.0
+      },
+      "mesh_obj_filename": "garment_XXL.obj",
+      "vertex_count": 1205,
+      "face_count": 2332
+    },
+    "3XL": {
+      "size_label": "3XL",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 135.0,
+        "waist_circ": 123.5,
+        "hip_circ": 135.0,
+        "hem_circ": 158.0,
+        "front_length": 95.0,
+        "back_length": 97.0,
+        "shoulder_width": 42.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 53.0,
+        "waist_delta_cm": 53.5,
+        "hip_delta_cm": 45.0,
+        "hem_delta_cm": 48.0,
+        "length_delta_cm": 7.0
+      },
+      "mesh_obj_filename": "garment_3XL.obj",
+      "vertex_count": 1333,
+      "face_count": 2588
+    },
+    "4XL": {
+      "size_label": "4XL",
+      "is_base_size": false,
+      "dimensions_cm": {
+        "bust_circ": 147.0,
+        "waist_circ": 137.5,
+        "hip_circ": 147.0,
+        "hem_circ": 168.0,
+        "front_length": 96.0,
+        "back_length": 98.0,
+        "shoulder_width": 44.0
+      },
+      "deltas_from_base": {
+        "bust_delta_cm": 65.0,
+        "waist_delta_cm": 67.5,
+        "hip_delta_cm": 57.0,
+        "hem_delta_cm": 58.0,
+        "length_delta_cm": 8.0
+      },
+      "mesh_obj_filename": "garment_4XL.obj",
+      "vertex_count": 1471,
+      "face_count": 2864
     }
   }
 }
