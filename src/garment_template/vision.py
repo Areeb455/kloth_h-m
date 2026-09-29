@@ -86,19 +86,26 @@ class GarmentVisionAnalyzer:
         shoulder_span_cm = round(shoulder_span_px * px_to_cm, 1)
 
         # 3. Armhole Drop & Underarm Chest Width (Inflection Point)
+        # Search below the neckline opening where the torso is solid, finding the local maximum
+        # where the armhole curves outward before tapering inward toward the waist.
         row_widths = []
-        for r in range(y_top, y_top + int(0.40 * garment_height_px)):
+        min_search_r = y_top + max(front_neck_depth_px, int(0.12 * garment_height_px))
+        max_search_r = y_top + int(0.35 * garment_height_px)
+        for r in range(min_search_r, max_search_r):
             xs = np.where(mask[r, :])[0]
             if len(xs) > 0:
                 row_widths.append((r - y_top, int(xs[-1] - xs[0])))
 
-        w_values = [w for _, w in row_widths]
-        # Armhole opening widens to the underarm corner at the base of the armhole (~20-30% height)
-        underarm_idx = int(np.argmax(w_values[:int(0.30 * garment_height_px)]))
+        if row_widths:
+            # Underarm inflection point: maximum width before waist tapering starts
+            best_row = max(row_widths, key=lambda it: it[1])
+            armhole_depth_px = best_row[0]
+            w_chest_px = best_row[1]
+        else:
+            armhole_depth_px = int(0.18 * garment_height_px)
+            w_chest_px = int(0.35 * garment_width_px)
 
-        armhole_depth_px = row_widths[underarm_idx][0]
         armhole_depth_cm = round(armhole_depth_px * px_to_cm, 1)
-        w_chest_px = row_widths[underarm_idx][1]
         w_chest_cm = round(w_chest_px * px_to_cm, 1)
 
         # 4. Waist, Hip, and Hem Widths
@@ -128,21 +135,21 @@ class GarmentVisionAnalyzer:
             "silhouette_ratios": {
                 "waist_to_chest": round(w_waist_px / max(1, w_chest_px), 3),
                 "hem_to_chest": round(w_hem_px / max(1, w_chest_px), 3),
-                "is_straight_shift": bool(0.95 <= (w_waist_px / max(1, w_chest_px)) <= 1.05)
+                "is_bodycon": bool((w_waist_px / max(1, w_chest_px)) < 0.95)
             },
             "data_provenance": {
                 "measured_from_image": [
                     f"front_neck_depth ({front_neck_depth_cm} cm - inner neckband scoop contour)",
-                    f"shoulder_span ({shoulder_span_cm} cm - top contour peak)",
+                    f"shoulder_span ({shoulder_span_cm} cm - top contour peak across tank straps)",
                     f"armhole_depth ({armhole_depth_cm} cm - underarm silhouette inflection point)",
-                    f"flat_chest_width ({w_chest_cm} cm - underarm width)",
+                    f"flat_chest_width ({w_chest_cm} cm - underarm width across flat garment)",
                     f"flat_waist_width ({round(w_waist_px * px_to_cm, 1)} cm - mid-torso row width)",
                     f"flat_hip_width ({round(w_hip_px * px_to_cm, 1)} cm - pelvic row width)",
                     f"flat_hem_width ({round(w_hem_px * px_to_cm, 1)} cm - bottom hem row width)"
                 ],
                 "assumed_parameters": [
-                    f"total_garment_length ({target_garment_length_cm} cm reference scale for knee-length shift dress)",
-                    "back_neck_depth (3.0 cm standard high back collar drop)",
+                    f"total_garment_length ({target_garment_length_cm} cm reference scale for maxi bodycon dress)",
+                    "back_neck_depth (measured from back catalog image if present, else 3.0 cm)",
                     "center_back_seam (AI-inferred from back image seam line)"
                 ]
             }
@@ -165,6 +172,9 @@ class GarmentVisionAnalyzer:
                 back_neck_depth_ratio = (neck_b_y - y_b_top) / back_h_px
                 back_neck_depth_cm = round(back_neck_depth_ratio * target_garment_length_cm, 1)
                 measurements["proportions_cm"]["back_neck_depth"] = back_neck_depth_cm
+                measurements["data_provenance"]["measured_from_image"].append(
+                    f"back_neck_depth ({back_neck_depth_cm} cm - scoop back neckline contour)"
+                )
 
         return measurements
 

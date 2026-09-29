@@ -78,7 +78,7 @@ class GradingEngine:
                 mesh_collider=self.collider,
                 torso_profile_fn=self.torso_profile_fn
             )
-            sim_res = sim.simulate(num_steps=40, sub_iters=4, dt=0.01)
+            sim_res = sim.simulate(num_steps=45, sub_iters=4, dt=0.01)
             simulated_meshes = sim_res.simulated_meshes
 
             all_size_meshes[size_label] = simulated_meshes

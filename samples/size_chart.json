@@ -16,7 +16,7 @@
       "bust": 2.0,
       "waist": 3.0,
       "hip": 4.0,
-      "rationale": "Soft stretch jersey bodycon dress (89% poly / 11% elastane) is designed for a body-contouring slim silhouette with minimal ease relying on high elastane stretch."
+      "rationale": "Soft stretch jersey bodycon dress (89% poly / 11% elastane) relies on negative ease in its unstretched flat state (flat chest width 28.7 cm vs body 78 cm; -20.6 cm negative ease flat). The size chart values (80 cm bust) specify 3D finished drape circumference with minimal +2 cm structural ease."
     },
     "length_specifications_cm": {
       "front_length": 118.0,
@@ -27,7 +27,7 @@
     "shoulder_specifications_cm": {
       "base_shoulder_width": 29.0,
       "shoulder_grade_increment": 1.0,
-      "rationale": "Wide tank shoulder straps set slightly narrower than total shoulder span (23.5 cm peak-to-peak measured from flat studio imagery)."
+      "rationale": "Narrow tank shoulder straps (~3.0 cm width) set slightly narrower than total shoulder span (23.5 cm peak-to-peak measured from flat studio imagery)."
     }
   },
   "sizes": {

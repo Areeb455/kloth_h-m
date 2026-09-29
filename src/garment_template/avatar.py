@@ -117,11 +117,12 @@ class AvatarProcessor:
 
         landmarks = {
             "top_head_y": float(y_max),
-            "shoulder_y": float(y_min + 0.81 * h),   # ~1.30 m
-            "chest_y": float(y_min + 0.73 * h),      # ~1.17 m
-            "waist_y": float(y_min + 0.62 * h),      # ~1.00 m
-            "hip_y": float(y_min + 0.52 * h),        # ~0.84 m
-            "knee_y": float(y_min + 0.28 * h),       # ~0.45 m
+            "shoulder_crest_y": float(y_min + 0.849 * h),  # ~1.365 m (true surface crest at neck base/shoulder ridge)
+            "shoulder_y": float(y_min + 0.81 * h),         # ~1.30 m (clavicle joint level)
+            "chest_y": float(y_min + 0.73 * h),            # ~1.17 m
+            "waist_y": float(y_min + 0.62 * h),            # ~1.00 m
+            "hip_y": float(y_min + 0.52 * h),              # ~0.84 m
+            "knee_y": float(y_min + 0.28 * h),             # ~0.45 m
             "floor_y": float(y_min)
         }
         return landmarks

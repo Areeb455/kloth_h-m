@@ -317,7 +317,35 @@ class ClothSimulator:
                 sdiff = self.positions[sa] - self.positions[sb]
                 self.positions[sa] -= 0.85 * (swa / sw_sum)[:, None] * sdiff
                 self.positions[sb] += 0.85 * (swb / sw_sum)[:, None] * sdiff
-            self.positions = self.collider.project_out(self.positions, margin=0.0045)
+
+            # Post-stitch structural edge relaxation: smoothly distributes seam pull
+            # into neighboring mesh rings instead of concentrating strain on adjacent single edges
+            for _ in range(2):
+                if len(self.edge_indices) > 0:
+                    ia = self.edge_indices[:, 0]
+                    ib = self.edge_indices[:, 1]
+                    diff = self.positions[ia] - self.positions[ib]
+                    dist = np.linalg.norm(diff, axis=1)
+                    valid = dist > 1e-6
+                    C = dist - self.edge_rest_lengths
+                    dir_norm = np.zeros_like(diff)
+                    dir_norm[valid] = diff[valid] / dist[valid, None]
+                    wa = self.inv_masses[ia]
+                    wb = self.inv_masses[ib]
+                    w_sum = wa + wb
+                    delta_mag = self.edge_stiffness * (C / w_sum)
+                    d_accum = np.zeros_like(self.positions)
+                    np.add.at(d_accum, ia, - (wa * delta_mag)[:, None] * dir_norm)
+                    np.add.at(d_accum, ib, + (wb * delta_mag)[:, None] * dir_norm)
+                    self.positions += d_accum / self.valences[:, None]
+
+                # Maintain seam closure
+                if len(self.seam_pairs_a) > 0:
+                    sdiff = self.positions[sa] - self.positions[sb]
+                    self.positions[sa] -= 0.50 * (swa / sw_sum)[:, None] * sdiff
+                    self.positions[sb] += 0.50 * (swb / sw_sum)[:, None] * sdiff
+
+                self.positions = self.collider.project_out(self.positions, margin=0.0045)
 
         simulated_meshes = {}
         starting_meshes = {}

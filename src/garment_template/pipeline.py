@@ -58,18 +58,19 @@ class PipelineOrchestrator:
         torso_fn = ap.get_torso_profile_at_y
         mesh_collider = AvatarMeshCollider(self.avatar_glb_path, margin=0.006)
 
-        print("[2/11] Analyzing garment imagery via Computer Vision (front.jpg & back.jpg)...")
-        vision = GarmentVisionAnalyzer(self.front_image_path, self.back_image_path)
-        vision_meas = vision.extract_silhouette_measurements(target_garment_length_cm=88.0)
-        vp = vision_meas["proportions_cm"]
-        print(f"       Vision: Neck dip={vp['neck_depth']}cm, Shoulder={vp['shoulder_span']}cm, Armhole={vp['armhole_depth']}cm, Chest={vp['flat_chest_width']}cm")
-
-        print("[3/11] Parsing size chart and applying ease allowances (XXS, XS, S)...")
+        print("[2/11] Parsing size chart and applying ease allowances (XXS, XS, S)...")
         sizing = SizingEngine(self.size_chart_path)
         base_size = sizing.primary_base_size
         base_dims = sizing.get_garment_dimensions(base_size)
         body_meas = sizing.sizes_data[base_size]["body_measurements_cm"]
         print(f"       Base size '{base_size}' garment dimensions: {base_dims}")
+
+        print("[3/11] Analyzing garment imagery via Computer Vision (front.jpg & back.jpg)...")
+        vision = GarmentVisionAnalyzer(self.front_image_path, self.back_image_path)
+        target_len = float(base_dims.get("front_length", 118.0))
+        vision_meas = vision.extract_silhouette_measurements(target_garment_length_cm=target_len)
+        vp = vision_meas["proportions_cm"]
+        print(f"       Vision: Neck dip={vp['neck_depth']}cm, Shoulder={vp['shoulder_span']}cm, Armhole={vp['armhole_depth']}cm, Chest={vp['flat_chest_width']}cm")
 
         print("[4/11] Generating continuous 2D shift patterns guided by vision proportions (Category 1)...")
         pat_gen = PatternGenerator(base_dims, vision_proportions=vp)
@@ -96,7 +97,7 @@ class PipelineOrchestrator:
             mesh_collider=mesh_collider,
             torso_profile_fn=torso_fn
         )
-        sim_result = simulator.simulate(num_steps=40, sub_iters=4, dt=0.01)
+        sim_result = simulator.simulate(num_steps=45, sub_iters=4, dt=0.01)
         simulated_meshes = sim_result.simulated_meshes
         sim_metrics = sim_result.metrics
         print(f"       Simulation: Max seam gap={sim_metrics['max_seam_gap_mm']}mm, Penetrations={sim_metrics['avatar_penetrations']} ({sim_metrics['pct_vertices_inside']}%), Strain p95={sim_metrics['edge_strain_p95_pct']}%, Settled={sim_metrics['settled']}")

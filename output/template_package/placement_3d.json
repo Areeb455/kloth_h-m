@@ -3,17 +3,17 @@
     "panel_id": "front_panel",
     "center_3d": [
       -0.0001,
-      0.6734,
-      0.0642
+      0.7268,
+      0.0637
     ],
     "bounding_box_min": [
-      -0.1841,
-      0.113,
-      -0.0513
+      -0.179,
+      0.1757,
+      -0.092
     ],
     "bounding_box_max": [
-      0.1803,
-      1.3145,
+      0.1761,
+      1.3657,
       0.11
     ],
     "initial_arrangement": "front_body_conformal_wrap"
@@ -22,37 +22,37 @@
     "panel_id": "back_left_panel",
     "center_3d": [
       -0.0952,
-      0.6696,
-      -0.1954
+      0.7241,
+      -0.1968
     ],
     "bounding_box_min": [
       -0.1745,
-      0.103,
+      0.1657,
       -0.24
     ],
     "bounding_box_max": [
       0.0,
-      1.3299,
-      -0.0566
+      1.3662,
+      -0.115
     ],
     "initial_arrangement": "back_body_conformal_wrap"
   },
   "back_right_panel": {
     "panel_id": "back_right_panel",
     "center_3d": [
-      0.1012,
-      0.6747,
-      -0.1929
+      0.1007,
+      0.7271,
+      -0.1942
     ],
     "bounding_box_min": [
       0.0,
-      0.103,
+      0.1657,
       -0.24
     ],
     "bounding_box_max": [
       0.1745,
-      1.3305,
-      -0.0578
+      1.3657,
+      -0.115
     ],
     "initial_arrangement": "back_body_conformal_wrap"
   }

@@ -26,7 +26,7 @@ class GarmentPlacer:
         mesh_collider: Optional[AvatarMeshCollider] = None
     ):
         self.landmarks = landmarks
-        self.shoulder_y = landmarks.get("shoulder_y", 1.33)
+        self.shoulder_y = landmarks.get("shoulder_crest_y", landmarks.get("shoulder_y", 1.365))
         self.torso_profile_fn = torso_profile_fn or self._default_torso_profile
         self.collider = mesh_collider
         self.clearance = 0.007  # 7 mm clearance
@@ -77,18 +77,22 @@ class GarmentPlacer:
 
             wrapped_x = R * math.sin(theta)
 
-            # Shoulder strap crest wrap: for y_cm near top (>-14 cm)
-            # Curves over the shoulder crest toward z_axis so shoulder seam starts close
-            sh_factor = 0.0
-            if y_cm > -14.0:
-                sh_factor = (y_cm + 14.0) / 14.0
-
-            cos_val = math.cos(theta) * (1.0 - 0.90 * sh_factor)
+            # Shoulder strap crest wrap: smoothly curves toward the shoulder ridge (Z ~ -0.105 m)
+            # Front panel remains strictly anterior (Z >= -0.095 m)
+            # Back panel remains strictly posterior (Z <= -0.115 m)
+            # This completely prevents vertices from crossing into the opposing hemisphere
+            sh_factor = max(0.0, min(1.0, (y_cm + 12.0) / 9.0))
 
             if is_front:
-                wrapped_z = z_axis + R * cos_val
+                base_z = z_axis + R * math.cos(theta)
+                target_sh_z = -0.092
+                wrapped_z = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
+                wrapped_z = max(wrapped_z, -0.095)
             else:
-                wrapped_z = z_axis - R * cos_val
+                base_z = z_axis - R * math.cos(theta)
+                target_sh_z = -0.118
+                wrapped_z = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
+                wrapped_z = min(wrapped_z, -0.115)
 
             placed_v3d.append((round(wrapped_x, 4), round(world_y, 4), round(wrapped_z, 4)))
             xs.append(wrapped_x)

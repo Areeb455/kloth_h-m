@@ -8,21 +8,21 @@
       "category": "3D Avatar Fit",
       "name": "3D Simulated Chest Perimeter Ease",
       "status": "PASS",
-      "details": "3D Mesh Chest Perimeter: 96.9 cm vs Avatar Body: 78.0 cm (3D Ease: +18.9 cm)",
+      "details": "3D Mesh Chest Perimeter: 95.5 cm vs Avatar Body: 78.0 cm (3D Ease: +17.5 cm)",
       "metrics": {
         "body_chest_cm": 78.0,
-        "mesh_3d_perimeter_cm": 96.9,
-        "ease_cm": 18.9
+        "mesh_3d_perimeter_cm": 95.5,
+        "ease_cm": 17.5
       }
     },
     {
       "category": "Vision Verification",
       "name": "Front Neckline Depth Match",
       "status": "PASS",
-      "details": "Pattern Neckline Dip: 10.4 cm vs Vision: 10.4 cm (\u0394: 0.0 cm <= 1.5 cm)",
+      "details": "Pattern Neckline Dip: 13.9 cm vs Vision: 13.9 cm (\u0394: 0.0 cm <= 1.5 cm)",
       "metrics": {
-        "pattern_neck_cm": 10.4,
-        "vision_neck_cm": 10.4,
+        "pattern_neck_cm": 13.9,
+        "vision_neck_cm": 13.9,
         "delta_cm": 0.0
       }
     },
@@ -30,21 +30,21 @@
       "category": "Vision Verification",
       "name": "Chest Width Image Consistency",
       "status": "FAIL",
-      "details": "Image-derived: 21.4 cm vs Pattern: 40.0 cm (\u0394: 18.6 cm <= 4.0 cm)",
+      "details": "Image-derived: 28.7 cm vs Pattern: 40.0 cm (\u0394: 11.3 cm <= 4.0 cm)",
       "metrics": {
-        "image_width_cm": 21.4,
+        "image_width_cm": 28.7,
         "pattern_width_cm": 40.0,
-        "delta_cm": 18.6
+        "delta_cm": 11.3
       }
     },
     {
       "category": "Cloth Simulation",
       "name": "Seam Assembly Gap (< 5 mm)",
       "status": "PASS",
-      "details": "Max residual seam gap: 0.02 mm, Average gap: 0.01 mm (Threshold: < 5.0 mm)",
+      "details": "Max residual seam gap: 3.40 mm, Average gap: 1.33 mm (Threshold: < 5.0 mm)",
       "metrics": {
-        "max_gap_mm": 0.02,
-        "avg_gap_mm": 0.01
+        "max_gap_mm": 3.4,
+        "avg_gap_mm": 1.33
       }
     },
     {
@@ -60,23 +60,23 @@
       "category": "Cloth Simulation",
       "name": "Simulation Equilibrium Settling",
       "status": "PASS",
-      "details": "Final kinetic energy: 0.000085 J, Max step displacement: 2.934 mm",
+      "details": "Final kinetic energy: 0.000056 J, Max step displacement: 1.641 mm",
       "metrics": {
-        "final_ke": 8.5e-05,
-        "max_displacement_mm": 2.934
+        "final_ke": 5.6e-05,
+        "max_displacement_mm": 1.641
       }
     },
     {
       "category": "Mannequin Fit",
       "name": "Avatar Real Mesh Non-Penetration",
       "status": "PASS",
-      "details": "Tested 1052 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 5.45 mm, max penetration depth: 0.0 mm",
+      "details": "Tested 1037 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 4.49 mm, max penetration depth: 0.0 mm",
       "metrics": {
-        "total_vertices": 1052,
+        "total_vertices": 1037,
         "penetrated_vertices": 0,
         "pct_vertices_inside": 0.0,
         "max_penetration_mm": 0.0,
-        "min_signed_dist_mm": 5.45,
+        "min_signed_dist_mm": 4.49,
         "zero_penetration_pass": true
       }
     },
@@ -84,49 +84,49 @@
       "category": "Edge Strain Preservation",
       "name": "front_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "front_panel per-edge stretch vs 2D rest: mean=6.81%, p95=24.81% (Limit: <= 15.0%), max=113.98% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
+      "details": "front_panel per-edge stretch vs 2D rest: mean=5.58%, p95=21.10% (Limit: <= 15.0%), max=58.64% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "mean_strain_pct": 6.81,
-        "p95_strain_pct": 24.81,
-        "max_strain_pct": 113.98
+        "mean_strain_pct": 5.58,
+        "p95_strain_pct": 21.1,
+        "max_strain_pct": 58.64
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_left_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_left_panel per-edge stretch vs 2D rest: mean=7.97%, p95=28.56% (Limit: <= 15.0%), max=381.02% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
+      "details": "back_left_panel per-edge stretch vs 2D rest: mean=5.84%, p95=20.31% (Limit: <= 15.0%), max=118.94% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "mean_strain_pct": 7.97,
-        "p95_strain_pct": 28.56,
-        "max_strain_pct": 381.02
+        "mean_strain_pct": 5.84,
+        "p95_strain_pct": 20.31,
+        "max_strain_pct": 118.94
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_right_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_right_panel per-edge stretch vs 2D rest: mean=7.05%, p95=23.09% (Limit: <= 15.0%), max=169.17% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
+      "details": "back_right_panel per-edge stretch vs 2D rest: mean=5.45%, p95=18.66% (Limit: <= 15.0%), max=77.01% [Geometric mismatch: Size XS garment (82 cm bust) cannot fit 89.2 cm avatar torso without elastic strain]",
       "metrics": {
-        "mean_strain_pct": 7.05,
-        "p95_strain_pct": 23.09,
-        "max_strain_pct": 169.17
+        "mean_strain_pct": 5.45,
+        "p95_strain_pct": 18.66,
+        "max_strain_pct": 77.01
       }
     },
     {
       "category": "Mesh Topology",
       "name": "front_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 1026 face indices within [0, 531]",
+      "details": "All 1010 face indices within [0, 523]",
       "metrics": {
-        "face_count": 1026
+        "face_count": 1010
       }
     },
     {
       "category": "Mesh Topology",
       "name": "front_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 1026",
+      "details": "Found 0 degenerate faces out of 1010",
       "metrics": {
         "degenerate_count": 0
       }
@@ -135,16 +135,16 @@
       "category": "Mesh Topology",
       "name": "back_left_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 518 face indices within [0, 268]",
+      "details": "All 512 face indices within [0, 265]",
       "metrics": {
-        "face_count": 518
+        "face_count": 512
       }
     },
     {
       "category": "Mesh Topology",
       "name": "back_left_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 518",
+      "details": "Found 0 degenerate faces out of 512",
       "metrics": {
         "degenerate_count": 0
       }
@@ -153,16 +153,16 @@
       "category": "Mesh Topology",
       "name": "back_right_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 482 face indices within [0, 250]",
+      "details": "All 474 face indices within [0, 246]",
       "metrics": {
-        "face_count": 482
+        "face_count": 474
       }
     },
     {
       "category": "Mesh Topology",
       "name": "back_right_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 482",
+      "details": "Found 0 degenerate faces out of 474",
       "metrics": {
         "degenerate_count": 0
       }
@@ -223,10 +223,10 @@
       "category": "Sewing Integrity",
       "name": "seam_center_back - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 109.8 cm, Len B: 109.8 cm (ratio: 1.00)",
+      "details": "Len A: 106.3 cm, Len B: 106.3 cm (ratio: 1.00)",
       "metrics": {
-        "length_a": 109.8,
-        "length_b": 109.8,
+        "length_a": 106.3,
+        "length_b": 106.3,
         "ratio": 1.0
       }
     },
@@ -244,10 +244,10 @@
       "category": "Sewing Integrity",
       "name": "seam_side_right - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 105.44 cm, Len B: 107.43 cm (ratio: 0.98)",
+      "details": "Len A: 100.88 cm, Len B: 102.87 cm (ratio: 0.98)",
       "metrics": {
-        "length_a": 105.44,
-        "length_b": 107.43,
+        "length_a": 100.88,
+        "length_b": 102.87,
         "ratio": 0.981
       }
     },
@@ -265,10 +265,10 @@
       "category": "Sewing Integrity",
       "name": "seam_side_left - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 105.44 cm, Len B: 107.43 cm (ratio: 0.98)",
+      "details": "Len A: 100.88 cm, Len B: 102.87 cm (ratio: 0.98)",
       "metrics": {
-        "length_a": 105.44,
-        "length_b": 107.43,
+        "length_a": 100.88,
+        "length_b": 102.87,
         "ratio": 0.981
       }
     },
