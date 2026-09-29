@@ -27,8 +27,8 @@
         "length_delta_cm": -2.0
       },
       "mesh_obj_filename": "garment_XXS.obj",
-      "vertex_count": 750,
-      "face_count": 1412
+      "vertex_count": 754,
+      "face_count": 1430
     },
     "XS": {
       "size_label": "XS",
@@ -50,8 +50,8 @@
         "length_delta_cm": 0.0
       },
       "mesh_obj_filename": "garment_XS.obj",
-      "vertex_count": 809,
-      "face_count": 1530
+      "vertex_count": 793,
+      "face_count": 1508
     },
     "S": {
       "size_label": "S",
@@ -73,8 +73,8 @@
         "length_delta_cm": 2.0
       },
       "mesh_obj_filename": "garment_S.obj",
-      "vertex_count": 886,
-      "face_count": 1684
+      "vertex_count": 869,
+      "face_count": 1660
     },
     "M": {
       "size_label": "M",
@@ -96,8 +96,8 @@
         "length_delta_cm": 4.0
       },
       "mesh_obj_filename": "garment_M.obj",
-      "vertex_count": 968,
-      "face_count": 1848
+      "vertex_count": 970,
+      "face_count": 1862
     }
   }
 }

@@ -6,7 +6,7 @@ with detailed geometric deltas relative to the primary base size (XS).
 """
 
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Callable
 import numpy as np
 
 from .models import GradingInfo, SizeMeshRef, SizeDeltas, PanelMesh
@@ -17,22 +17,26 @@ from .placement import GarmentPlacer
 
 
 class GradingEngine:
-    def __init__(self, sizing_engine: SizingEngine, landmarks: Dict[str, float]):
+    def __init__(
+        self,
+        sizing_engine: SizingEngine,
+        landmarks: Dict[str, float],
+        torso_profile_fn: Callable[[float], Dict[str, float]] = None,
+        vision_proportions: Dict[str, float] = None
+    ):
         self.sizing = sizing_engine
         self.landmarks = landmarks
+        self.torso_profile_fn = torso_profile_fn
+        self.vision_proportions = vision_proportions or {}
         self.base_size = self.sizing.primary_base_size
 
     def generate_size_meshes(
         self,
         output_dir: str
     ) -> Tuple[GradingInfo, Dict[str, Dict[str, PanelMesh]]]:
-        """
-        Generates 2D patterns, triangulates, conformally places around mannequin,
-        and exports OBJ mesh files for all supported sizes.
-        """
         os.makedirs(output_dir, exist_ok=True)
         mesher = PanelMesher(target_edge_length_cm=3.0)
-        placer = GarmentPlacer(self.landmarks)
+        placer = GarmentPlacer(self.landmarks, self.torso_profile_fn)
 
         all_size_meshes: Dict[str, Dict[str, PanelMesh]] = {}
         size_refs: Dict[str, SizeMeshRef] = {}
@@ -41,14 +45,14 @@ class GradingEngine:
             dims = self.sizing.get_garment_dimensions(size_label)
             deltas = self.sizing.get_grading_deltas(size_label, self.base_size)
 
-            # Generate 2D patterns for this size
-            p_gen = PatternGenerator(dims)
+            # Generate 2D patterns for this size incorporating vision proportions
+            p_gen = PatternGenerator(dims, self.vision_proportions)
             panels_2d = p_gen.generate_all_panels()
 
             # Triangulate
             flat_meshes = mesher.triangulate_all(panels_2d)
 
-            # 3D placement
+            # 3D placement wrapped around real torso cross-sections
             placed_meshes, _ = placer.place_all_panels(flat_meshes)
             all_size_meshes[size_label] = placed_meshes
 
@@ -77,12 +81,9 @@ class GradingEngine:
 
     @staticmethod
     def _export_unified_obj(placed_meshes: Dict[str, PanelMesh], obj_path: str) -> Tuple[int, int]:
-        """
-        Exports all panels of a size into a single unified Wavefront OBJ file with UVs and group tags.
-        """
         total_vertices = 0
         total_faces = 0
-        vertex_offset = 1  # OBJ is 1-indexed
+        vertex_offset = 1
 
         with open(obj_path, "w") as f:
             f.write("# Kloth Garment Template Generator - Exported OBJ\n")
@@ -91,16 +92,13 @@ class GradingEngine:
                 f.write(f"\ng {pid}\n")
                 f.write(f"usemtl Material_{pid}\n")
 
-                # Vertices (3D in meters)
                 for v in mesh.vertices_3d:
                     f.write(f"v {v[0]:.5f} {v[1]:.5f} {v[2]:.5f}\n")
                     total_vertices += 1
 
-                # UV texture coordinates
                 for uv in mesh.uvs:
                     f.write(f"vt {uv[0]:.5f} {uv[1]:.5f}\n")
 
-                # Faces (v/vt/vn format)
                 for face in mesh.faces:
                     i0 = face[0] + vertex_offset
                     i1 = face[1] + vertex_offset

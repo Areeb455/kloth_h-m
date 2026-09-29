@@ -6,9 +6,7 @@ Usage:
 
 import os
 import sys
-import json
 
-# Ensure project root is in python path
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
@@ -18,18 +16,22 @@ from src.garment_template.pipeline import PipelineOrchestrator
 def main():
     print("=" * 70)
     print("  KLOTH 3D GARMENT TEMPLATE GENERATOR")
-    print("  End-to-End Pipeline Execution")
+    print("  Vision-Guided Parametric Pipeline Execution")
     print("=" * 70)
 
     size_chart = os.path.join(ROOT_DIR, "samples", "size_chart.json")
     details = os.path.join(ROOT_DIR, "samples", "product_details.json")
     avatar_glb = os.path.join(ROOT_DIR, "assets", "person_0.glb")
+    front_img = os.path.join(ROOT_DIR, "samples", "front.jpg")
+    back_img = os.path.join(ROOT_DIR, "samples", "back.jpg")
     output_dir = os.path.join(ROOT_DIR, "output")
 
     orchestrator = PipelineOrchestrator(
         size_chart_path=size_chart,
         product_details_path=details,
         avatar_glb_path=avatar_glb,
+        front_image_path=front_img,
+        back_image_path=back_img,
         output_dir=output_dir
     )
 

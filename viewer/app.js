@@ -25,10 +25,9 @@ let templateData = {
 
 // Colors for 2D/3D panels
 const PANEL_COLORS = {
-  front_bodice: 0x3b82f6,
-  back_bodice: 0x8b5cf6,
-  front_skirt: 0x10b981,
-  back_skirt: 0xf59e0b
+  front_panel: 0x3b82f6,
+  back_left_panel: 0x8b5cf6,
+  back_right_panel: 0x10b981
 };
 
 // -------------------------------------------------------------
@@ -170,10 +169,9 @@ function loadGarmentMesh(size) {
           // Color per panel group
           let color = 0x60a5fa;
           const groupName = child.name.toLowerCase();
-          if (groupName.includes("front_bodice")) color = PANEL_COLORS.front_bodice;
-          else if (groupName.includes("back_bodice")) color = PANEL_COLORS.back_bodice;
-          else if (groupName.includes("front_skirt")) color = PANEL_COLORS.front_skirt;
-          else if (groupName.includes("back_skirt")) color = PANEL_COLORS.back_skirt;
+          if (groupName.includes("front_panel")) color = PANEL_COLORS.front_panel;
+          else if (groupName.includes("back_left")) color = PANEL_COLORS.back_left_panel;
+          else if (groupName.includes("back_right")) color = PANEL_COLORS.back_right_panel;
 
           child.material = new THREE.MeshStandardMaterial({
             color: color,
@@ -234,15 +232,14 @@ function render2DPatterns() {
   const h = rect.height;
   ctx.clearRect(0, 0, w, h);
 
-  // Layout 4 panels side by side in 2x2 grid
+  // Layout 3 continuous panels: Front on left, Back Left & Back Right on right
   const panelLayouts = [
-    { id: "front_bodice", label: "Front Bodice", cx: w * 0.28, cy: h * 0.32, color: "#3b82f6" },
-    { id: "back_bodice",  label: "Back Bodice",  cx: w * 0.72, cy: h * 0.32, color: "#8b5cf6" },
-    { id: "front_skirt",  label: "Front Skirt",  cx: w * 0.28, cy: h * 0.72, color: "#10b981" },
-    { id: "back_skirt",   label: "Back Skirt",   cx: w * 0.72, cy: h * 0.72, color: "#f59e0b" }
+    { id: "front_panel",      label: "Front Panel",      cx: w * 0.32, cy: h * 0.15, color: "#3b82f6" },
+    { id: "back_left_panel",  label: "Back Left Panel",  cx: w * 0.68, cy: h * 0.15, color: "#8b5cf6" },
+    { id: "back_right_panel", label: "Back Right Panel", cx: w * 0.86, cy: h * 0.15, color: "#10b981" }
   ];
 
-  const scale = 2.4; // cm to pixels
+  const scale = 1.35; // cm to screen pixels
 
   panelLayouts.forEach((pLayout) => {
     const pData = templateData.patterns[pLayout.id];
@@ -255,13 +252,13 @@ function render2DPatterns() {
     ctx.beginPath();
     pData.contour_points.forEach((pt, i) => {
       const px = pt.x * scale;
-      const py = -pt.y * scale; // Invert Y for screen coords
+      const py = -pt.y * scale; // Invert Y since negative Y is hem
       if (i === 0) ctx.moveTo(px, py);
       else ctx.lineTo(px, py);
     });
     ctx.closePath();
 
-    ctx.fillStyle = pLayout.color + "25"; // transparent fill
+    ctx.fillStyle = pLayout.color + "25";
     ctx.fill();
     ctx.strokeStyle = pLayout.color;
     ctx.lineWidth = 1.5;
@@ -272,8 +269,8 @@ function render2DPatterns() {
     ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
-    ctx.moveTo(0, -20);
-    ctx.lineTo(0, 20);
+    ctx.moveTo(0, 20);
+    ctx.lineTo(0, 80);
     ctx.stroke();
     ctx.setLineDash([]);
 
@@ -281,10 +278,10 @@ function render2DPatterns() {
     ctx.fillStyle = "#f8fafc";
     ctx.font = "10px Plus Jakarta Sans, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`${pLayout.label}`, 0, 35);
+    ctx.fillText(`${pLayout.label}`, 0, 105);
     ctx.fillStyle = "#94a3b8";
     ctx.font = "9px JetBrains Mono, monospace";
-    ctx.fillText(`${pData.width_cm} × ${pData.height_cm} cm`, 0, 48);
+    ctx.fillText(`${pData.width_cm} × ${pData.height_cm} cm`, 0, 118);
 
     ctx.restore();
   });

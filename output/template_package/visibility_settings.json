@@ -1,24 +1,18 @@
 {
-  "front_bodice": {
-    "panel_id": "front_bodice",
+  "front_panel": {
+    "panel_id": "front_panel",
     "visible": true,
     "opacity": 1.0,
     "alpha_mode": "OPAQUE"
   },
-  "back_bodice": {
-    "panel_id": "back_bodice",
+  "back_left_panel": {
+    "panel_id": "back_left_panel",
     "visible": true,
     "opacity": 1.0,
     "alpha_mode": "OPAQUE"
   },
-  "front_skirt": {
-    "panel_id": "front_skirt",
-    "visible": true,
-    "opacity": 1.0,
-    "alpha_mode": "OPAQUE"
-  },
-  "back_skirt": {
-    "panel_id": "back_skirt",
+  "back_right_panel": {
+    "panel_id": "back_right_panel",
     "visible": true,
     "opacity": 1.0,
     "alpha_mode": "OPAQUE"

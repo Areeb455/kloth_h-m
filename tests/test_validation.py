@@ -1,5 +1,5 @@
 """
-Validation Suite Tests: Tests individual checks on geometry, mesh, and seams.
+Validation Suite Tests: Tests individual checks on geometry, mesh, non-penetration, and seams.
 """
 
 import os
@@ -18,6 +18,7 @@ def base_garment_data():
     chart_path = os.path.join(test_root, "samples", "size_chart.json")
     sizing = SizingEngine(chart_path)
     dims = sizing.get_garment_dimensions("XS")
+    body_meas = sizing.sizes_data["XS"]["body_measurements_cm"]
     panels = PatternGenerator(dims).generate_all_panels()
     flat_meshes = PanelMesher(target_edge_length_cm=3.0).triangulate_all(panels)
     landmarks = {"waist_y": 1.0, "shoulder_y": 1.3}
@@ -25,6 +26,7 @@ def base_garment_data():
     sewing_conns = SewingEngine(panels, placed_meshes).generate_sewing_connections()
     return {
         "dims": dims,
+        "body_meas": body_meas,
         "panels": panels,
         "placed_meshes": placed_meshes,
         "sewing_conns": sewing_conns
@@ -33,22 +35,24 @@ def base_garment_data():
 
 def test_2d_panel_polygons_valid(base_garment_data):
     for pid, geo in base_garment_data["panels"].items():
-        assert geo.area_sq_cm > 100.0
+        assert geo.area_sq_cm > 500.0
         assert geo.width_cm > 0.0
         assert geo.height_cm > 0.0
-        assert len(geo.contour_points) >= 8
+        assert len(geo.contour_points) >= 6
 
 
 def test_mesh_has_no_degenerate_triangles(base_garment_data):
     validator = GarmentValidator(
-        base_garment_data["dims"],
-        base_garment_data["panels"],
-        base_garment_data["placed_meshes"],
-        base_garment_data["sewing_conns"]
+        body_measurements=base_garment_data["body_meas"],
+        garment_dimensions=base_garment_data["dims"],
+        vision_measurements={},
+        panels_2d=base_garment_data["panels"],
+        meshes=base_garment_data["placed_meshes"],
+        sewing_conns=base_garment_data["sewing_conns"]
     )
     report = validator.run_all_checks()
     degen_checks = [c for c in report.checks if "Non-Degenerate" in c["name"]]
-    assert len(degen_checks) == 4
+    assert len(degen_checks) == 3
     for c in degen_checks:
         assert c["status"] == "PASS"
 

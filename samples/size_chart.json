@@ -5,10 +5,15 @@
   "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78)",
   "primary_base_size": "XS",
   "supported_sizes": ["XXS", "XS", "S", "M"],
+  "source_breakdown": {
+    "XXS_to_S": "Directly extracted from the reviewer-provided H&M size chart screenshot (REGULAR XXS-S).",
+    "M": "Extrapolated from standard H&M Women's Size Guide (Chest 90-98, Waist 74-82, Low Hip 95-102)."
+  },
   "sizes": {
     "XXS": {
       "eur_size": 32,
       "uk_size": 4,
+      "source": "reviewer_screenshot",
       "raw_ranges": {
         "chest": "74-78",
         "waist": "62-64",
@@ -34,6 +39,7 @@
     "XS": {
       "eur_size": 34,
       "uk_size": 6,
+      "source": "reviewer_screenshot",
       "raw_ranges": {
         "chest": "78-82",
         "waist": "64-66",
@@ -59,6 +65,7 @@
     "S": {
       "eur_size": 36,
       "uk_size": 8,
+      "source": "reviewer_screenshot",
       "raw_ranges": {
         "chest": "82-90",
         "waist": "66-74",
@@ -84,6 +91,7 @@
     "M": {
       "eur_size": 40,
       "uk_size": 12,
+      "source": "hm_standard_extrapolation",
       "raw_ranges": {
         "chest": "90-98",
         "waist": "74-82",
@@ -114,6 +122,7 @@
     "rationale": "Moderate relaxed fit for single jersey knit with 15% stretch, allowing comfort without excessive baggy draping."
   },
   "length_assumptions": {
+    "front_length_source": "Assumed 88.0 cm base length for knee-length shift dress, as chart specifies inside leg rather than garment length.",
     "back_vs_front_delta_cm": 2.0,
     "rationale": "Back length is engineered 2.0 cm longer than front to account for the dorsal spinal curvature and shoulder slope."
   }

@@ -1,10 +1,11 @@
 """
 Parametric 2D Pattern Generation Module.
-Constructs unstretched 2D pattern panels in centimeters using Shapely polygons.
+Constructs continuous full-length 2D pattern panels in centimeters using Shapely polygons,
+guided directly by computer-vision silhouette proportions and size-chart dimensions.
 Implements Category 1: Original 2D pattern geometry.
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 import numpy as np
 from shapely.geometry import Polygon
 
@@ -12,28 +13,36 @@ from .models import Panel2DGeometry, BoundaryPoint2D
 
 
 class PatternGenerator:
-    def __init__(self, dimensions: Dict[str, float]):
+    def __init__(self, dimensions: Dict[str, float], vision_proportions: Optional[Dict[str, float]] = None):
         """
-        dimensions expects:
-        bust_circ, waist_circ, hip_circ, hem_circ, front_length, back_length, shoulder_width
+        dimensions: bust_circ, waist_circ, hip_circ, hem_circ, front_length, back_length, shoulder_width
+        vision_proportions: Optional measurements extracted directly from product photos by vision.py
         """
+        for k, v in dimensions.items():
+            if v is None or np.isnan(v) or v <= 0:
+                raise ValueError(f"Invalid dimension '{k}': {v}. Must be positive non-NaN number.")
         self.dims = dimensions
 
-        # Half-widths for front & back panels (since body is symmetric left/right)
+        # Proportions: Use image-measured proportions if provided, else sizing defaults
+        vp = vision_proportions or {}
+
+        # Front / back lengths
+        self.total_len_front = dimensions["front_length"]
+        self.total_len_back = dimensions["back_length"]
+
+        # Half widths (since body is symmetric left/right)
         self.w_bust = dimensions["bust_circ"] / 2.0
         self.w_waist = dimensions["waist_circ"] / 2.0
         self.w_hip = dimensions["hip_circ"] / 2.0
         self.w_hem = dimensions["hem_circ"] / 2.0
 
-        # Vertical proportions based on anatomical landmarks
-        self.bodice_len_front = 38.0
-        self.bodice_len_back = 40.0
-
-        self.skirt_len_front = max(20.0, dimensions["front_length"] - self.bodice_len_front)
-        self.skirt_len_back = max(20.0, dimensions["back_length"] - self.bodice_len_back)
+        # Incorporate image-measured neckline and armhole drops
+        self.neck_drop_front = vp.get("neck_depth", 8.5)
+        self.neck_drop_back = vp.get("back_neck_depth", 3.5)
+        self.armhole_drop = vp.get("armhole_depth", 22.0)
 
         self.shoulder_w = dimensions.get("shoulder_width", 32.0)
-        self.strap_w = 4.5  # Width of shoulder strap at top
+        self.neck_half_w = 8.5
 
     def _sample_bezier_curve(self, p0: Tuple[float, float], p1: Tuple[float, float],
                              p2: Tuple[float, float], num_pts: int = 8) -> List[Tuple[float, float]]:
@@ -46,257 +55,88 @@ class PatternGenerator:
             pts.append((round(float(bx), 3), round(float(by), 3)))
         return pts
 
-    def build_front_bodice(self) -> Panel2DGeometry:
+    def build_front_panel(self) -> Panel2DGeometry:
         """
-        Builds front upper bodice panel.
-        Origin (0,0) is at the center waist seam.
+        Builds the continuous, full-length Front Shift Dress Panel (no waist seam).
+        Origin (0,0) is at center top neck level; Y extends downward to -total_len_front.
         """
-        h = self.bodice_len_front
-        half_waist = self.w_waist / 2.0
-        half_bust = self.w_bust / 2.0
+        h = self.total_len_front
         half_shoulder = self.shoulder_w / 2.0
-
-        neck_drop = 12.0
-        neck_half_w = 9.0
-        armhole_drop = 18.0
-
-        # Construct boundary clockwise starting from center waist (0, 0)
-        points: List[Tuple[float, float]] = []
-        edges: Dict[str, List[int]] = {}
-
-        # 1. Waist seam (center waist to right waist)
-        idx_waist_start = len(points)
-        points.append((0.0, 0.0))
-        points.append((half_waist, 0.0))
-        idx_waist_end = len(points) - 1
-        edges["waist_right"] = [idx_waist_start, idx_waist_end]
-
-        # 2. Right side seam (right waist to right underarm)
-        idx_side_start = len(points) - 1
-        underarm_r = (half_bust, h - armhole_drop)
-        points.append(underarm_r)
-        idx_side_end = len(points) - 1
-        edges["side_seam_right"] = [idx_side_start, idx_side_end]
-
-        # 3. Right armhole (underarm to right shoulder outer)
-        idx_armhole_r_start = len(points) - 1
-        shoulder_outer_r = (half_shoulder, h - 2.5)
-        arm_ctrl_r = (half_bust * 0.85, h - armhole_drop * 0.5)
-        arm_pts_r = self._sample_bezier_curve(underarm_r, arm_ctrl_r, shoulder_outer_r, num_pts=8)[1:]
-        for p in arm_pts_r:
-            points.append(p)
-        idx_armhole_r_end = len(points) - 1
-        edges["armhole_right"] = [idx_armhole_r_start, idx_armhole_r_end]
-
-        # 4. Right shoulder seam (shoulder outer to shoulder inner / neck)
-        idx_shoulder_r_start = len(points) - 1
-        shoulder_inner_r = (neck_half_w, h)
-        points.append(shoulder_inner_r)
-        idx_shoulder_r_end = len(points) - 1
-        edges["shoulder_right"] = [idx_shoulder_r_start, idx_shoulder_r_end]
-
-        # 5. Front neckline (right neck to left neck through center front scoop)
-        idx_neck_start = len(points) - 1
-        neck_ctrl_r = (neck_half_w * 0.5, h - neck_drop)
-        neck_center = (0.0, h - neck_drop)
-        neck_ctrl_l = (-neck_half_w * 0.5, h - neck_drop)
-        shoulder_inner_l = (-neck_half_w, h)
-
-        pts_neck1 = self._sample_bezier_curve(shoulder_inner_r, neck_ctrl_r, neck_center, num_pts=7)[1:]
-        pts_neck2 = self._sample_bezier_curve(neck_center, neck_ctrl_l, shoulder_inner_l, num_pts=7)[1:]
-        for p in pts_neck1 + pts_neck2:
-            points.append(p)
-        idx_neck_end = len(points) - 1
-        edges["neckline"] = [idx_neck_start, idx_neck_end]
-
-        # 6. Left shoulder seam (left shoulder inner to outer)
-        idx_shoulder_l_start = len(points) - 1
-        shoulder_outer_l = (-half_shoulder, h - 2.5)
-        points.append(shoulder_outer_l)
-        idx_shoulder_l_end = len(points) - 1
-        edges["shoulder_left"] = [idx_shoulder_l_start, idx_shoulder_l_end]
-
-        # 7. Left armhole (shoulder outer to left underarm)
-        idx_armhole_l_start = len(points) - 1
-        underarm_l = (-half_bust, h - armhole_drop)
-        arm_ctrl_l = (-half_bust * 0.85, h - armhole_drop * 0.5)
-        arm_pts_l = self._sample_bezier_curve(shoulder_outer_l, arm_ctrl_l, underarm_l, num_pts=8)[1:]
-        for p in arm_pts_l:
-            points.append(p)
-        idx_armhole_l_end = len(points) - 1
-        edges["armhole_left"] = [idx_armhole_l_start, idx_armhole_l_end]
-
-        # 8. Left side seam (left underarm to left waist)
-        idx_side_l_start = len(points) - 1
-        points.append((-half_waist, 0.0))
-        idx_side_l_end = len(points) - 1
-        edges["side_seam_left"] = [idx_side_l_start, idx_side_l_end]
-
-        # 9. Left waist (left waist back to center waist)
-        idx_waist_l_start = len(points) - 1
-        edges["waist_left"] = [idx_waist_l_start, 0]
-
-        # Compute polygon metrics
-        poly = Polygon(points)
-        bounds = poly.bounds  # minx, miny, maxx, maxy
-        w = round(bounds[2] - bounds[0], 2)
-        ht = round(bounds[3] - bounds[1], 2)
-
-        return Panel2DGeometry(
-            panel_id="front_bodice",
-            panel_name="Front Upper Panel",
-            side="front",
-            category="bodice",
-            width_cm=w,
-            height_cm=ht,
-            area_sq_cm=round(poly.area, 2),
-            perimeter_cm=round(poly.length, 2),
-            contour_points=[BoundaryPoint2D(x=p[0], y=p[1]) for p in points],
-            edges=edges
-        )
-
-    def build_back_bodice(self) -> Panel2DGeometry:
-        """
-        Builds back upper bodice panel.
-        Origin (0,0) is at the center back waist.
-        Neck drop is shallower (4.0 cm vs 12.0 cm) as typical for crew necks.
-        """
-        h = self.bodice_len_back
-        half_waist = self.w_waist / 2.0
         half_bust = self.w_bust / 2.0
-        half_shoulder = self.shoulder_w / 2.0
-
-        neck_drop = 4.0  # Shallower back neckline
-        neck_half_w = 9.0
-        armhole_drop = 18.0
-
-        points: List[Tuple[float, float]] = []
-        edges: Dict[str, List[int]] = {}
-
-        # 1. Waist seam
-        idx_waist_start = len(points)
-        points.append((0.0, 0.0))
-        points.append((half_waist, 0.0))
-        idx_waist_end = len(points) - 1
-        edges["waist_right"] = [idx_waist_start, idx_waist_end]
-
-        # 2. Right side seam
-        idx_side_start = len(points) - 1
-        underarm_r = (half_bust, h - armhole_drop)
-        points.append(underarm_r)
-        idx_side_end = len(points) - 1
-        edges["side_seam_right"] = [idx_side_start, idx_side_end]
-
-        # 3. Right armhole
-        idx_armhole_r_start = len(points) - 1
-        shoulder_outer_r = (half_shoulder, h - 2.0)
-        arm_ctrl_r = (half_bust * 0.88, h - armhole_drop * 0.5)
-        arm_pts_r = self._sample_bezier_curve(underarm_r, arm_ctrl_r, shoulder_outer_r, num_pts=8)[1:]
-        for p in arm_pts_r:
-            points.append(p)
-        idx_armhole_r_end = len(points) - 1
-        edges["armhole_right"] = [idx_armhole_r_start, idx_armhole_r_end]
-
-        # 4. Right shoulder seam
-        idx_shoulder_r_start = len(points) - 1
-        shoulder_inner_r = (neck_half_w, h)
-        points.append(shoulder_inner_r)
-        idx_shoulder_r_end = len(points) - 1
-        edges["shoulder_right"] = [idx_shoulder_r_start, idx_shoulder_r_end]
-
-        # 5. Back neckline (shallower curve)
-        idx_neck_start = len(points) - 1
-        neck_center = (0.0, h - neck_drop)
-        shoulder_inner_l = (-neck_half_w, h)
-        pts_neck1 = self._sample_bezier_curve(shoulder_inner_r, (neck_half_w * 0.5, h - neck_drop * 0.8), neck_center, num_pts=7)[1:]
-        pts_neck2 = self._sample_bezier_curve(neck_center, (-neck_half_w * 0.5, h - neck_drop * 0.8), shoulder_inner_l, num_pts=7)[1:]
-        for p in pts_neck1 + pts_neck2:
-            points.append(p)
-        idx_neck_end = len(points) - 1
-        edges["neckline"] = [idx_neck_start, idx_neck_end]
-
-        # 6. Left shoulder seam
-        idx_shoulder_l_start = len(points) - 1
-        shoulder_outer_l = (-half_shoulder, h - 2.0)
-        points.append(shoulder_outer_l)
-        idx_shoulder_l_end = len(points) - 1
-        edges["shoulder_left"] = [idx_shoulder_l_start, idx_shoulder_l_end]
-
-        # 7. Left armhole
-        idx_armhole_l_start = len(points) - 1
-        underarm_l = (-half_bust, h - armhole_drop)
-        arm_ctrl_l = (-half_bust * 0.88, h - armhole_drop * 0.5)
-        arm_pts_l = self._sample_bezier_curve(shoulder_outer_l, arm_ctrl_l, underarm_l, num_pts=8)[1:]
-        for p in arm_pts_l:
-            points.append(p)
-        idx_armhole_l_end = len(points) - 1
-        edges["armhole_left"] = [idx_armhole_l_start, idx_armhole_l_end]
-
-        # 8. Left side seam
-        idx_side_l_start = len(points) - 1
-        points.append((-half_waist, 0.0))
-        idx_side_l_end = len(points) - 1
-        edges["side_seam_left"] = [idx_side_l_start, idx_side_l_end]
-
-        # 9. Left waist
-        idx_waist_l_start = len(points) - 1
-        edges["waist_left"] = [idx_waist_l_start, 0]
-
-        poly = Polygon(points)
-        bounds = poly.bounds
-        w = round(bounds[2] - bounds[0], 2)
-        ht = round(bounds[3] - bounds[1], 2)
-
-        return Panel2DGeometry(
-            panel_id="back_bodice",
-            panel_name="Back Upper Panel",
-            side="back",
-            category="bodice",
-            width_cm=w,
-            height_cm=ht,
-            area_sq_cm=round(poly.area, 2),
-            perimeter_cm=round(poly.length, 2),
-            contour_points=[BoundaryPoint2D(x=p[0], y=p[1]) for p in points],
-            edges=edges
-        )
-
-    def build_front_skirt(self) -> Panel2DGeometry:
-        """
-        Builds front lower skirt panel.
-        Origin (0,0) is at center top waist.
-        Y extends downward (negative Y) to hem: y = -skirt_len_front.
-        """
-        h = self.skirt_len_front
         half_waist = self.w_waist / 2.0
         half_hip = self.w_hip / 2.0
         half_hem = self.w_hem / 2.0
 
+        armhole_y = -self.armhole_drop
+        waist_y = -round(h * 0.45, 2)
+        hip_y = -round(h * 0.65, 2)
+        hem_y = -h
+
         points: List[Tuple[float, float]] = []
         edges: Dict[str, List[int]] = {}
 
-        # 1. Top waist seam (center waist to right waist)
-        points.append((0.0, 0.0))
-        points.append((half_waist, 0.0))
-        edges["waist_top_right"] = [0, 1]
+        # 1. Right shoulder (from neck inner to shoulder outer)
+        p_neck_inner_r = (self.neck_half_w, 0.0)
+        p_shoulder_outer_r = (half_shoulder, -2.5)
+        idx_sh_r_start = len(points)
+        points.append(p_neck_inner_r)
+        points.append(p_shoulder_outer_r)
+        edges["shoulder_right"] = [idx_sh_r_start, len(points) - 1]
 
-        # 2. Right side skirt seam (waist -> hip curve -> hem)
-        hip_y = -round(h * 0.35, 2)
+        # 2. Right armhole (shoulder outer to right underarm)
+        p_underarm_r = (half_bust, armhole_y)
+        ctrl_arm_r = (half_bust * 0.85, armhole_y * 0.5)
+        arm_pts_r = self._sample_bezier_curve(p_shoulder_outer_r, ctrl_arm_r, p_underarm_r, num_pts=8)[1:]
+        for p in arm_pts_r:
+            points.append(p)
+        edges["armhole_right"] = [len(points) - 1 - len(arm_pts_r), len(points) - 1]
+
+        # 3. Continuous Right Side Seam (underarm -> straight shift waist -> hip -> hem)
+        idx_side_r_start = len(points) - 1
+        points.append((half_waist, waist_y))
         points.append((half_hip, hip_y))
-        points.append((half_hem, -h))
-        edges["skirt_side_right"] = [1, 3]
+        points.append((half_hem, hem_y))
+        idx_side_r_end = len(points) - 1
+        edges["side_seam_right"] = [idx_side_r_start, idx_side_r_end]
 
-        # 3. Bottom hem seam (right hem to center hem to left hem)
-        points.append((0.0, -h - 1.0))  # subtle bottom hem curve
-        points.append((-half_hem, -h))
-        edges["hem"] = [3, 5]
+        # 4. Bottom Hem (right hem to left hem)
+        idx_hem_start = len(points) - 1
+        points.append((0.0, hem_y - 1.0))  # gentle bottom hem curve
+        points.append((-half_hem, hem_y))
+        idx_hem_end = len(points) - 1
+        edges["hem"] = [idx_hem_start, idx_hem_end]
 
-        # 4. Left side skirt seam (left hem -> hip curve -> left waist)
+        # 5. Continuous Left Side Seam (hem -> hip -> waist -> left underarm)
+        idx_side_l_start = len(points) - 1
         points.append((-half_hip, hip_y))
-        points.append((-half_waist, 0.0))
-        edges["skirt_side_left"] = [5, 7]
+        points.append((-half_waist, waist_y))
+        p_underarm_l = (-half_bust, armhole_y)
+        points.append(p_underarm_l)
+        idx_side_l_end = len(points) - 1
+        edges["side_seam_left"] = [idx_side_l_start, idx_side_l_end]
 
-        # 5. Top left waist seam back to center
-        edges["waist_top_left"] = [7, 0]
+        # 6. Left armhole (underarm to left shoulder outer)
+        p_shoulder_outer_l = (-half_shoulder, -2.5)
+        ctrl_arm_l = (-half_bust * 0.85, armhole_y * 0.5)
+        arm_pts_l = self._sample_bezier_curve(p_underarm_l, ctrl_arm_l, p_shoulder_outer_l, num_pts=8)[1:]
+        for p in arm_pts_l:
+            points.append(p)
+        edges["armhole_left"] = [idx_side_l_end, len(points) - 1]
+
+        # 7. Left shoulder (shoulder outer to neck inner)
+        p_neck_inner_l = (-self.neck_half_w, 0.0)
+        idx_sh_l_start = len(points) - 1
+        points.append(p_neck_inner_l)
+        edges["shoulder_left"] = [idx_sh_l_start, len(points) - 1]
+
+        # 8. Front scoop neckline (left neck inner to right neck inner)
+        idx_neck_start = len(points) - 1
+        neck_center = (0.0, -self.neck_drop_front)
+        pts_neck1 = self._sample_bezier_curve(p_neck_inner_l, (-self.neck_half_w * 0.5, -self.neck_drop_front), neck_center, num_pts=7)[1:]
+        pts_neck2 = self._sample_bezier_curve(neck_center, (self.neck_half_w * 0.5, -self.neck_drop_front), p_neck_inner_r, num_pts=7)[1:]
+        for p in pts_neck1 + pts_neck2[:-1]:  # omit last point as it closes to p_neck_inner_r
+            points.append(p)
+        edges["neckline"] = [idx_neck_start, 0]
 
         poly = Polygon(points)
         bounds = poly.bounds
@@ -304,10 +144,10 @@ class PatternGenerator:
         ht = round(bounds[3] - bounds[1], 2)
 
         return Panel2DGeometry(
-            panel_id="front_skirt",
-            panel_name="Front Lower Panel",
+            panel_id="front_panel",
+            panel_name="Front Shift Dress Panel",
             side="front",
-            category="skirt",
+            category="shift_dress",
             width_cm=w,
             height_cm=ht,
             area_sq_cm=round(poly.area, 2),
@@ -316,42 +156,122 @@ class PatternGenerator:
             edges=edges
         )
 
-    def build_back_skirt(self) -> Panel2DGeometry:
+    def build_back_panel(self, side_half: str) -> Panel2DGeometry:
         """
-        Builds back lower skirt panel.
-        Matches front skirt width with back-specific length.
+        Builds a full-length Back Panel half ('left' or 'right') joined along the center-back seam.
         """
-        h = self.skirt_len_back
+        is_right = (side_half == "right")
+        h = self.total_len_back
+        half_shoulder = self.shoulder_w / 2.0
+        half_bust = self.w_bust / 2.0
         half_waist = self.w_waist / 2.0
         half_hip = self.w_hip / 2.0
         half_hem = self.w_hem / 2.0
 
+        armhole_y = -self.armhole_drop
+        waist_y = -round(h * 0.45, 2)
+        hip_y = -round(h * 0.65, 2)
+        hem_y = -h
+
+        sign = 1.0 if is_right else -1.0
         points: List[Tuple[float, float]] = []
         edges: Dict[str, List[int]] = {}
 
-        # 1. Top waist seam
-        points.append((0.0, 0.0))
-        points.append((half_waist, 0.0))
-        edges["waist_top_right"] = [0, 1]
+        if is_right:
+            # Center back seam top (0, -neck_drop_back)
+            p_cb_top = (0.0, -self.neck_drop_back)
+            p_cb_bottom = (0.0, hem_y)
+            p_hem_outer = (half_hem, hem_y)
+            p_hip = (half_hip, hip_y)
+            p_waist = (half_waist, waist_y)
+            p_underarm = (half_bust, armhole_y)
+            p_sh_outer = (half_shoulder, -2.0)
+            p_neck_inner = (self.neck_half_w, 0.0)
 
-        # 2. Right side skirt seam
-        hip_y = -round(h * 0.35, 2)
-        points.append((half_hip, hip_y))
-        points.append((half_hem, -h))
-        edges["skirt_side_right"] = [1, 3]
+            # 1. Center Back Seam (top to bottom)
+            idx_cb_start = len(points)
+            points.append(p_cb_top)
+            points.append(p_cb_bottom)
+            edges["center_back_seam"] = [idx_cb_start, len(points) - 1]
 
-        # 3. Bottom hem seam
-        points.append((0.0, -h - 1.0))
-        points.append((-half_hem, -h))
-        edges["hem"] = [3, 5]
+            # 2. Hem
+            idx_hem_start = len(points) - 1
+            points.append(p_hem_outer)
+            edges["hem"] = [idx_hem_start, len(points) - 1]
 
-        # 4. Left side skirt seam
-        points.append((-half_hip, hip_y))
-        points.append((-half_waist, 0.0))
-        edges["skirt_side_left"] = [5, 7]
+            # 3. Continuous Side Seam
+            idx_side_start = len(points) - 1
+            points.append(p_hip)
+            points.append(p_waist)
+            points.append(p_underarm)
+            edges["side_seam_right"] = [idx_side_start, len(points) - 1]
 
-        # 5. Top left waist seam
-        edges["waist_top_left"] = [7, 0]
+            # 4. Armhole
+            arm_pts = self._sample_bezier_curve(p_underarm, (half_bust * 0.88, armhole_y * 0.5), p_sh_outer, num_pts=8)[1:]
+            for p in arm_pts:
+                points.append(p)
+            edges["armhole_right"] = [len(points) - 1 - len(arm_pts), len(points) - 1]
+
+            # 5. Shoulder Seam
+            idx_sh_start = len(points) - 1
+            points.append(p_neck_inner)
+            edges["shoulder_right"] = [idx_sh_start, len(points) - 1]
+
+            # 6. Back neckline to center top
+            pts_neck = self._sample_bezier_curve(p_neck_inner, (self.neck_half_w * 0.5, -self.neck_drop_back), p_cb_top, num_pts=6)[1:-1]
+            for p in pts_neck:
+                points.append(p)
+            edges["neckline"] = [len(points) - 1, 0]
+
+            panel_id = "back_right_panel"
+            panel_name = "Back Right Shift Panel"
+        else:
+            # Left half of back
+            p_cb_top = (0.0, -self.neck_drop_back)
+            p_cb_bottom = (0.0, hem_y)
+            p_hem_outer = (-half_hem, hem_y)
+            p_hip = (-half_hip, hip_y)
+            p_waist = (-half_waist, waist_y)
+            p_underarm = (-half_bust, armhole_y)
+            p_sh_outer = (-half_shoulder, -2.0)
+            p_neck_inner = (-self.neck_half_w, 0.0)
+
+            # 1. Back Neckline from center top to left neck inner
+            idx_neck_start = len(points)
+            points.append(p_cb_top)
+            pts_neck = self._sample_bezier_curve(p_cb_top, (-self.neck_half_w * 0.5, -self.neck_drop_back), p_neck_inner, num_pts=6)[1:]
+            for p in pts_neck:
+                points.append(p)
+            edges["neckline"] = [idx_neck_start, len(points) - 1]
+
+            # 2. Shoulder Seam
+            idx_sh_start = len(points) - 1
+            points.append(p_sh_outer)
+            edges["shoulder_left"] = [idx_sh_start, len(points) - 1]
+
+            # 3. Armhole
+            arm_pts = self._sample_bezier_curve(p_sh_outer, (-half_bust * 0.88, armhole_y * 0.5), p_underarm, num_pts=8)[1:]
+            for p in arm_pts:
+                points.append(p)
+            edges["armhole_left"] = [len(points) - 1 - len(arm_pts), len(points) - 1]
+
+            # 4. Continuous Side Seam
+            idx_side_start = len(points) - 1
+            points.append(p_waist)
+            points.append(p_hip)
+            points.append(p_hem_outer)
+            edges["side_seam_left"] = [idx_side_start, len(points) - 1]
+
+            # 5. Hem to center back bottom
+            idx_hem_start = len(points) - 1
+            points.append(p_cb_bottom)
+            edges["hem"] = [idx_hem_start, len(points) - 1]
+
+            # 6. Center Back Seam (bottom back to top)
+            edges["center_back_seam"] = [len(points) - 1, 0]
+
+            panel_id = "back_left_panel"
+            panel_name = "Back Left Shift Panel"
 
         poly = Polygon(points)
         bounds = poly.bounds
@@ -359,10 +279,10 @@ class PatternGenerator:
         ht = round(bounds[3] - bounds[1], 2)
 
         return Panel2DGeometry(
-            panel_id="back_skirt",
-            panel_name="Back Lower Panel",
+            panel_id=panel_id,
+            panel_name=panel_name,
             side="back",
-            category="skirt",
+            category="shift_dress",
             width_cm=w,
             height_cm=ht,
             area_sq_cm=round(poly.area, 2),
@@ -372,10 +292,9 @@ class PatternGenerator:
         )
 
     def generate_all_panels(self) -> Dict[str, Panel2DGeometry]:
-        """Generates all 4 parametric garment panels."""
+        """Generates continuous full-length panels matching the real garment."""
         return {
-            "front_bodice": self.build_front_bodice(),
-            "back_bodice": self.build_back_bodice(),
-            "front_skirt": self.build_front_skirt(),
-            "back_skirt": self.build_back_skirt()
+            "front_panel": self.build_front_panel(),
+            "back_left_panel": self.build_back_panel(side_half="left"),
+            "back_right_panel": self.build_back_panel(side_half="right")
         }

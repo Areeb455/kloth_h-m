@@ -2,61 +2,54 @@
   "product_name": "Sleeveless Jersey Shift Dress",
   "brand": "H&M",
   "category": "Women's Dresses",
-  "fit": "Regular fit",
-  "neckline": "Round neckline (crew neck)",
+  "product_reference_url": "https://www2.hm.com/en_in/productpage.1143896001.html",
+  "fit": "Regular straight shift fit",
+  "neckline": "Round scoop neckline",
   "sleeves": "Sleeveless with bound armholes",
-  "silhouette": "Gentle A-line shift silhouette",
-  "length": "Knee length / calf length",
-  "composition": {
-    "material": "Cotton single jersey blend",
-    "cotton_percent": 95,
-    "elastane_percent": 5
+  "silhouette": "Straight shift A-line silhouette (continuous full-length without waist seam)",
+  "length_style": "Above-knee mini dress (~88 cm total front length)",
+  "assumptions_disclosure": {
+    "fabric_composition": "Assumed 95% cotton / 5% elastane single jersey based on standard H&M basic knitwear specifications.",
+    "garment_length": "Assumed 88.0 cm front length for above-knee shift fit, as the H&M chart lists body measurements and inside leg rather than garment length.",
+    "back_panel_construction": "Center-back seam modeled joining two symmetrical back halves as shown in the back studio photograph."
   },
   "fabric_properties": {
-    "fabric_type": "Cotton Jersey 95/5",
+    "fabric_type": "Cotton Single Jersey 95/5",
     "weight_gsm": 180.0,
     "density_kg_m3": 450.0,
     "stretch_warp_percent": 15.0,
     "stretch_weft_percent": 28.0,
     "bending_stiffness_Nm": 0.045,
     "shear_stiffness_N_m": 0.065,
-    "status": "estimated"
+    "source": "estimated"
   },
   "grainline": {
     "direction": "vertical",
     "angle_deg": 0.0,
     "vector": [0.0, 1.0],
-    "status": "defaulted"
+    "source": "default"
   },
   "panels": [
     {
-      "id": "front_bodice",
-      "name": "Front Upper Panel",
-      "category": "bodice",
+      "id": "front_panel",
+      "name": "Front Shift Dress Panel",
+      "category": "shift_dress",
       "side": "front",
       "visibility": true,
       "opacity": 1.0
     },
     {
-      "id": "back_bodice",
-      "name": "Back Upper Panel",
-      "category": "bodice",
+      "id": "back_left_panel",
+      "name": "Back Left Shift Panel",
+      "category": "shift_dress",
       "side": "back",
       "visibility": true,
       "opacity": 1.0
     },
     {
-      "id": "front_skirt",
-      "name": "Front Lower Panel",
-      "category": "skirt",
-      "side": "front",
-      "visibility": true,
-      "opacity": 1.0
-    },
-    {
-      "id": "back_skirt",
-      "name": "Back Lower Panel",
-      "category": "skirt",
+      "id": "back_right_panel",
+      "name": "Back Right Shift Panel",
+      "category": "shift_dress",
       "side": "back",
       "visibility": true,
       "opacity": 1.0

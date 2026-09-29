@@ -1,78 +1,59 @@
 {
-  "front_bodice": {
-    "panel_id": "front_bodice",
+  "front_panel": {
+    "panel_id": "front_panel",
     "center_3d": [
-      -0.0001,
-      1.1847,
-      0.0967
+      0.0002,
+      0.8404,
+      0.0713
     ],
     "bounding_box_min": [
-      -0.1533,
-      0.9977,
-      0.0207
+      -0.2187,
+      0.413,
+      0.0133
     ],
     "bounding_box_max": [
-      0.1533,
-      1.3777,
-      0.135
+      0.2187,
+      1.303,
+      0.1161
     ],
-    "initial_arrangement": "front_torso_wrap"
+    "initial_arrangement": "front_body_conformal_wrap"
   },
-  "back_bodice": {
-    "panel_id": "back_bodice",
+  "back_left_panel": {
+    "panel_id": "back_left_panel",
     "center_3d": [
-      -0.0009,
-      1.2091,
-      -0.0989
+      -0.1074,
+      0.8362,
+      -0.1779
     ],
     "bounding_box_min": [
-      -0.1533,
-      0.9977,
-      -0.135
+      -0.2187,
+      0.403,
+      -0.2145
     ],
     "bounding_box_max": [
-      0.1533,
-      1.3977,
-      -0.0207
+      0.0,
+      1.303,
+      -0.1244
     ],
-    "initial_arrangement": "back_torso_wrap"
+    "initial_arrangement": "back_body_conformal_wrap"
   },
-  "front_skirt": {
-    "panel_id": "front_skirt",
+  "back_right_panel": {
+    "panel_id": "back_right_panel",
     "center_3d": [
-      -0.0003,
-      0.7275,
-      0.0934
+      0.1046,
+      0.8354,
+      -0.1781
     ],
     "bounding_box_min": [
-      -0.1962,
-      0.4877,
-      -0.0261
+      0.0,
+      0.403,
+      -0.2146
     ],
     "bounding_box_max": [
-      0.1962,
-      0.9977,
-      0.135
+      0.2187,
+      1.303,
+      -0.1244
     ],
-    "initial_arrangement": "front_skirt_drape"
-  },
-  "back_skirt": {
-    "panel_id": "back_skirt",
-    "center_3d": [
-      -0.0003,
-      0.7275,
-      -0.0934
-    ],
-    "bounding_box_min": [
-      -0.1962,
-      0.4877,
-      -0.135
-    ],
-    "bounding_box_max": [
-      0.1962,
-      0.9977,
-      0.0261
-    ],
-    "initial_arrangement": "back_skirt_drape"
+    "initial_arrangement": "back_body_conformal_wrap"
   }
 }
