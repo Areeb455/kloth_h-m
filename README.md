@@ -86,8 +86,8 @@ An end-to-end parametric 3D garment template generator that ingests garment imag
 The pipeline runs on Python 3.10+ (tested on Python 3.11 64-bit Windows & Linux).
 
 ```bash
-git clone https://github.com/your-username/kloth-garment-template.git
-cd kloth-garment-template
+git clone https://github.com/Areeb455/kloth_h-m.git
+cd kloth_h-m
 pip install -r requirements.txt
 ```
 
