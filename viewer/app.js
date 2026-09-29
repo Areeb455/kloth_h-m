@@ -2,7 +2,7 @@
  * Kloth 3D Garment Template Generator - Interactive Viewer
  * Features:
  * - 60fps WebGL rendering with Three.js & OrbitControls
- * - Dynamic size switching (XXS, XS, S, M)
+ * - Dynamic size switching (XXS, XS, S)
  * - 2D pattern canvas with panel boundaries & grainlines
  * - Real-time inspection of sewing connections, fabric properties, and validation checks
  */
