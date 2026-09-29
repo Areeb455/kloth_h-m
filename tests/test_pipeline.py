@@ -56,7 +56,7 @@ def test_roundtrip_load_from_directory(pipeline_run_result):
     assert len(pkg.meshes) == 3
     assert len(pkg.sewing_connections) == 5  # 2 shoulders, 2 sides, 1 center-back
     assert pkg.mannequin_ref.joint_count == 52
-    assert set(pkg.grading_info.size_meshes.keys()) == {"XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"}
+    assert set(pkg.grading_info.size_meshes.keys()) == {"XXS", "XS", "S"}
 
 
 def test_roundtrip_load_from_zip(pipeline_run_result):

@@ -1,35 +1,35 @@
 {
   "front_panel": {
     "panel_id": "front_panel",
-    "material_name": "Cotton Single Jersey 95/5",
-    "stretch_warp_percent": 15.0,
-    "stretch_weft_percent": 28.0,
-    "bending_stiffness_Nm": 0.045,
-    "shear_stiffness_N_m": 0.065,
-    "weight_gsm": 180.0,
-    "density_kg_m3": 450.0,
-    "source": "estimated"
+    "material_name": "Poly-Elastane Soft Stretch Jersey Knit (89/11)",
+    "stretch_warp_percent": 18.0,
+    "stretch_weft_percent": 35.0,
+    "bending_stiffness_Nm": 0.038,
+    "shear_stiffness_N_m": 0.055,
+    "weight_gsm": 195.0,
+    "density_kg_m3": 420.0,
+    "source": "estimated_from_hm_spec"
   },
   "back_left_panel": {
     "panel_id": "back_left_panel",
-    "material_name": "Cotton Single Jersey 95/5",
-    "stretch_warp_percent": 15.0,
-    "stretch_weft_percent": 28.0,
-    "bending_stiffness_Nm": 0.045,
-    "shear_stiffness_N_m": 0.065,
-    "weight_gsm": 180.0,
-    "density_kg_m3": 450.0,
-    "source": "estimated"
+    "material_name": "Poly-Elastane Soft Stretch Jersey Knit (89/11)",
+    "stretch_warp_percent": 18.0,
+    "stretch_weft_percent": 35.0,
+    "bending_stiffness_Nm": 0.038,
+    "shear_stiffness_N_m": 0.055,
+    "weight_gsm": 195.0,
+    "density_kg_m3": 420.0,
+    "source": "estimated_from_hm_spec"
   },
   "back_right_panel": {
     "panel_id": "back_right_panel",
-    "material_name": "Cotton Single Jersey 95/5",
-    "stretch_warp_percent": 15.0,
-    "stretch_weft_percent": 28.0,
-    "bending_stiffness_Nm": 0.045,
-    "shear_stiffness_N_m": 0.065,
-    "weight_gsm": 180.0,
-    "density_kg_m3": 450.0,
-    "source": "estimated"
+    "material_name": "Poly-Elastane Soft Stretch Jersey Knit (89/11)",
+    "stretch_warp_percent": 18.0,
+    "stretch_weft_percent": 35.0,
+    "bending_stiffness_Nm": 0.038,
+    "shear_stiffness_N_m": 0.055,
+    "weight_gsm": 195.0,
+    "density_kg_m3": 420.0,
+    "source": "estimated_from_hm_spec"
   }
 }

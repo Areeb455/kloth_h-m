@@ -23,11 +23,11 @@ let templateData = {
   validation: null
 };
 
-// Colors for 2D/3D panels
+// Colors for 2D/3D panels - H&M Dark Burgundy / Maroon Palette
 const PANEL_COLORS = {
-  front_panel: 0x3b82f6,
-  back_left_panel: 0x8b5cf6,
-  back_right_panel: 0x10b981
+  front_panel: 0x8b263e,
+  back_left_panel: 0x721c30,
+  back_right_panel: 0x5e1626
 };
 
 // -------------------------------------------------------------
@@ -241,12 +241,13 @@ function render2DPatterns() {
 
   // Layout 3 continuous panels: Front on left, Back Left & Back Right on right
   const panelLayouts = [
-    { id: "front_panel",      label: "Front Panel",      cx: w * 0.32, cy: h * 0.15, color: "#3b82f6" },
-    { id: "back_left_panel",  label: "Back Left Panel",  cx: w * 0.68, cy: h * 0.15, color: "#8b5cf6" },
-    { id: "back_right_panel", label: "Back Right Panel", cx: w * 0.86, cy: h * 0.15, color: "#10b981" }
+    { id: "front_panel",      label: "Front Panel",      cx: w * 0.30, cy: h * 0.08, color: "#9f1239" },
+    { id: "back_left_panel",  label: "Back Left Panel",  cx: w * 0.68, cy: h * 0.08, color: "#881337" },
+    { id: "back_right_panel", label: "Back Right Panel", cx: w * 0.86, cy: h * 0.08, color: "#4c0519" }
   ];
 
-  const scale = 1.35; // cm to screen pixels
+  const maxH = Math.max(...panelLayouts.map(p => (templateData.patterns[p.id] ? templateData.patterns[p.id].height_cm : 100)));
+  const scale = Math.min(1.25, (h * 0.72) / maxH);
 
   panelLayouts.forEach((pLayout) => {
     const pData = templateData.patterns[pLayout.id];
@@ -265,30 +266,32 @@ function render2DPatterns() {
     });
     ctx.closePath();
 
-    ctx.fillStyle = pLayout.color + "25";
+    ctx.fillStyle = pLayout.color + "33";
     ctx.fill();
     ctx.strokeStyle = pLayout.color;
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
     // Grainline arrow
+    const grainLen = (pData.height_cm * scale) * 0.6;
     ctx.beginPath();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
-    ctx.moveTo(0, 20);
-    ctx.lineTo(0, 80);
+    ctx.moveTo(0, 15);
+    ctx.lineTo(0, 15 + grainLen);
     ctx.stroke();
     ctx.setLineDash([]);
 
     // Label & dimensions
+    const labelY = (pData.height_cm * scale) + 14;
     ctx.fillStyle = "#f8fafc";
     ctx.font = "10px Plus Jakarta Sans, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`${pLayout.label}`, 0, 105);
+    ctx.fillText(`${pLayout.label}`, 0, labelY);
     ctx.fillStyle = "#94a3b8";
     ctx.font = "9px JetBrains Mono, monospace";
-    ctx.fillText(`${pData.width_cm} × ${pData.height_cm} cm`, 0, 118);
+    ctx.fillText(`${pData.width_cm} × ${pData.height_cm} cm`, 0, labelY + 12);
 
     ctx.restore();
   });

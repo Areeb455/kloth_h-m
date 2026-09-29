@@ -1,27 +1,31 @@
 {
-  "product_name": "Sleeveless Jersey Shift Dress",
+  "product_name": "Scoop-neck Bodycon Maxi Dress",
   "brand": "H&M",
   "category": "Women's Dresses",
-  "product_reference_url": "https://www2.hm.com/en_in/productpage.1143896001.html",
-  "fit": "Regular straight shift fit",
-  "neckline": "Round scoop neckline",
-  "sleeves": "Sleeveless with bound armholes",
-  "silhouette": "Straight shift A-line silhouette (continuous full-length without waist seam)",
-  "length_style": "Above-knee mini dress (~88 cm total front length)",
+  "article_number": "1356023002",
+  "concept": "DIVIDED",
+  "product_reference_url": "https://www2.hm.com/en_in/productpage.1356023002.html",
+  "fit": "Slim fit, bodycon style",
+  "neckline": "Scoop neckline at both front and back",
+  "sleeves": "Sleeveless with wide shoulder straps",
+  "silhouette": "Fitted bodycon maxi silhouette (continuous full-length without waist seam)",
+  "length_style": "Long / maxi length (~118 cm total front length)",
+  "color": "Dark Red / Deep Burgundy Maroon",
   "assumptions_disclosure": {
-    "fabric_composition": "Assumed 95% cotton / 5% elastane single jersey based on standard H&M basic knitwear specifications.",
-    "garment_length": "Assumed 88.0 cm front length for above-knee shift fit, as the H&M chart lists body measurements and inside leg rather than garment length.",
-    "back_panel_construction": "Center-back seam modeled joining two symmetrical back halves as shown in the back studio photograph."
+    "fabric_composition": "89% polyester, 11% elastane soft stretch jersey knit based on official H&M DIVIDED specifications.",
+    "garment_length": "Assumed 118.0 cm front length for long/maxi bodycon fit, as H&M size guide lists body measurements and inside leg (71.5 cm) rather than finished dress length.",
+    "back_length_difference": "Assumed 120.0 cm back length (+2.0 cm over front) to accommodate dorsal thoracic curvature and buttocks volume.",
+    "back_panel_construction": "Center-back seam modeled joining two symmetrical back halves reflecting realistic 2-piece back construction with scoop back neckline."
   },
   "fabric_properties": {
-    "fabric_type": "Cotton Single Jersey 95/5",
-    "weight_gsm": 180.0,
-    "density_kg_m3": 450.0,
-    "stretch_warp_percent": 15.0,
-    "stretch_weft_percent": 28.0,
-    "bending_stiffness_Nm": 0.045,
-    "shear_stiffness_N_m": 0.065,
-    "source": "estimated"
+    "fabric_type": "Poly-Elastane Soft Stretch Jersey Knit (89/11)",
+    "weight_gsm": 195.0,
+    "density_kg_m3": 420.0,
+    "stretch_warp_percent": 18.0,
+    "stretch_weft_percent": 35.0,
+    "bending_stiffness_Nm": 0.038,
+    "shear_stiffness_N_m": 0.055,
+    "source": "estimated_from_hm_spec"
   },
   "grainline": {
     "direction": "vertical",
@@ -32,24 +36,24 @@
   "panels": [
     {
       "id": "front_panel",
-      "name": "Front Shift Dress Panel",
-      "category": "shift_dress",
+      "name": "Front Bodycon Panel",
+      "category": "bodycon_dress",
       "side": "front",
       "visibility": true,
       "opacity": 1.0
     },
     {
       "id": "back_left_panel",
-      "name": "Back Left Shift Panel",
-      "category": "shift_dress",
+      "name": "Back Left Bodycon Panel",
+      "category": "bodycon_dress",
       "side": "back",
       "visibility": true,
       "opacity": 1.0
     },
     {
       "id": "back_right_panel",
-      "name": "Back Right Shift Panel",
-      "category": "shift_dress",
+      "name": "Back Right Bodycon Panel",
+      "category": "bodycon_dress",
       "side": "back",
       "visibility": true,
       "opacity": 1.0

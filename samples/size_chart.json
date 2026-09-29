@@ -1,20 +1,40 @@
 {
   "brand": "H&M",
   "category": "Women's Dresses",
-  "measurement_criteria_source": "H&M How to Measure Guide (Chest over fullest bust, Waist at narrowest point, Low Hip around fullest part)",
-  "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78)",
+  "garment_name": "Scoop-neck Bodycon Maxi Dress",
+  "article_number": "1356023002",
+  "product_url": "https://www2.hm.com/en_in/productpage.1356023002.html",
+  "measurement_criteria_source": "H&M How to Measure Guide (Chest over fullest bust, Waist at narrowest point, Low Hip around fullest part, Inside leg from crotch to floor)",
+  "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78, 64-66 -> 64, 83-87 -> 83)",
   "primary_base_size": "XS",
-  "supported_sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"],
+  "supported_sizes": ["XXS", "XS", "S"],
   "source_breakdown": {
-    "XXS_to_S": "Directly extracted from the reviewer-provided H&M size chart screenshot (REGULAR XXS-S).",
-    "M_to_XL": "Directly extracted from the user-provided H&M size chart screenshot (REGULAR M-XL).",
-    "XXL_to_4XL": "Directly extracted from the user-provided H&M size chart screenshot (REGULAR XXL-4XL)."
+    "chart_source": "Directly extracted from user-provided H&M size chart screenshot (SIZE GUIDE - DRESSES, JUMPSUITS ETC. / REGULAR XXS-S)."
+  },
+  "assumptions": {
+    "ease_allowances_cm": {
+      "bust": 2.0,
+      "waist": 3.0,
+      "hip": 4.0,
+      "rationale": "Soft stretch jersey bodycon dress (89% poly / 11% elastane) is designed for a body-contouring slim silhouette with minimal ease relying on high elastane stretch."
+    },
+    "length_specifications_cm": {
+      "front_length": 118.0,
+      "back_length": 120.0,
+      "length_grade_increment": 2.0,
+      "rationale": "H&M size chart lists body measurements and inside leg rather than garment length. 118.0 cm provides an ankle-grazing maxi dress length corresponding to H&M catalog imagery. Back is +2.0 cm longer to accommodate dorsal thoracic curvature and buttocks curvature."
+    },
+    "shoulder_specifications_cm": {
+      "base_shoulder_width": 29.0,
+      "shoulder_grade_increment": 1.0,
+      "rationale": "Wide tank shoulder straps set slightly narrower than total shoulder span (23.5 cm peak-to-peak measured from flat studio imagery)."
+    }
   },
   "sizes": {
     "XXS": {
       "eur_size": 32,
       "uk_size": 4,
-      "source": "reviewer_screenshot",
+      "source": "hm_regular_xxs_s_chart",
       "raw_ranges": {
         "chest": "74-78",
         "waist": "62-64",
@@ -28,19 +48,19 @@
         "inside_leg": 71.0
       },
       "garment_dimensions_cm": {
-        "bust_circ": 78.0,
-        "waist_circ": 68.0,
-        "hip_circ": 86.0,
-        "hem_circ": 104.0,
-        "front_length": 86.0,
-        "back_length": 88.0,
-        "shoulder_width": 31.0
+        "bust_circ": 76.0,
+        "waist_circ": 65.0,
+        "hip_circ": 83.0,
+        "hem_circ": 98.0,
+        "front_length": 116.0,
+        "back_length": 118.0,
+        "shoulder_width": 28.0
       }
     },
     "XS": {
       "eur_size": 34,
       "uk_size": 6,
-      "source": "reviewer_screenshot",
+      "source": "hm_regular_xxs_s_chart",
       "raw_ranges": {
         "chest": "78-82",
         "waist": "64-66",
@@ -54,19 +74,19 @@
         "inside_leg": 71.5
       },
       "garment_dimensions_cm": {
-        "bust_circ": 82.0,
-        "waist_circ": 70.0,
-        "hip_circ": 90.0,
-        "hem_circ": 110.0,
-        "front_length": 88.0,
-        "back_length": 90.0,
-        "shoulder_width": 32.0
+        "bust_circ": 80.0,
+        "waist_circ": 67.0,
+        "hip_circ": 87.0,
+        "hem_circ": 102.0,
+        "front_length": 118.0,
+        "back_length": 120.0,
+        "shoulder_width": 29.0
       }
     },
     "S": {
-      "eur_size": 36,
-      "uk_size": 8,
-      "source": "reviewer_screenshot",
+      "eur_size": "36-38",
+      "uk_size": "8-10",
+      "source": "hm_regular_xxs_s_chart",
       "raw_ranges": {
         "chest": "82-90",
         "waist": "66-74",
@@ -80,181 +100,14 @@
         "inside_leg": 73.0
       },
       "garment_dimensions_cm": {
-        "bust_circ": 86.0,
-        "waist_circ": 74.0,
-        "hip_circ": 96.0,
-        "hem_circ": 118.0,
-        "front_length": 90.0,
-        "back_length": 92.0,
-        "shoulder_width": 33.5
-      }
-    },
-    "M": {
-      "eur_size": 40,
-      "uk_size": 12,
-      "source": "user_screenshot",
-      "raw_ranges": {
-        "chest": "90-98",
-        "waist": "74-82.5",
-        "low_hip": "94.5-100.5",
-        "inside_leg": "75"
-      },
-      "body_measurements_cm": {
-        "chest": 90.0,
-        "waist": 74.0,
-        "low_hip": 94.5,
-        "inside_leg": 75.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 94.0,
-        "waist_circ": 80.0,
-        "hip_circ": 101.5,
-        "hem_circ": 124.0,
-        "front_length": 91.0,
-        "back_length": 93.0,
-        "shoulder_width": 35.0
-      }
-    },
-    "L": {
-      "eur_size": 44,
-      "uk_size": 16,
-      "source": "user_screenshot",
-      "raw_ranges": {
-        "chest": "98-107",
-        "waist": "82.5-93",
-        "low_hip": "100.5-107.5",
-        "inside_leg": "77"
-      },
-      "body_measurements_cm": {
-        "chest": 98.0,
-        "waist": 82.5,
-        "low_hip": 100.5,
-        "inside_leg": 77.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 102.0,
-        "waist_circ": 88.5,
-        "hip_circ": 107.5,
-        "hem_circ": 130.0,
-        "front_length": 92.0,
-        "back_length": 94.0,
-        "shoulder_width": 36.5
-      }
-    },
-    "XL": {
-      "eur_size": 48,
-      "uk_size": 20,
-      "source": "user_screenshot",
-      "raw_ranges": {
-        "chest": "107-119",
-        "waist": "93-105",
-        "low_hip": "107.5-117.5",
-        "inside_leg": "77"
-      },
-      "body_measurements_cm": {
-        "chest": 107.0,
-        "waist": 93.0,
-        "low_hip": 107.5,
-        "inside_leg": 77.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 111.0,
-        "waist_circ": 99.0,
-        "hip_circ": 114.5,
-        "hem_circ": 138.0,
-        "front_length": 93.0,
-        "back_length": 95.0,
-        "shoulder_width": 38.0
-      }
-    },
-    "XXL": {
-      "eur_size": 52,
-      "uk_size": 24,
-      "source": "user_screenshot",
-      "raw_ranges": {
-        "chest": "119-131",
-        "waist": "105-117.5",
-        "low_hip": "117.5-128",
-        "inside_leg": "77"
-      },
-      "body_measurements_cm": {
-        "chest": 119.0,
-        "waist": 105.0,
-        "low_hip": 117.5,
-        "inside_leg": 77.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 123.0,
-        "waist_circ": 111.0,
-        "hip_circ": 124.5,
-        "hem_circ": 148.0,
-        "front_length": 94.0,
-        "back_length": 96.0,
-        "shoulder_width": 40.0
-      }
-    },
-    "3XL": {
-      "eur_size": 56,
-      "uk_size": 28,
-      "source": "user_screenshot",
-      "raw_ranges": {
-        "chest": "131-143",
-        "waist": "117.5-131.5",
-        "low_hip": "128-140",
-        "inside_leg": "77"
-      },
-      "body_measurements_cm": {
-        "chest": 131.0,
-        "waist": 117.5,
-        "low_hip": 128.0,
-        "inside_leg": 77.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 135.0,
-        "waist_circ": 123.5,
-        "hip_circ": 135.0,
-        "hem_circ": 158.0,
-        "front_length": 95.0,
-        "back_length": 97.0,
-        "shoulder_width": 42.0
-      }
-    },
-    "4XL": {
-      "eur_size": 60,
-      "uk_size": 32,
-      "source": "user_screenshot",
-      "raw_ranges": {
-        "chest": "143-155",
-        "waist": "131.5-145.5",
-        "low_hip": "140-152",
-        "inside_leg": "77"
-      },
-      "body_measurements_cm": {
-        "chest": 143.0,
-        "waist": 131.5,
-        "low_hip": 140.0,
-        "inside_leg": 77.0
-      },
-      "garment_dimensions_cm": {
-        "bust_circ": 147.0,
-        "waist_circ": 137.5,
-        "hip_circ": 147.0,
-        "hem_circ": 168.0,
-        "front_length": 96.0,
-        "back_length": 98.0,
-        "shoulder_width": 44.0
+        "bust_circ": 84.0,
+        "waist_circ": 69.0,
+        "hip_circ": 91.0,
+        "hem_circ": 106.0,
+        "front_length": 120.0,
+        "back_length": 122.0,
+        "shoulder_width": 30.0
       }
     }
-  },
-  "ease_allowances_cm": {
-    "bust_ease": 4.0,
-    "waist_ease": 6.0,
-    "hip_ease": 7.0,
-    "rationale": "Moderate relaxed fit for single jersey knit with 15% stretch, allowing comfort without excessive baggy draping."
-  },
-  "length_assumptions": {
-    "front_length_source": "Assumed 88.0 cm base length for knee-length shift dress, as chart specifies inside leg rather than garment length.",
-    "back_vs_front_delta_cm": 2.0,
-    "rationale": "Back length is engineered 2.0 cm longer than front to account for the dorsal spinal curvature and shoulder slope."
   }
 }

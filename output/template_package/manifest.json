@@ -1,21 +1,15 @@
 {
   "schema_version": "1.0.0",
-  "garment_name": "Sleeveless Jersey Shift Dress",
+  "garment_name": "Scoop-neck Bodycon Maxi Dress",
   "brand": "H&M",
   "category": "Women's Dresses",
   "base_size": "XS",
   "supported_sizes": [
     "XXS",
     "XS",
-    "S",
-    "M",
-    "L",
-    "XL",
-    "XXL",
-    "3XL",
-    "4XL"
+    "S"
   ],
-  "created_at": "2026-09-29T21:53:03.331903Z",
+  "created_at": "2026-09-29T22:52:53.831983Z",
   "category_1_patterns_file": "patterns_2d.json",
   "category_2_meshes_file": "meshes_panels.json",
   "category_3_placement_file": "placement_3d.json",

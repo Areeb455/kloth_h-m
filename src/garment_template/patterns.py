@@ -68,8 +68,8 @@ class PatternGenerator:
         half_hem = self.w_hem / 2.0
 
         armhole_y = -self.armhole_drop
-        waist_y = -round(h * 0.45, 2)
-        hip_y = -round(h * 0.65, 2)
+        waist_y = -min(40.0, round(h * 0.35, 2))
+        hip_y = -min(60.0, round(h * 0.52, 2))
         hem_y = -h
 
         points: List[Tuple[float, float]] = []
@@ -169,8 +169,8 @@ class PatternGenerator:
         half_hem = self.w_hem / 2.0
 
         armhole_y = -self.armhole_drop
-        waist_y = -round(h * 0.45, 2)
-        hip_y = -round(h * 0.65, 2)
+        waist_y = -min(40.0, round(h * 0.35, 2))
+        hip_y = -min(60.0, round(h * 0.52, 2))
         hem_y = -h
 
         sign = 1.0 if is_right else -1.0

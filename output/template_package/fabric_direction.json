@@ -6,8 +6,8 @@
       0.0,
       1.0
     ],
-    "warp_stretch_along_grain": 15.0,
-    "weft_stretch_across_grain": 28.0,
+    "warp_stretch_along_grain": 18.0,
+    "weft_stretch_across_grain": 35.0,
     "source": "default"
   },
   "back_left_panel": {
@@ -17,8 +17,8 @@
       0.0,
       1.0
     ],
-    "warp_stretch_along_grain": 15.0,
-    "weft_stretch_across_grain": 28.0,
+    "warp_stretch_along_grain": 18.0,
+    "weft_stretch_across_grain": 35.0,
     "source": "default"
   },
   "back_right_panel": {
@@ -28,8 +28,8 @@
       0.0,
       1.0
     ],
-    "warp_stretch_along_grain": 15.0,
-    "weft_stretch_across_grain": 28.0,
+    "warp_stretch_along_grain": 18.0,
+    "weft_stretch_across_grain": 35.0,
     "source": "default"
   }
 }

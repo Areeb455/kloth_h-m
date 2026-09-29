@@ -153,14 +153,18 @@ class GarmentVisionAnalyzer:
             back_img = Image.open(self.back_path).convert("RGB")
             back_arr = np.array(back_img)
             back_mask = np.any(back_arr < 238, axis=2)
-            y_b_indices, _ = np.where(back_mask)
-            if len(y_b_indices) > 0:
+            y_b_indices, x_b_indices = np.where(back_mask)
+            if len(y_b_indices) > 0 and len(x_b_indices) > 0:
                 y_b_top = int(y_b_indices.min())
+                y_b_bottom = int(y_b_indices.max())
+                x_b_center = int(x_b_indices.mean())
+                back_h_px = max(1, y_b_bottom - y_b_top)
                 neck_b_y = y_b_top
-                while neck_b_y < y_b_top + 200 and not back_mask[neck_b_y, x_center]:
+                while neck_b_y < y_b_bottom and not back_mask[neck_b_y, x_b_center]:
                     neck_b_y += 1
-                back_neck_depth_px = max(10, neck_b_y - y_b_top)
-                measurements["proportions_cm"]["back_neck_depth"] = round(back_neck_depth_px * px_to_cm, 1)
+                back_neck_depth_ratio = (neck_b_y - y_b_top) / back_h_px
+                back_neck_depth_cm = round(back_neck_depth_ratio * target_garment_length_cm, 1)
+                measurements["proportions_cm"]["back_neck_depth"] = back_neck_depth_cm
 
         return measurements
 
