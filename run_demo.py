@@ -18,7 +18,14 @@ class GarmentDemoHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/" or self.path == "":
-            self.path = "/viewer/index.html"
+            self.send_response(302)
+            self.send_header("Location", "/viewer/index.html")
+            self.end_headers()
+            return
+        if self.path == "/styles.css":
+            self.path = "/viewer/styles.css"
+        elif self.path == "/app.js":
+            self.path = "/viewer/app.js"
         return super().do_GET()
 
 
