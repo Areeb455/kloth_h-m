@@ -8,7 +8,7 @@ import sys
 import webbrowser
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", 8000))
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
