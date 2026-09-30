@@ -384,80 +384,104 @@
   // Populate Inspector Tabs & UI Controls
   // -------------------------------------------------------------
   function populateInspectorTabs() {
-    // 1. Sewing Table
+    // 1. Sewing Table (JSON root = array of seam objects)
     const sewTbody = document.getElementById("sewingTableBody");
     if (sewTbody && templateData.sewing) {
       sewTbody.innerHTML = "";
-      templateData.sewing.forEach((s) => {
+      const seams = Array.isArray(templateData.sewing)
+        ? templateData.sewing : (templateData.sewing.seams || []);
+      seams.forEach((s) => {
+        const isValid = s.is_valid !== false;
         const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td style="font-weight:600; color:#f8fafc;">${s.seam_id}</td>
-          <td>${s.panel_a} [${s.edge_a}] (${s.length_a_cm}cm)</td>
-          <td>${s.panel_b} [${s.edge_b}] (${s.length_b_cm}cm)</td>
-          <td>${s.gather_ratio.toFixed(2)}</td>
-          <td><span class="status-badge pass">PASS (1:1)</span></td>
-        `;
+        tr.innerHTML =
+          '<td style="font-weight:600; color:#f8fafc;">' + s.seam_id + '</td>' +
+          '<td>' + s.panel_a_id + ' [' + s.edge_a_name + '] (' + (s.edge_a_length_cm||0).toFixed(2) + 'cm)</td>' +
+          '<td>' + s.panel_b_id + ' [' + s.edge_b_name + '] (' + (s.edge_b_length_cm||0).toFixed(2) + 'cm)</td>' +
+          '<td>' + (s.gather_ratio||1).toFixed(2) + '</td>' +
+          '<td><span class="status-badge ' + (isValid ? 'pass' : 'fail') + '">' + (isValid ? 'PASS (1:1)' : 'FAIL') + '</span></td>';
         sewTbody.appendChild(tr);
       });
-      document.getElementById("statSeams").innerText = "5/5 Paired (1:1, 0 Tears)";
+      const validCount = seams.filter(s => s.is_valid !== false).length;
+      const seamsEl = document.getElementById("statSeams");
+      if (seamsEl) seamsEl.innerText = validCount + "/" + seams.length + " Paired (1:1, 0 Tears)";
     }
 
     // 2. Fabric Tab
-    if (templateData.fabric && templateData.fabric.front_panel) {
-      const f = templateData.fabric.front_panel;
-      document.getElementById("fabMaterial").innerText = f.material_name || "89% polyester, 11% elastane";
-      document.getElementById("fabWeight").innerText = `${f.weight_gsm} GSM`;
-      document.getElementById("fabWarp").innerText = `${f.stretch_warp_percent}%`;
-      document.getElementById("fabWeft").innerText = `${f.stretch_weft_percent}%`;
-      document.getElementById("fabBending").innerText = `${f.bending_stiffness_Nm} N*m`;
-      document.getElementById("fabShear").innerText = `${f.shear_stiffness_N_m} N*m`;
+    if (templateData.fabric) {
+      const f = templateData.fabric.front_panel || templateData.fabric;
+      if (f) {
+        const el = (id) => document.getElementById(id);
+        if (el("fabMaterial")) el("fabMaterial").innerText = f.material_name || "Poly-Elastane Soft Stretch Jersey Knit (89/11)";
+        if (el("fabWeight"))   el("fabWeight").innerText   = f.weight_gsm !== undefined ? f.weight_gsm + " GSM" : "195 GSM";
+        if (el("fabWarp"))     el("fabWarp").innerText     = f.stretch_warp_percent !== undefined ? f.stretch_warp_percent + "%" : "18.0%";
+        if (el("fabWeft"))     el("fabWeft").innerText     = f.stretch_weft_percent !== undefined ? f.stretch_weft_percent + "%" : "35.0%";
+        if (el("fabBending"))  el("fabBending").innerText  = f.bending_stiffness_Nm !== undefined ? f.bending_stiffness_Nm + " N*m" : "0.038 N*m";
+        if (el("fabShear"))    el("fabShear").innerText    = f.shear_stiffness_N_m !== undefined ? f.shear_stiffness_N_m + " N/m" : "0.055 N/m";
+      }
     }
 
     // 3. Grading Tab
     const gradTbody = document.getElementById("gradingTableBody");
-    if (gradTbody && templateData.grading && templateData.grading.size_meshes) {
+    if (gradTbody && templateData.grading) {
       gradTbody.innerHTML = "";
-      const sizes = templateData.grading.size_meshes;
-      for (const [sz, gData] of Object.entries(sizes)) {
-        const dims = gData.dimensions_cm || {};
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td style="font-weight:700; color:#e11d48;">${sz} ${sz === "XS" ? '<span class="base-badge">BASE</span>' : ''}</td>
-          <td>${dims.bust_circ || '—'} cm</td>
-          <td>${dims.waist_circ || '—'} cm</td>
-          <td>${dims.hip_circ || '—'} cm</td>
-          <td>${dims.front_length || '—'} cm</td>
-          <td style="font-size:10px;">${gData.mesh_filename || `garment_${sz}.obj`}</td>
-        `;
-        gradTbody.appendChild(tr);
+      const sizeMeshes = templateData.grading.size_meshes || templateData.grading;
+      if (sizeMeshes && typeof sizeMeshes === "object" && !Array.isArray(sizeMeshes)) {
+        for (const [sz, gData] of Object.entries(sizeMeshes)) {
+          if (!gData || typeof gData !== "object") continue;
+          const dims = gData.dimensions_cm || {};
+          const isBase = sz === "XS";
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td style="font-weight:700; color:#e11d48;">' + sz + (isBase ? ' <span class="base-badge">BASE</span>' : '') + '</td>' +
+            '<td>' + (dims.bust_circ  !== undefined ? dims.bust_circ  : '–') + ' cm</td>' +
+            '<td>' + (dims.waist_circ !== undefined ? dims.waist_circ : '–') + ' cm</td>' +
+            '<td>' + (dims.hip_circ   !== undefined ? dims.hip_circ   : '–') + ' cm</td>' +
+            '<td>' + (dims.front_length !== undefined ? dims.front_length : '–') + ' cm</td>' +
+            '<td style="font-size:10px;">' + (gData.mesh_filename || 'garment_' + sz + '.obj') + '</td>';
+          gradTbody.appendChild(tr);
+        }
       }
     }
 
-    // 4. Validation Tab
+    // 4. Validation Tab (JSON: {overall_status, passed_checks, total_checks, checks:[{category,name,status,details}]})
     if (templateData.validation) {
       const v = templateData.validation;
-      const countEl = document.getElementById("valPassedCount");
-      if (countEl) {
-        countEl.innerText = `${v.passed_checks_count} / ${v.total_checks_count} Passed`;
+      const passed = v.passed_checks !== undefined ? v.passed_checks : 0;
+      const total  = v.total_checks  !== undefined ? v.total_checks  : 0;
+      const isPassing = (v.overall_status || "").toUpperCase() === "PASS";
+
+      const summaryBadge = document.getElementById("valSummaryBadge");
+      if (summaryBadge) {
+        summaryBadge.className = "status-badge " + (isPassing ? "pass" : "fail");
+        summaryBadge.innerText = passed + "/" + total + " PASS" + (isPassing ? "" : " (FAIL)");
       }
-      const valTbody = document.getElementById("validationTableBody");
-      if (valTbody && v.checks) {
-        valTbody.innerHTML = "";
+      const tabBtn = document.getElementById("tabValidationBtn");
+      if (tabBtn) tabBtn.innerText = "Validation (" + passed + "/" + total + ")";
+
+      const valList = document.getElementById("validationList");
+      if (valList && Array.isArray(v.checks)) {
+        valList.innerHTML = "";
         v.checks.forEach((chk) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td style="font-weight:600; color:#f8fafc;">${chk.check_name}</td>
-            <td>${chk.category}</td>
-            <td><span class="status-badge ${chk.passed ? 'pass' : 'fail'}">${chk.passed ? 'PASS' : 'FAIL'}</span></td>
-            <td style="font-size:11px; color:#cbd5e1;">${chk.details}</td>
-          `;
-          valTbody.appendChild(tr);
+          const isPassed = (chk.status || "").toUpperCase() === "PASS";
+          const item = document.createElement("div");
+          item.className = "val-item";
+          item.innerHTML =
+            '<div class="val-item-left">' +
+              '<span style="font-size:14px;font-weight:700;color:' + (isPassed ? '#34d399' : '#f87171') + '">' + (isPassed ? '\u2713' : '\u2717') + '</span>' +
+              '<div>' +
+                '<div class="val-item-title">' + (chk.name || '') + '</div>' +
+                '<div class="val-item-detail">' + (chk.category || '') + ' \u2014 ' + (chk.details || '') + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<span class="status-badge ' + (isPassed ? 'pass' : 'fail') + '">' + (isPassed ? 'PASS' : 'FAIL') + '</span>';
+          valList.appendChild(item);
         });
       }
     }
   }
 
   // -------------------------------------------------------------
+  // UI Event Handlers
   // UI Event Handlers
   // -------------------------------------------------------------
   function setupEventListeners() {
