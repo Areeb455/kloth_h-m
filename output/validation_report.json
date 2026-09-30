@@ -8,11 +8,11 @@
       "category": "3D Avatar Fit",
       "name": "3D Simulated Chest Perimeter Ease",
       "status": "PASS",
-      "details": "3D Mesh Chest Perimeter: 91.0 cm vs Avatar Body: 78.0 cm (3D Ease: +13.0 cm)",
+      "details": "3D Mesh Chest Perimeter: 90.7 cm vs Avatar Body: 78.0 cm (3D Ease: +12.7 cm)",
       "metrics": {
         "body_chest_cm": 78.0,
-        "mesh_3d_perimeter_cm": 91.0,
-        "ease_cm": 13.0
+        "mesh_3d_perimeter_cm": 90.7,
+        "ease_cm": 12.7
       }
     },
     {
@@ -70,10 +70,10 @@
       "category": "Cloth Simulation",
       "name": "Seam Assembly Gap (< 5 mm)",
       "status": "PASS",
-      "details": "Max residual seam gap: 1.52 mm, Average gap: 0.63 mm (Threshold: < 5.0 mm)",
+      "details": "Max residual seam gap: 1.56 mm, Average gap: 0.61 mm (Threshold: < 5.0 mm)",
       "metrics": {
-        "max_gap_mm": 1.52,
-        "avg_gap_mm": 0.63
+        "max_gap_mm": 1.56,
+        "avg_gap_mm": 0.61
       }
     },
     {
@@ -89,23 +89,23 @@
       "category": "Cloth Simulation",
       "name": "Simulation Equilibrium Settling",
       "status": "PASS",
-      "details": "Final kinetic energy: 0.000086 J, Max step displacement: 3.599 mm",
+      "details": "Final kinetic energy: 0.000068 J, Max step displacement: 2.453 mm",
       "metrics": {
-        "final_ke": 8.6e-05,
-        "max_displacement_mm": 3.599
+        "final_ke": 6.8e-05,
+        "max_displacement_mm": 2.453
       }
     },
     {
       "category": "Mannequin Fit",
       "name": "Avatar Real Mesh Non-Penetration",
       "status": "PASS",
-      "details": "Tested 702 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 4.91 mm, max penetration depth: 0.0 mm",
+      "details": "Tested 702 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 6.26 mm, max penetration depth: 0.0 mm",
       "metrics": {
         "total_vertices": 702,
         "penetrated_vertices": 0,
         "pct_vertices_inside": 0.0,
         "max_penetration_mm": 0.0,
-        "min_signed_dist_mm": 4.91,
+        "min_signed_dist_mm": 6.26,
         "zero_penetration_pass": true
       }
     },
@@ -113,33 +113,33 @@
       "category": "Edge Strain Preservation",
       "name": "front_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "front_panel per-edge stretch vs 2D rest: mean=12.57%, p95=49.28% (Limit: <= 15.0%), max=92.93% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "front_panel per-edge stretch vs 2D rest: mean=11.23%, p95=45.95% (Limit: <= 15.0%), max=87.29% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 12.57,
-        "p95_strain_pct": 49.28,
-        "max_strain_pct": 92.93
+        "mean_strain_pct": 11.23,
+        "p95_strain_pct": 45.95,
+        "max_strain_pct": 87.29
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_left_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_left_panel per-edge stretch vs 2D rest: mean=11.06%, p95=46.85% (Limit: <= 15.0%), max=119.57% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "back_left_panel per-edge stretch vs 2D rest: mean=11.25%, p95=44.95% (Limit: <= 15.0%), max=138.13% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 11.06,
-        "p95_strain_pct": 46.85,
-        "max_strain_pct": 119.57
+        "mean_strain_pct": 11.25,
+        "p95_strain_pct": 44.95,
+        "max_strain_pct": 138.13
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_right_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_right_panel per-edge stretch vs 2D rest: mean=10.19%, p95=35.10% (Limit: <= 15.0%), max=115.31% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "back_right_panel per-edge stretch vs 2D rest: mean=10.49%, p95=32.84% (Limit: <= 15.0%), max=136.22% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 10.19,
-        "p95_strain_pct": 35.1,
-        "max_strain_pct": 115.31
+        "mean_strain_pct": 10.49,
+        "p95_strain_pct": 32.84,
+        "max_strain_pct": 136.22
       }
     },
     {
