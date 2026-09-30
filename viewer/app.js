@@ -43,7 +43,7 @@
   // Three.js Scene Setup
   // -------------------------------------------------------------
   function initScene() {
-    const container = document.getElementById("canvasContainer");
+    const container = document.getElementById("threeContainer");
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
@@ -104,7 +104,7 @@
   }
 
   function onWindowResize() {
-    const container = document.getElementById("canvasContainer");
+    const container = document.getElementById("threeContainer");
     if (!container || !renderer || !camera) return;
     const width = container.clientWidth;
     const height = container.clientHeight;
@@ -143,7 +143,7 @@
         });
 
         avatarGroup.add(model);
-        document.getElementById("statAvatar").innerText = "SMPL-X (52 Joints)";
+        document.getElementById("statVertices").innerText = "SMPL-X (52 Joints)";
       },
       undefined,
       (err) => {
@@ -185,8 +185,8 @@
 
         garmentGroup.add(obj);
         document.getElementById("viewportStatusText").innerText = `Ready (${label} Active)`;
-        document.getElementById("statGarment").innerText = `${totalVerts} Verts (${size} Bodycon)`;
-        document.getElementById("statClearance").innerText = "0.0% Penetration (0 Tears)";
+        document.getElementById("statVertices").innerText = `${totalVerts} Verts (${size} Bodycon)`;
+        document.getElementById("statSeams").innerText = "0.0% Penetration (0 Tears)";
       },
       undefined,
       (err) => {
@@ -474,7 +474,7 @@
       this.classList.toggle("active", isWireframe);
     });
 
-    document.getElementById("btnTurntable").addEventListener("click", function() {
+    document.getElementById("btnToggleTurntable").addEventListener("click", function() {
       isTurntable = !isTurntable;
       this.classList.toggle("active", isTurntable);
     });
@@ -489,10 +489,10 @@
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", function () {
         document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-        document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach((c) => c.classList.remove("active"));
         this.classList.add("active");
         const tabId = this.dataset.tab;
-        const targetContent = document.getElementById(`tab-${tabId}`);
+        const targetContent = document.getElementById(tabId);
         if (targetContent) targetContent.classList.add("active");
       });
     });
