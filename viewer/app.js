@@ -29,11 +29,11 @@
     product: null
   };
 
-  // Garment Material: Authentic H&M Dark Burgundy / Wine Maroon (#4c2228 sampled directly from catalog front.jpg)
-  const DRESS_COLOR = 0x4c2228;
+  // Garment Material: Authentic H&M Deep Dark Burgundy Wine (#280c11)
+  const DRESS_COLOR = 0x280c11;
   const garmentMaterial = new THREE.MeshStandardMaterial({
     color: DRESS_COLOR,
-    roughness: 0.85,  // Soft matte jersey knit fabric (eliminates plastic shine)
+    roughness: 0.82,  // Soft matte jersey knit fabric
     metalness: 0.0,   // Zero metalness for natural cloth drape
     side: THREE.DoubleSide,
     wireframe: false
@@ -75,25 +75,25 @@
     controls.maxDistance = 5.0;
     controls.maxPolarAngle = Math.PI / 2 + 0.1;
 
-    // 5. Lighting: Balanced studio illumination preserving authentic fabric hues
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.60);
+    // 5. Lighting: Studio lighting calibrated to preserve deep wine/maroon hues
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.28);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.05);
+    const keyLight = new THREE.DirectionalLight(0xfff5ea, 1.15);
     keyLight.position.set(2.0, 3.5, 2.5);
     keyLight.castShadow = true;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.50);
+    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.40);
     fillLight.position.set(-2.5, 2.0, 1.5);
     scene.add(fillLight);
 
-    const backLight = new THREE.DirectionalLight(0x93c5fd, 0.55);
+    const backLight = new THREE.DirectionalLight(0x93c5fd, 0.45);
     backLight.position.set(0.0, 2.5, -2.5);
     scene.add(backLight);
 
-    // Subtle overhead studio light for clean contour definition without harsh hotspots
-    const topRimLight = new THREE.DirectionalLight(0xf8fafc, 0.25);
+    // Subtle overhead studio light for clean contour definition
+    const topRimLight = new THREE.DirectionalLight(0xf8fafc, 0.20);
     topRimLight.position.set(0.0, 4.0, 0.5);
     scene.add(topRimLight);
 
