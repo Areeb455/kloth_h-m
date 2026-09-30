@@ -29,12 +29,12 @@
     product: null
   };
 
-  // Garment Material: Deep Burgundy Maroon (#881337)
-  const DRESS_COLOR = 0x881337;
+  // Garment Material: Authentic H&M Dark Burgundy / Wine Maroon (#4c2228 sampled directly from catalog front.jpg)
+  const DRESS_COLOR = 0x4c2228;
   const garmentMaterial = new THREE.MeshStandardMaterial({
     color: DRESS_COLOR,
-    roughness: 0.60,
-    metalness: 0.08,
+    roughness: 0.85,  // Soft matte jersey knit fabric (eliminates plastic shine)
+    metalness: 0.0,   // Zero metalness for natural cloth drape
     side: THREE.DoubleSide,
     wireframe: false
   });
@@ -59,8 +59,9 @@
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.0;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
@@ -74,25 +75,25 @@
     controls.maxDistance = 5.0;
     controls.maxPolarAngle = Math.PI / 2 + 0.1;
 
-    // 5. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    // 5. Lighting: Balanced studio illumination preserving authentic fabric hues
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.60);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.45);
+    const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.05);
     keyLight.position.set(2.0, 3.5, 2.5);
     keyLight.castShadow = true;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.85);
+    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.50);
     fillLight.position.set(-2.5, 2.0, 1.5);
     scene.add(fillLight);
 
-    const backLight = new THREE.DirectionalLight(0x93c5fd, 0.95);
+    const backLight = new THREE.DirectionalLight(0x93c5fd, 0.55);
     backLight.position.set(0.0, 2.5, -2.5);
     scene.add(backLight);
 
-    // Studio overhead rim light for crisp showroom mannequin silhouette
-    const topRimLight = new THREE.DirectionalLight(0xf8fafc, 0.60);
+    // Subtle overhead studio light for clean contour definition without harsh hotspots
+    const topRimLight = new THREE.DirectionalLight(0xf8fafc, 0.25);
     topRimLight.position.set(0.0, 4.0, 0.5);
     scene.add(topRimLight);
 
@@ -120,7 +121,7 @@
   }
 
   // -------------------------------------------------------------
-  // Load Mannequin (GLTF Avatar) - Showroom Fiberglass Finish
+  // Load Mannequin (GLTF Avatar) - Soft Matte Studio Finish
   // -------------------------------------------------------------
   function loadAvatar() {
     const loader = new THREE.GLTFLoader();
@@ -132,13 +133,10 @@
         avatarGroup.clear();
         const model = gltf.scene;
 
-        const avatarMat = new THREE.MeshPhysicalMaterial({
-          color: 0xf1f5f9,          // Sleek satin pearl white
-          roughness: 0.28,          // Smooth polished fiberglass finish
-          metalness: 0.04,
-          clearcoat: 0.40,          // Luxury showroom lacquer coat
-          clearcoatRoughness: 0.18,
-          reflectivity: 0.55,
+        const avatarMat = new THREE.MeshStandardMaterial({
+          color: 0xedf2f7,          // Clean soft neutral showroom white
+          roughness: 0.52,          // Soft satin matte (no harsh plastic glare)
+          metalness: 0.02,
           wireframe: false
         });
 
@@ -159,13 +157,10 @@
         loader.load("/output/template_package/mannequin.glb", (gltf) => {
           avatarGroup.clear();
           const model = gltf.scene;
-          const avatarMat = new THREE.MeshPhysicalMaterial({
-            color: 0xf1f5f9,
-            roughness: 0.28,
-            metalness: 0.04,
-            clearcoat: 0.40,
-            clearcoatRoughness: 0.18,
-            reflectivity: 0.55,
+          const avatarMat = new THREE.MeshStandardMaterial({
+            color: 0xedf2f7,
+            roughness: 0.52,
+            metalness: 0.02,
             wireframe: false
           });
           model.traverse((child) => {
