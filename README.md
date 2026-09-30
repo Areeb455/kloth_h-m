@@ -175,11 +175,37 @@ Rather than hardcoding tautologies (e.g. validating pattern width against the ph
 
 ## AI-Tool Usage & Transparency Disclosure
 
-In compliance with assignment guidelines, the following AI tools and models were utilized:
-* **Google Antigravity**: Primary agentic AI coding assistant utilized for codebase architecture, geometric algorithm development, and pipeline orchestration.
-* **Anthropic Claude 3.5 Sonnet / 3.7 Sonnet**: Utilized for mathematical derivations (conformal cylindrical coordinate mapping and PBD constraint projections) and documentation structuring.
-* **Imagen 3**: Utilized for synthesizing the catalog-style rear flat-lay image (`samples/back.jpg`) reflecting realistic 2-piece back construction and center-back seam line.
-* No proprietary API keys or confidential credentials exist in the repository or its commit history.
+In compliance with assignment guidelines, this section documents the AI tools and external resources utilized, what they helped build, and the rigorous review and verification procedures applied to all AI-assisted outputs.
+
+### 1. AI Tools & External Resources Used (What They Helped Build)
+* **Google Antigravity**: Primary agentic AI coding assistant utilized for end-to-end codebase architecture, automated test orchestration, browser-based inspection runs, and iterative refactoring of the 11-stage pipeline.
+* **Anthropic Claude 3.5 Sonnet / 3.7 Sonnet**: Utilized for formulating mathematical derivations:
+  * Conformal cylindrical coordinate wrapping angles ($	heta$) around torso landmarks.
+  * Position-Based Dynamics (PBD) constraint projection equations (mass-weighted distance constraints, anisotropic warp/weft compliance, and quasi-static damping).
+  * Quadratic Bezier curve sampling with arc-length invariance for neckline and armhole contours.
+* **Google Imagen 3**: Synthesized the complementary catalog-style rear flat-lay image (`samples/back.jpg`) on a clean studio white background, reflecting realistic 2-piece back construction with a visible center-back spine seam matching H&M manufacturing standards.
+* **External Standards & Assets**:
+  * **H&M Catalog & Measurement Guide**: Product photos and size charts for article `#1356023002`.
+  * **SMPL-X Mannequin Asset**: Standard female avatar model (`person_0.glb`, 10,251 vertices, 52 articulated skeletal joints).
+  * **PBD Cloth Simulation Literature**: Müller et al. (2007) *Position-Based Dynamics* and Bender et al. (2014) for physical fabric constraint modeling.
+* *Note: No proprietary API keys or confidential credentials exist in the repository or commit history.*
+
+### 2. How AI Outputs Were Reviewed and Verified
+To ensure engineering integrity and avoid hallucinated or cosmetically masked errors, all AI-generated code and assets underwent rigorous multi-layer verification:
+
+1. **Independent Automated Test Suite (`pytest`)**:
+   * Executed 20 unit and regression tests in [`tests/`](file:///tests/) verifying input validation, Shapely polygon convexity, non-negative dimensions, Delaunay triangle orientation, 1:1 seam vertex index counts, and schema compliance.
+2. **Non-Circular Verification Suite (`validator.py`)**:
+   * Implemented 29 automated checks that query real geometry rather than relying on AI self-attestation.
+   * Collision verification was tested independently by both `scipy.spatial.cKDTree` and `trimesh.proximity.closest_point` querying the true avatar surface mesh, confirming strictly **0.0% penetration** and positive clearance.
+   * Replaced tautological validation checks (e.g. comparing pattern chest against the front photo from which it was drafted) with independent cross-referencing against the back image.
+3. **Interactive 3D WebGL Inspection & Empirical Debugging**:
+   * Every simulation output was rendered and visually audited in the interactive 3D WebGL viewer (`http://localhost:8000`).
+   * This human-in-the-loop review directly caught and resolved two critical geometric bugs that automated scripts initially masked:
+     * **The "Triangle Tear" Bug**: Visual side-profile auditing revealed an open triangular gap at the hip. Debugging the vertex arrays proved that a 2.0 cm dorsal length delta caused `np.linspace` to omit index 18 on the back seam; this was resolved by locking side seam boundary heights and preserving the delta strictly at the center-back spine.
+     * **Strap & Armhole Grading**: Size-switching inspection revealed that naive grading expanded tank straps into 7 cm cap sleeves on XXL and created baggy loops on XXS–M. This was corrected by freezing strap width at 3.25 cm and using a continuous vertical concave Bezier curve.
+4. **Round-Trip Deserialization Read-Back**:
+   * Verified that the exported `.zip` package can be loaded into an isolated environment via `load_template()`, verifying complete JSON schema validation with Pydantic without loss of precision or schema drift.
 
 ---
 
