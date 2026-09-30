@@ -1,4 +1,4 @@
-"""
+﻿"""
 Sizing and Measurement Engine.
 Parses the H&M size chart according to official assignment rules:
 - Applies lower-bound range resolution (e.g. 78-82 -> 78).
@@ -66,7 +66,7 @@ class SizingEngine:
             hem_circ = hip_circ * 1.22
             front_len = 88.0 + (size_entry.get("eur_size", 34) - 34) * 1.0
             back_len = front_len + self.length_assumptions["back_vs_front_delta_cm"]
-            shoulder_w = 32.0 + (chest - 78.0) * 0.15
+            shoulder_w = 22.5  # Fixed: strap outer span constant across all sizes (strap ~3.25 cm wide)
 
             dims = {
                 "bust_circ": round(bust_circ, 1),
@@ -95,3 +95,4 @@ class SizingEngine:
             hem_delta_cm=round(target_dims["hem_circ"] - base_dims["hem_circ"], 2),
             length_delta_cm=round(target_dims["front_length"] - base_dims["front_length"], 2)
         )
+

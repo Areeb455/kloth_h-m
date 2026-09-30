@@ -33,9 +33,9 @@
       "rationale": "H&M size chart lists body measurements and inside leg rather than garment length. 118.0 cm provides an ankle-grazing maxi dress length corresponding to H&M catalog imagery. Back is +2.0 cm longer to accommodate dorsal thoracic curvature and buttocks curvature."
     },
     "shoulder_specifications_cm": {
-      "base_shoulder_width": 23.5,
-      "shoulder_grade_increment": 1.0,
-      "rationale": "Narrow tank shoulder straps (~3.0 cm width) with outer strap span 23.5 cm measured directly from flat studio photography."
+      "base_shoulder_width": 22.5,
+      "shoulder_grade_increment": 0.0,
+      "rationale": "Narrow tank strap span constant 22.5 cm across all sizes. Strap width (~3.25 cm) does not grade with body size - only bust/waist/hip scale."
     }
   },
   "sizes": {
@@ -88,7 +88,7 @@
         "hem_circ": 76.0,
         "front_length": 118.0,
         "back_length": 120.0,
-        "shoulder_width": 23.5
+        "shoulder_width": 22.5
       }
     },
     "S": {
@@ -114,7 +114,7 @@
         "hem_circ": 80.0,
         "front_length": 120.0,
         "back_length": 122.0,
-        "shoulder_width": 24.5
+        "shoulder_width": 22.5
       }
     },
     "M": {
@@ -140,7 +140,7 @@
         "hem_circ": 86.0,
         "front_length": 122.0,
         "back_length": 124.0,
-        "shoulder_width": 25.5
+        "shoulder_width": 22.5
       }
     },
     "L": {
@@ -166,7 +166,7 @@
         "hem_circ": 94.0,
         "front_length": 124.0,
         "back_length": 126.0,
-        "shoulder_width": 27.0
+        "shoulder_width": 22.5
       }
     },
     "XL": {
@@ -192,7 +192,7 @@
         "hem_circ": 103.0,
         "front_length": 125.0,
         "back_length": 127.0,
-        "shoulder_width": 28.5
+        "shoulder_width": 22.5
       }
     },
     "XXL": {
@@ -218,7 +218,7 @@
         "hem_circ": 113.0,
         "front_length": 126.0,
         "back_length": 128.0,
-        "shoulder_width": 30.0
+        "shoulder_width": 22.5
       }
     }
   }

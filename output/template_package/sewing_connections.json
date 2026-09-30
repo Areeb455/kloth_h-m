@@ -8,7 +8,7 @@
       1,
       2
     ],
-    "edge_a_length_cm": 4.51,
+    "edge_a_length_cm": 4.1,
     "panel_b_id": "back_right_panel",
     "edge_b_name": "shoulder_right",
     "edge_b_vertex_indices": [
@@ -16,9 +16,9 @@
       87,
       86
     ],
-    "edge_b_length_cm": 4.25,
+    "edge_b_length_cm": 3.82,
     "seam_order": 1,
-    "gather_ratio": 1.061,
+    "gather_ratio": 1.073,
     "is_valid": true,
     "tolerance_cm": 1.0
   },
@@ -31,7 +31,7 @@
       101,
       100
     ],
-    "edge_a_length_cm": 4.51,
+    "edge_a_length_cm": 4.1,
     "panel_b_id": "back_left_panel",
     "edge_b_name": "shoulder_left",
     "edge_b_vertex_indices": [
@@ -39,9 +39,9 @@
       6,
       7
     ],
-    "edge_b_length_cm": 4.25,
+    "edge_b_length_cm": 3.82,
     "seam_order": 2,
-    "gather_ratio": 1.061,
+    "gather_ratio": 1.073,
     "is_valid": true,
     "tolerance_cm": 1.0
   },
