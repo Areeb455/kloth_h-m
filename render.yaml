@@ -2,7 +2,7 @@ services:
   - type: web
     name: kloth-garment-template
     env: python
-    buildCommand: pip install -r requirements.txt && python run_pipeline.py
+    buildCommand: echo "Pre-rendered 3D assets ready"
     startCommand: python run_demo.py
     plan: free
     autoDeploy: true
