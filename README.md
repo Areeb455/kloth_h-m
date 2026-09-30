@@ -137,7 +137,7 @@ Rather than hardcoding tautologies (e.g. validating pattern width against the ph
 * **Specification**: Shoulder outer span = $22.5\text{ cm}$, neckline inner half-width = $8.0\text{ cm}$, producing a constant strap width of $3.25\text{ cm}$ across all sizes.
 
 ### 5. Avatar vs. Garment Sizing Discrepancy
-* **Assumption & Finding**: The provided SMPL-X female avatar mesh (`person_0.glb`) has an anatomically measured bust circumference of **$89.2\text{ cm}$**, corresponding to size **M or L**.
+* **Assumption & Finding**: The provided avatar mesh (`person_0.glb`) has an anatomically measured bust circumference of **$89.2\text{ cm}$**, corresponding to size **M or L**.
 * **Simulation Behavior**: Dressing an unstretched XS dress ($57.4\text{ cm}$) onto an $89.2\text{ cm}$ avatar requires $55.4\%$ weft elongation (exceeding the fabric\'s $35\%$ elastane limit). The generator models this physical reality faithfully, providing size **M** ($89.2\text{ cm}$ avatar match) and size **L** as the stretch-compliant hero demo sizes.
 
 ### 6. Fabric Mechanical Parameters
