@@ -75,21 +75,26 @@
     controls.maxPolarAngle = Math.PI / 2 + 0.1;
 
     // 5. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.80);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff5ea, 1.4);
+    const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.45);
     keyLight.position.set(2.0, 3.5, 2.5);
     keyLight.castShadow = true;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.7);
+    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.85);
     fillLight.position.set(-2.5, 2.0, 1.5);
     scene.add(fillLight);
 
-    const backLight = new THREE.DirectionalLight(0x93c5fd, 0.85);
+    const backLight = new THREE.DirectionalLight(0x93c5fd, 0.95);
     backLight.position.set(0.0, 2.5, -2.5);
     scene.add(backLight);
+
+    // Studio overhead rim light for crisp showroom mannequin silhouette
+    const topRimLight = new THREE.DirectionalLight(0xf8fafc, 0.60);
+    topRimLight.position.set(0.0, 4.0, 0.5);
+    scene.add(topRimLight);
 
     // Floor Grid
     const grid = new THREE.GridHelper(3.0, 30, 0x1e293b, 0x0f172a);
@@ -115,7 +120,7 @@
   }
 
   // -------------------------------------------------------------
-  // Load Mannequin (GLTF Avatar)
+  // Load Mannequin (GLTF Avatar) - Showroom Fiberglass Finish
   // -------------------------------------------------------------
   function loadAvatar() {
     const loader = new THREE.GLTFLoader();
@@ -127,10 +132,13 @@
         avatarGroup.clear();
         const model = gltf.scene;
 
-        const avatarMat = new THREE.MeshStandardMaterial({
-          color: 0xe2e8f0,
-          roughness: 0.45,
-          metalness: 0.08,
+        const avatarMat = new THREE.MeshPhysicalMaterial({
+          color: 0xf1f5f9,          // Sleek satin pearl white
+          roughness: 0.28,          // Smooth polished fiberglass finish
+          metalness: 0.04,
+          clearcoat: 0.40,          // Luxury showroom lacquer coat
+          clearcoatRoughness: 0.18,
+          reflectivity: 0.55,
           wireframe: false
         });
 
@@ -150,7 +158,24 @@
         console.warn("Avatar load fallback to mannequin.glb:", err);
         loader.load("/output/template_package/mannequin.glb", (gltf) => {
           avatarGroup.clear();
-          avatarGroup.add(gltf.scene);
+          const model = gltf.scene;
+          const avatarMat = new THREE.MeshPhysicalMaterial({
+            color: 0xf1f5f9,
+            roughness: 0.28,
+            metalness: 0.04,
+            clearcoat: 0.40,
+            clearcoatRoughness: 0.18,
+            reflectivity: 0.55,
+            wireframe: false
+          });
+          model.traverse((child) => {
+            if (child.isMesh) {
+              child.material = avatarMat;
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          avatarGroup.add(model);
         });
       }
     );
