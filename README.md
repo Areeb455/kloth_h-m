@@ -185,6 +185,7 @@ In compliance with assignment guidelines, this section documents the AI tools an
   * Quadratic Bezier curve sampling with arc-length invariance for neckline and armhole contours.
 * **Google Imagen 3**: Synthesized the complementary catalog-style rear flat-lay image (`samples/back.jpg`) on a clean studio white background, reflecting realistic 2-piece back construction with a visible center-back spine seam matching H&M manufacturing standards.
 * **External Standards & Assets**:
+*  used claude to help with planning, reviewing Antigravity's output, and writing the independent mesh checks
   * **H&M Catalog & Measurement Guide**: Product photos and size charts for article `#1356023002`.
   * **SMPL-X Mannequin Asset**: Standard female avatar model (`person_0.glb`, 10,251 vertices, 52 articulated skeletal joints).
   * **PBD Cloth Simulation Literature**: Müller et al. (2007) *Position-Based Dynamics* and Bender et al. (2014) for physical fabric constraint modeling.
