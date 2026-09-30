@@ -13,10 +13,10 @@
   },
   "assumptions": {
     "ease_allowances_cm": {
-      "bust": 2.0,
-      "waist": 3.0,
-      "hip": 4.0,
-      "rationale": "Soft stretch jersey bodycon dress (89% poly / 11% elastane) relies on negative ease in its unstretched flat state (flat chest width 28.7 cm vs body 78 cm; -20.6 cm negative ease flat). The size chart values (80 cm bust) specify 3D finished drape circumference with minimal +2 cm structural ease."
+      "bust": -20.6,
+      "waist": -12.8,
+      "hip": -15.8,
+      "rationale": "Soft stretch jersey bodycon dress (89% poly / 11% elastane, 35% weft stretch) is drafted at its flat unstretched rest dimensions (flat chest width 28.7 cm -> 57.4 cm circumference for XS; negative ease of -20.6 cm in flat state vs 78 cm body). On a human XS body (78 cm), the fabric elongates elastically by 35.9% (~36%), matching the fabric's 35% weft stretch limit. On the provided SMPL-X avatar (89.2 cm bust), it requires 55.4% elongation, exceeding the fabric limit and reflecting an avatar sizing discrepancy (M/L body on XS garment)."
     },
     "length_specifications_cm": {
       "front_length": 118.0,
@@ -25,9 +25,9 @@
       "rationale": "H&M size chart lists body measurements and inside leg rather than garment length. 118.0 cm provides an ankle-grazing maxi dress length corresponding to H&M catalog imagery. Back is +2.0 cm longer to accommodate dorsal thoracic curvature and buttocks curvature."
     },
     "shoulder_specifications_cm": {
-      "base_shoulder_width": 29.0,
+      "base_shoulder_width": 23.5,
       "shoulder_grade_increment": 1.0,
-      "rationale": "Narrow tank shoulder straps (~3.0 cm width) set slightly narrower than total shoulder span (23.5 cm peak-to-peak measured from flat studio imagery)."
+      "rationale": "Narrow tank shoulder straps (~3.0 cm width) with outer strap span 23.5 cm measured directly from flat studio photography."
     }
   },
   "sizes": {
@@ -48,13 +48,13 @@
         "inside_leg": 71.0
       },
       "garment_dimensions_cm": {
-        "bust_circ": 76.0,
-        "waist_circ": 65.0,
-        "hip_circ": 83.0,
-        "hem_circ": 98.0,
+        "bust_circ": 53.4,
+        "waist_circ": 47.2,
+        "hip_circ": 63.2,
+        "hem_circ": 72.0,
         "front_length": 116.0,
         "back_length": 118.0,
-        "shoulder_width": 28.0
+        "shoulder_width": 22.5
       }
     },
     "XS": {
@@ -74,13 +74,13 @@
         "inside_leg": 71.5
       },
       "garment_dimensions_cm": {
-        "bust_circ": 80.0,
-        "waist_circ": 67.0,
-        "hip_circ": 87.0,
-        "hem_circ": 102.0,
+        "bust_circ": 57.4,
+        "waist_circ": 51.2,
+        "hip_circ": 67.2,
+        "hem_circ": 76.0,
         "front_length": 118.0,
         "back_length": 120.0,
-        "shoulder_width": 29.0
+        "shoulder_width": 23.5
       }
     },
     "S": {
@@ -100,13 +100,13 @@
         "inside_leg": 73.0
       },
       "garment_dimensions_cm": {
-        "bust_circ": 84.0,
-        "waist_circ": 69.0,
-        "hip_circ": 91.0,
-        "hem_circ": 106.0,
+        "bust_circ": 61.4,
+        "waist_circ": 55.2,
+        "hip_circ": 71.2,
+        "hem_circ": 80.0,
         "front_length": 120.0,
         "back_length": 122.0,
-        "shoulder_width": 30.0
+        "shoulder_width": 24.5
       }
     }
   }

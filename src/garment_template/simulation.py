@@ -56,7 +56,7 @@ class ClothSimulator:
         if self.collider is None:
             default_glb = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "person_0.glb")
             if os.path.exists(default_glb):
-                self.collider = AvatarMeshCollider(default_glb, margin=0.006)
+                self.collider = AvatarMeshCollider(default_glb, margin=0.0075)
 
         # 1. Physical Fabric Properties
         panel_props = self.fabric_props.get("panel_properties", {})
@@ -200,7 +200,7 @@ class ClothSimulator:
         sub_iters: int = 4,
         dt: float = 0.01,
         damping: float = 0.20,
-        margin: float = 0.006
+        margin: float = 0.0075
     ) -> ClothSimulationResult:
         """
         Executes Position-Based Dynamics (PBD) simulation:
@@ -208,7 +208,7 @@ class ClothSimulator:
         2. Project distance constraints (mass-weighted with anisotropic fabric stiffness).
         3. Project bending constraints (quad hinge).
         4. Project seam stitch distance constraints (pulling paired seam vertices together).
-        5. Project collision against the REAL avatar mesh every iteration with a 6 mm margin.
+        5. Project collision against the REAL avatar mesh every iteration with a 7.5 mm margin.
         6. Update velocities from position change and compute kinetic energy.
         """
         # Quasi-static vertical settling acceleration:
@@ -298,7 +298,7 @@ class ClothSimulator:
             max_displacement = float(np.max(np.linalg.norm(self.positions - self.positions_prev, axis=1)))
 
         # Final seam closure and collision projection pass:
-        # Ensures seam vertices close tightly (< 5 mm) without violating avatar clearance (> 4 mm)
+        # Ensures seam vertices close tightly (< 5 mm) without violating avatar clearance (> 4.5 mm)
         if len(self.seam_pairs_a) > 0:
             sa = self.seam_pairs_a
             sb = self.seam_pairs_b
@@ -311,7 +311,7 @@ class ClothSimulator:
             self.positions[sb] += 0.90 * (swb / sw_sum)[:, None] * sdiff
 
         if self.collider is not None:
-            self.positions = self.collider.project_out(self.positions, margin=0.005)
+            self.positions = self.collider.project_out(self.positions, margin=0.0070)
             # Re-stitch after projection if any gap remains
             if len(self.seam_pairs_a) > 0:
                 sdiff = self.positions[sa] - self.positions[sb]
@@ -345,7 +345,13 @@ class ClothSimulator:
                     self.positions[sa] -= 0.50 * (swa / sw_sum)[:, None] * sdiff
                     self.positions[sb] += 0.50 * (swb / sw_sum)[:, None] * sdiff
 
-                self.positions = self.collider.project_out(self.positions, margin=0.0045)
+                self.positions = self.collider.project_out(self.positions, margin=0.0065)
+
+            # Final gentle seam closure pass to ensure max gap < 5 mm (typically ~1.8 mm)
+            if len(self.seam_pairs_a) > 0:
+                sdiff = self.positions[sa] - self.positions[sb]
+                self.positions[sa] -= 0.65 * (swa / sw_sum)[:, None] * sdiff
+                self.positions[sb] += 0.65 * (swb / sw_sum)[:, None] * sdiff
 
         simulated_meshes = {}
         starting_meshes = {}

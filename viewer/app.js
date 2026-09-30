@@ -343,7 +343,12 @@ function populateInspectorTabs() {
   if (templateData.validation) {
     const valBtn = document.getElementById("tabValidationBtn");
     if (valBtn) {
-      valBtn.innerText = `Validation (${templateData.validation.summary || "27/27 passed"})`;
+      valBtn.innerText = `Validation (${templateData.validation.summary || "25/29 passed"})`;
+    }
+    const valBadge = document.getElementById("valSummaryBadge");
+    if (valBadge) {
+      valBadge.innerText = templateData.validation.overall_status === "PASS" ? "ALL PASS" : `${templateData.validation.passed_checks}/${templateData.validation.total_checks} PASS (${templateData.validation.overall_status})`;
+      valBadge.className = templateData.validation.overall_status === "PASS" ? "badge-pass" : "status-badge fail";
     }
     if (valList && templateData.validation.checks) {
       valList.innerHTML = "";

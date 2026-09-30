@@ -39,8 +39,8 @@ class PanelMesher:
         for x in xs:
             for y in ys:
                 pt = Point(x, y)
-                # Ensure point is well inside polygon with a buffer
-                if poly.contains(pt) and poly.boundary.distance(pt) > (self.grid_step * 0.4):
+                # Ensure point is well inside polygon with a buffer to avoid skinny boundary triangles
+                if poly.contains(pt) and poly.boundary.distance(pt) > (self.grid_step * 0.65):
                     k = (round(float(x), 3), round(float(y), 3))
                     if k not in seen_pts:
                         seen_pts.add(k)

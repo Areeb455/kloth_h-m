@@ -56,7 +56,7 @@ class PipelineOrchestrator:
         mannequin_ref = ap.to_mannequin_ref()
         landmarks = ap.get_anatomical_landmarks()
         torso_fn = ap.get_torso_profile_at_y
-        mesh_collider = AvatarMeshCollider(self.avatar_glb_path, margin=0.006)
+        mesh_collider = AvatarMeshCollider(self.avatar_glb_path, margin=0.0075)
 
         print("[2/11] Parsing size chart and applying ease allowances (XXS, XS, S)...")
         sizing = SizingEngine(self.size_chart_path)
@@ -97,7 +97,7 @@ class PipelineOrchestrator:
             mesh_collider=mesh_collider,
             torso_profile_fn=torso_fn
         )
-        sim_result = simulator.simulate(num_steps=45, sub_iters=4, dt=0.01)
+        sim_result = simulator.simulate(num_steps=45, sub_iters=4, dt=0.01, margin=0.0075)
         simulated_meshes = sim_result.simulated_meshes
         sim_metrics = sim_result.metrics
         print(f"       Simulation: Max seam gap={sim_metrics['max_seam_gap_mm']}mm, Penetrations={sim_metrics['avatar_penetrations']} ({sim_metrics['pct_vertices_inside']}%), Strain p95={sim_metrics['edge_strain_p95_pct']}%, Settled={sim_metrics['settled']}")

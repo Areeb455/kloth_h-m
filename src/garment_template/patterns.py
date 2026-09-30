@@ -37,12 +37,12 @@ class PatternGenerator:
         self.w_hem = dimensions["hem_circ"] / 2.0
 
         # Incorporate image-measured neckline and armhole drops
-        self.neck_drop_front = vp.get("neck_depth", 8.5)
-        self.neck_drop_back = vp.get("back_neck_depth", 3.5)
-        self.armhole_drop = vp.get("armhole_depth", 22.0)
+        self.neck_drop_front = vp.get("neck_depth", 13.9)
+        self.neck_drop_back = vp.get("back_neck_depth", 13.7)
+        self.armhole_drop = vp.get("armhole_depth", 18.1)
 
-        self.shoulder_w = dimensions.get("shoulder_width", 32.0)
-        self.neck_half_w = 8.5
+        self.shoulder_w = dimensions.get("shoulder_width", 23.5)
+        self.neck_half_w = 8.0  # Narrow tank strap width: (23.5/2 - 8.0) = 3.75 cm (~3 cm)
 
     def _sample_bezier_curve(self, p0: Tuple[float, float], p1: Tuple[float, float],
                              p2: Tuple[float, float], num_pts: int = 8) -> List[Tuple[float, float]]:

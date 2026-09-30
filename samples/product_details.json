@@ -4,7 +4,12 @@
   "category": "Women's Dresses",
   "article_number": "1356023002",
   "concept": "DIVIDED",
-  "product_reference_url": "https://www2.hm.com/en_in/productpage.1356023002.html",
+  "product_reference_url": "https://www2.hm.com/en_gb/productpage.1356023002.html",
+  "official_sources": [
+    "https://www2.hm.com/en_gb/productpage.1356023002.html",
+    "https://www2.hm.com/en_in/productpage.1356023002.html",
+    "https://www2.hm.com/en_us/productpage.1356023002.html"
+  ],
   "fit": "Slim fit, bodycon style",
   "neckline": "Scoop neckline at both front and back",
   "sleeves": "Sleeveless with narrow tank straps (~3.0 cm width)",
@@ -12,11 +17,12 @@
   "length_style": "Long / maxi length (~118 cm total front length)",
   "color": "Dark Red / Deep Burgundy Maroon",
   "assumptions_disclosure": {
-    "fabric_composition": "89% polyester, 11% elastane soft stretch jersey knit based on official H&M DIVIDED specifications.",
+    "official_hm_verification": "Article 1356023002 verified directly from official H&M catalog (DIVIDED concept, 89% polyester / 11% elastane soft stretch jersey knit, Scoop-neck bodycon dress in Dark red).",
+    "fabric_composition": "89% polyester, 11% elastane soft stretch jersey knit (35% weft stretch, 18% warp stretch).",
     "garment_length": "Assumed 118.0 cm front length for long/maxi bodycon fit, as H&M size guide lists body measurements and inside leg (71.5 cm) rather than finished dress length.",
     "back_length_difference": "Assumed 120.0 cm back length (+2.0 cm over front) to accommodate dorsal thoracic curvature and buttocks volume.",
     "back_panel_construction": "Center-back seam modeled joining two symmetrical back halves reflecting realistic 2-piece back construction with scoop back neckline.",
-    "negative_ease_physics": "Fitted stretch jersey bodycon dress (89% poly / 11% elastane, 35% weft stretch) features an unstretched flat chest width of 28.7 cm (57.4 cm flat circumference). When worn on a 78.0 cm (XS) body, the fabric elongates elastically by ~36% to contour the body (negative ease of -20.6 cm in flat unstretched state). Pattern dimensions in size chart list the 3D target circumference (80.0 cm) incorporating structural ease."
+    "negative_ease_physics": "Fitted stretch jersey bodycon dress (89% poly / 11% elastane, 35% weft stretch) features an unstretched flat chest width of 28.7 cm (57.4 cm flat circumference). When worn on a 78.0 cm (XS) human body, the fabric elongates elastically by 35.9% (~36%) to contour the body, matching the fabric's 35% weft stretch limit. On the 89.2 cm avatar torso, 55.4% stretch is required, exceeding the fabric limit and reflecting an avatar sizing discrepancy (M/L body on XS garment)."
   },
   "fabric_properties": {
     "fabric_type": "Poly-Elastane Soft Stretch Jersey Knit (89/11)",

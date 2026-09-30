@@ -29,12 +29,11 @@ class GarmentPlacer:
         self.shoulder_y = landmarks.get("shoulder_crest_y", landmarks.get("shoulder_y", 1.365))
         self.torso_profile_fn = torso_profile_fn or self._default_torso_profile
         self.collider = mesh_collider
-        self.clearance = 0.007  # 7 mm clearance
-
+        self.clearance = 0.008  # 8 mm clearance
         if self.collider is None:
             default_glb = os.path.join(os.path.dirname(__file__), "..", "..", "assets", "person_0.glb")
             if os.path.exists(default_glb):
-                self.collider = AvatarMeshCollider(default_glb, margin=0.007)
+                self.collider = AvatarMeshCollider(default_glb, margin=0.008)
 
     def _default_torso_profile(self, y: float) -> Dict[str, float]:
         if y > 1.20:
@@ -58,9 +57,9 @@ class GarmentPlacer:
         R = 0.175
         z_axis = -0.065
 
-        # Find maximum pattern width across y to normalize boundary wrap
-        x_pts = [abs(p[0]) for p in mesh.vertices_2d]
-        max_half_w = max(10.0, max(x_pts)) if x_pts else 25.0
+        # Precompute local width profile along Y
+        y_vals = np.array([p[1] for p in mesh.vertices_2d])
+        x_vals = np.array([abs(p[0]) for p in mesh.vertices_2d])
 
         for p2d in mesh.vertices_2d:
             x_cm = p2d[0]
@@ -69,30 +68,40 @@ class GarmentPlacer:
             y_offset_m = y_cm * 0.01
             world_y = self.shoulder_y + y_offset_m
 
-            # Normalized width for this vertex relative to panel boundary
-            # Map boundary vertices to reach near the coronal midplane (~86 degrees)
-            u_norm = min(1.0, abs(x_cm) / max_half_w)
+            # Find local row width within +/- 3 cm band
+            mask_y = np.abs(y_vals - y_cm) <= 3.0
+            local_w = np.max(x_vals[mask_y]) if np.any(mask_y) else abs(x_cm)
+            local_w = max(local_w, 6.0)
+
+            u_norm = min(1.0, abs(x_cm) / local_w)
             sign = 1.0 if x_cm >= 0 else -1.0
-            theta = sign * u_norm * (math.pi / 2.0) * 0.95
+
+            # Wrap boundary vertices to reach near the coronal midplane (~88 degrees)
+            if y_cm > -14.0:
+                # Shoulder strap region: maintain proportional arc based on shoulder span
+                theta = sign * (abs(x_cm) / 18.0) * (math.pi / 2.0) * 0.95
+            else:
+                # Torso and lower body: normalize by local row width to close side seams cleanly (< 1.5 cm gap)
+                theta = sign * u_norm * (math.pi / 2.0) * 0.96
 
             wrapped_x = R * math.sin(theta)
 
             # Shoulder strap crest wrap: smoothly curves toward the shoulder ridge (Z ~ -0.105 m)
-            # Front panel remains strictly anterior (Z >= -0.095 m)
-            # Back panel remains strictly posterior (Z <= -0.115 m)
-            # This completely prevents vertices from crossing into the opposing hemisphere
-            sh_factor = max(0.0, min(1.0, (y_cm + 12.0) / 9.0))
+            # Confined strictly to the shoulder crest region (y > -10.0 cm)
+            sh_factor = max(0.0, min(1.0, (y_cm + 10.0) / 8.0))
 
             if is_front:
                 base_z = z_axis + R * math.cos(theta)
                 target_sh_z = -0.092
                 wrapped_z = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
-                wrapped_z = max(wrapped_z, -0.095)
+                if sh_factor > 0.1:
+                    wrapped_z = max(wrapped_z, -0.095)
             else:
                 base_z = z_axis - R * math.cos(theta)
                 target_sh_z = -0.118
                 wrapped_z = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
-                wrapped_z = min(wrapped_z, -0.115)
+                if sh_factor > 0.1:
+                    wrapped_z = min(wrapped_z, -0.115)
 
             placed_v3d.append((round(wrapped_x, 4), round(world_y, 4), round(wrapped_z, 4)))
             xs.append(wrapped_x)
