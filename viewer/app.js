@@ -236,6 +236,12 @@
     const activePatterns = templateData.patterns;
     if (!activePatterns) return;
 
+    // Update badge in card header
+    const badgeEl = document.getElementById("patternDimsBadge");
+    if (badgeEl) {
+      badgeEl.innerText = `Size ${currentSize} [cm]`;
+    }
+
     const ctx = canvas.getContext("2d");
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * window.devicePixelRatio;
@@ -246,14 +252,30 @@
     const h = rect.height;
     ctx.clearRect(0, 0, w, h);
 
+    // Dynamic Sizing Dimensions based on active size
+    const sizeLookup = {
+      XXS: { hem_circ: 72.0, front_length: 116.0, back_length: 118.0 },
+      XS:  { hem_circ: 76.0, front_length: 118.0, back_length: 120.0 },
+      S:   { hem_circ: 80.0, front_length: 120.0, back_length: 122.0 },
+      M:   { hem_circ: 86.0, front_length: 122.0, back_length: 124.0 },
+      L:   { hem_circ: 94.0, front_length: 124.0, back_length: 126.0 },
+      XL:  { hem_circ: 103.0, front_length: 125.0, back_length: 127.0 },
+      XXL: { hem_circ: 113.0, front_length: 126.0, back_length: 128.0 }
+    };
+
+    const curDims = (templateData.grading && templateData.grading.size_meshes && templateData.grading.size_meshes[currentSize] && templateData.grading.size_meshes[currentSize].dimensions_cm) 
+      || sizeLookup[currentSize] || sizeLookup["XS"];
+
+    const formatNum = (v) => (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1));
+
     // 3-panel continuous layout for Maxi Dress (Front, Back Left, Back Right)
     const panelLayouts = [
-      { id: "front_panel",      label: "Front Panel",   cx: w * 0.22, cy: h * 0.06, color: "#e11d48" },
-      { id: "back_left_panel",  label: "Back Left",     cx: w * 0.54, cy: h * 0.06, color: "#be123c" },
-      { id: "back_right_panel", label: "Back Right",    cx: w * 0.84, cy: h * 0.06, color: "#881337" }
+      { id: "front_panel",      label: "Front Panel",   cx: w * 0.22, cy: h * 0.05, color: "#e11d48" },
+      { id: "back_left_panel",  label: "Back Left",     cx: w * 0.54, cy: h * 0.05, color: "#be123c" },
+      { id: "back_right_panel", label: "Back Right",    cx: w * 0.84, cy: h * 0.05, color: "#881337" }
     ];
 
-    const baseScale = (h * 0.70) / 125.0;
+    const baseScale = (h * 0.68) / 130.0;
 
     panelLayouts.forEach((pLayout) => {
       const pData = activePatterns[pLayout.id];
@@ -262,7 +284,17 @@
       const pts = pData.contour_points;
       if (pts.length < 3) return;
 
-      // Compute bounding box in pattern units
+      const isFront = (pLayout.id === "front_panel");
+      
+      // Compute actual width and height in cm for the active size
+      const actualWidthCm = isFront ? (curDims.hem_circ / 2.0) : (curDims.hem_circ / 4.0);
+      const actualHeightCm = isFront ? (curDims.front_length + 1.0) : curDims.back_length;
+
+      // Scaling relative to base pattern (XS has hem_circ 76, front_length 118, back_length 120)
+      const scaleX = curDims.hem_circ / 76.0;
+      const scaleY = isFront ? ((curDims.front_length + 1.0) / 119.0) : (curDims.back_length / 120.0);
+
+      // Compute bounding box in base pattern units
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       pts.forEach((pt) => {
         if (pt.x < minX) minX = pt.x;
@@ -271,8 +303,8 @@
         if (pt.y > maxY) maxY = pt.y;
       });
 
-      const pWidth = maxX - minX;
-      const pHeight = maxY - minY;
+      const pWidth = (maxX - minX) * scaleX;
+      const pHeight = (maxY - minY) * scaleY;
       const scale = baseScale;
 
       ctx.save();
@@ -281,16 +313,16 @@
       const offsetY = pLayout.cy;
       ctx.translate(offsetX, offsetY);
 
-      // Draw Pattern Contour
+      // Draw Scaled Pattern Contour
       ctx.beginPath();
       // Invert Y so highest Y (shoulders) is at top, lowest Y (hem) is at bottom
-      const startX = (pts[0].x - minX) * scale;
-      const startY = (maxY - pts[0].y) * scale;
+      const startX = (pts[0].x - minX) * scaleX * scale;
+      const startY = (maxY - pts[0].y) * scaleY * scale;
       ctx.moveTo(startX, startY);
 
       for (let i = 1; i < pts.length; i++) {
-        const px = (pts[i].x - minX) * scale;
-        const py = (maxY - pts[i].y) * scale;
+        const px = (pts[i].x - minX) * scaleX * scale;
+        const py = (maxY - pts[i].y) * scaleY * scale;
         ctx.lineTo(px, py);
       }
       ctx.closePath();
@@ -302,8 +334,8 @@
 
       // Vertical Grainline
       const gx = (pWidth * scale) / 2.0;
-      const gy1 = 12;
-      const gy2 = pHeight * scale - 12;
+      const gy1 = 10;
+      const gy2 = pHeight * scale - 10;
 
       ctx.beginPath();
       ctx.setLineDash([4, 4]);
@@ -316,10 +348,10 @@
 
       // Glass Badge for Panel Dimensions
       const badgeY = (pHeight * scale) + 16;
-      const badgeW = 90;
+      const badgeW = 96;
       const badgeH = 28;
 
-      ctx.fillStyle = "rgba(10, 15, 26, 0.88)";
+      ctx.fillStyle = "rgba(10, 15, 26, 0.90)";
       ctx.strokeStyle = pLayout.color + "99";
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -332,9 +364,9 @@
       ctx.textAlign = "center";
       ctx.fillText(pLayout.label, gx, badgeY - 1);
 
-      ctx.fillStyle = "#94a3b8";
-      ctx.font = "500 9.5px 'JetBrains Mono', monospace";
-      ctx.fillText(`${Math.round(pData.width_cm)} × ${Math.round(pData.height_cm)} cm`, gx, badgeY + 10);
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "600 10px 'JetBrains Mono', monospace";
+      ctx.fillText(`${formatNum(actualWidthCm)} × ${formatNum(actualHeightCm)} cm`, gx, badgeY + 10);
 
       ctx.restore();
     });
@@ -362,6 +394,7 @@
         btn.classList.add("active");
         currentSize = sz;
         loadGarmentMesh(currentSize);
+        render2DPatterns();
       });
       pillGroup.appendChild(btn);
     });
