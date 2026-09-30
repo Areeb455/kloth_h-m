@@ -24,16 +24,17 @@
     patterns: null,
     sewing: null,
     grading: null,
+    fabric: null,
     validation: null,
     product: null
   };
 
-  // Garment Material: Deep Burgundy Maroon (#800020)
+  // Garment Material: Deep Burgundy Maroon (#881337)
   const DRESS_COLOR = 0x881337;
   const garmentMaterial = new THREE.MeshStandardMaterial({
     color: DRESS_COLOR,
-    roughness: 0.65,
-    metalness: 0.05,
+    roughness: 0.60,
+    metalness: 0.08,
     side: THREE.DoubleSide,
     wireframe: false
   });
@@ -43,8 +44,8 @@
   // -------------------------------------------------------------
   function initScene() {
     const container = document.getElementById("canvasContainer");
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
 
     // 1. Scene
     scene = new THREE.Scene();
@@ -52,7 +53,7 @@
 
     // 2. Camera
     camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0.0, 0.95, 2.7);
+    camera.position.set(0.0, 0.90, 2.6);
 
     // 3. Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
@@ -68,13 +69,13 @@
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.target.set(0.0, 0.90, 0.0);
+    controls.target.set(0.0, 0.85, 0.0);
     controls.minDistance = 0.8;
     controls.maxDistance = 5.0;
     controls.maxPolarAngle = Math.PI / 2 + 0.1;
 
     // 5. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.80);
     scene.add(ambientLight);
 
     const keyLight = new THREE.DirectionalLight(0xfff5ea, 1.4);
@@ -146,7 +147,11 @@
       },
       undefined,
       (err) => {
-        console.warn("Avatar load failed:", err);
+        console.warn("Avatar load fallback to mannequin.glb:", err);
+        loader.load("/output/template_package/mannequin.glb", (gltf) => {
+          avatarGroup.clear();
+          avatarGroup.add(gltf.scene);
+        });
       }
     );
   }
@@ -185,48 +190,44 @@
       },
       undefined,
       (err) => {
-        console.warn("OBJ load fallback to base garment.obj:", err);
+        console.warn("OBJ load fallback to garment.obj:", err);
         loader.load("/output/garment.obj", (obj) => {
           garmentGroup.clear();
           garmentGroup.add(obj);
+          document.getElementById("viewportStatusText").innerText = `Ready (${label} Active)`;
         });
       }
     );
   }
 
   // -------------------------------------------------------------
-  // Fetch Package Data
+  // Fetch Package Data (Resilient Multi-Fetch)
   // -------------------------------------------------------------
   async function loadPackageData() {
-    try {
-      const resManifest = await fetch("/output/template_package/manifest.json");
-      templateData.manifest = await resManifest.json();
+    const safeFetch = async (url) => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (e) {
+        return null;
+      }
+    };
 
-      const resPatterns = await fetch("/output/template_package/patterns_2d.json");
-      templateData.patterns = await resPatterns.json();
+    templateData.manifest = await safeFetch("/output/template_package/manifest.json");
+    templateData.patterns = await safeFetch("/output/template_package/patterns_2d.json");
+    templateData.sewing = await safeFetch("/output/template_package/sewing_connections.json");
+    templateData.grading = await safeFetch("/output/template_package/grading_sizes.json");
+    templateData.fabric = await safeFetch("/output/template_package/fabric_properties.json");
+    templateData.validation = await safeFetch("/output/template_package/validation_report.json");
+    templateData.product = await safeFetch("/samples/product_details.json");
 
-      const resSewing = await fetch("/output/template_package/sewing_connections.json");
-      templateData.sewing = await resSewing.json();
-
-      const resGrading = await fetch("/output/template_package/grading_table.json");
-      templateData.grading = await resGrading.json();
-
-      const resValid = await fetch("/output/template_package/validation_report.json");
-      templateData.validation = await resValid.json();
-
-      const resProd = await fetch("/output/template_package/product_details.json");
-      templateData.product = await resProd.json();
-
-      populateInspectorTabs();
-      updateSizePills();
-      render2DPatterns();
-    } catch (e) {
-      console.warn("Could not load all template JSON files:", e);
-    }
+    populateInspectorTabs();
+    render2DPatterns();
   }
 
   // -------------------------------------------------------------
-  // 2D Pattern Canvas Drawing (Non-Overlapping Layout)
+  // 2D Pattern Canvas Drawing (Normalized, Top-Down, Clean Glass Badges)
   // -------------------------------------------------------------
   function render2DPatterns() {
     const canvas = document.getElementById("patternCanvas");
@@ -247,12 +248,12 @@
 
     // 3-panel continuous layout for Maxi Dress (Front, Back Left, Back Right)
     const panelLayouts = [
-      { id: "front_panel",      label: "Front Panel",   cx: w * 0.22, cy: h * 0.08, color: "#e11d48", scaleMult: 0.90 },
-      { id: "back_left_panel",  label: "Back Left",     cx: w * 0.54, cy: h * 0.08, color: "#be123c", scaleMult: 0.90 },
-      { id: "back_right_panel", label: "Back Right",    cx: w * 0.84, cy: h * 0.08, color: "#881337", scaleMult: 0.90 }
+      { id: "front_panel",      label: "Front Panel",   cx: w * 0.22, cy: h * 0.06, color: "#e11d48" },
+      { id: "back_left_panel",  label: "Back Left",     cx: w * 0.54, cy: h * 0.06, color: "#be123c" },
+      { id: "back_right_panel", label: "Back Right",    cx: w * 0.84, cy: h * 0.06, color: "#881337" }
     ];
 
-    const baseScale = (h * 0.72) / 120.0;
+    const baseScale = (h * 0.70) / 125.0;
 
     panelLayouts.forEach((pLayout) => {
       const pData = activePatterns[pLayout.id];
@@ -261,9 +262,7 @@
       const pts = pData.contour_points;
       if (pts.length < 3) return;
 
-      const scale = baseScale * (pLayout.scaleMult || 1.0);
-
-      // Compute bounding box
+      // Compute bounding box in pattern units
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       pts.forEach((pt) => {
         if (pt.x < minX) minX = pt.x;
@@ -272,59 +271,70 @@
         if (pt.y > maxY) maxY = pt.y;
       });
 
-      const panelCenterOffsetX = ((minX + maxX) / 2.0) * scale;
+      const pWidth = maxX - minX;
+      const pHeight = maxY - minY;
+      const scale = baseScale;
 
       ctx.save();
-      ctx.translate(pLayout.cx - panelCenterOffsetX, pLayout.cy);
+      // Center panel horizontally at pLayout.cx, top at pLayout.cy
+      const offsetX = pLayout.cx - (pWidth * scale) / 2.0;
+      const offsetY = pLayout.cy;
+      ctx.translate(offsetX, offsetY);
 
-      // 1. Fill pattern panel
+      // Draw Pattern Contour
       ctx.beginPath();
-      ctx.moveTo(pts[0].x * scale, pts[0].y * scale);
+      // Invert Y so highest Y (shoulders) is at top, lowest Y (hem) is at bottom
+      const startX = (pts[0].x - minX) * scale;
+      const startY = (maxY - pts[0].y) * scale;
+      ctx.moveTo(startX, startY);
+
       for (let i = 1; i < pts.length; i++) {
-        ctx.lineTo(pts[i].x * scale, pts[i].y * scale);
+        const px = (pts[i].x - minX) * scale;
+        const py = (maxY - pts[i].y) * scale;
+        ctx.lineTo(px, py);
       }
       ctx.closePath();
       ctx.fillStyle = pLayout.color + "22";
       ctx.fill();
       ctx.strokeStyle = pLayout.color;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1.6;
       ctx.stroke();
 
-      // 2. Vertical Grainline with arrows
-      const gx = ((minX + maxX) / 2.0) * scale;
-      const gy1 = minY * scale + 15;
-      const gy2 = maxY * scale - 15;
+      // Vertical Grainline
+      const gx = (pWidth * scale) / 2.0;
+      const gy1 = 12;
+      const gy2 = pHeight * scale - 12;
 
       ctx.beginPath();
       ctx.setLineDash([4, 4]);
       ctx.moveTo(gx, gy1);
       ctx.lineTo(gx, gy2);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.40)";
       ctx.lineWidth = 1.2;
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 3. Dark Glass Pill Badge for Non-Overlapping Labels
-      const labelY = (pData.height_cm * scale) + 14;
-      const pillW = 86;
-      const pillH = 28;
+      // Glass Badge for Panel Dimensions
+      const badgeY = (pHeight * scale) + 16;
+      const badgeW = 90;
+      const badgeH = 28;
 
       ctx.fillStyle = "rgba(10, 15, 26, 0.88)";
       ctx.strokeStyle = pLayout.color + "99";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(gx - pillW / 2, labelY - 14, pillW, pillH, 6);
+      ctx.roundRect(gx - badgeW / 2, badgeY - 14, badgeW, badgeH, 6);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = "#ffffff";
       ctx.font = "600 11px Inter, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(pLayout.label, gx, labelY - 1);
+      ctx.fillText(pLayout.label, gx, badgeY - 1);
 
       ctx.fillStyle = "#94a3b8";
       ctx.font = "500 9.5px 'JetBrains Mono', monospace";
-      ctx.fillText(`${Math.round(pData.width_cm)} × ${Math.round(pData.height_cm)} cm`, gx, labelY + 10);
+      ctx.fillText(`${Math.round(pData.width_cm)} × ${Math.round(pData.height_cm)} cm`, gx, badgeY + 10);
 
       ctx.restore();
     });
@@ -393,14 +403,14 @@
     }
 
     // 2. Fabric Tab
-    if (templateData.manifest && templateData.manifest.fabric) {
-      const f = templateData.manifest.fabric;
-      document.getElementById("fabMaterial").innerText = f.material_composition || "89% polyester, 11% elastane";
-      document.getElementById("fabWeight").innerText = `${f.areal_weight_gsm} GSM`;
-      document.getElementById("fabWarp").innerText = `${f.warp_stretch_limit_pct}%`;
-      document.getElementById("fabWeft").innerText = `${f.weft_stretch_limit_pct}%`;
-      document.getElementById("fabBending").innerText = `${f.bending_stiffness_nm} N*m`;
-      document.getElementById("fabShear").innerText = `${f.shear_stiffness_nm} N*m`;
+    if (templateData.fabric && templateData.fabric.front_panel) {
+      const f = templateData.fabric.front_panel;
+      document.getElementById("fabMaterial").innerText = f.material_name || "89% polyester, 11% elastane";
+      document.getElementById("fabWeight").innerText = `${f.weight_gsm} GSM`;
+      document.getElementById("fabWarp").innerText = `${f.stretch_warp_percent}%`;
+      document.getElementById("fabWeft").innerText = `${f.stretch_weft_percent}%`;
+      document.getElementById("fabBending").innerText = `${f.bending_stiffness_Nm} N*m`;
+      document.getElementById("fabShear").innerText = `${f.shear_stiffness_N_m} N*m`;
     }
 
     // 3. Grading Tab
@@ -409,14 +419,15 @@
       gradTbody.innerHTML = "";
       const sizes = templateData.grading.size_meshes;
       for (const [sz, gData] of Object.entries(sizes)) {
+        const dims = gData.dimensions_cm || {};
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td style="font-weight:700; color:#e11d48;">${sz} ${sz === "XS" ? '<span class="base-badge">BASE</span>' : ''}</td>
-          <td>${gData.bust_circumference_cm} cm</td>
-          <td>${gData.waist_circumference_cm} cm</td>
-          <td>${gData.hip_circumference_cm} cm</td>
-          <td>${gData.front_length_cm} cm</td>
-          <td style="font-size:10px;">${gData.mesh_filename}</td>
+          <td>${dims.bust_circ || '—'} cm</td>
+          <td>${dims.waist_circ || '—'} cm</td>
+          <td>${dims.hip_circ || '—'} cm</td>
+          <td>${dims.front_length || '—'} cm</td>
+          <td style="font-size:10px;">${gData.mesh_filename || `garment_${sz}.obj`}</td>
         `;
         gradTbody.appendChild(tr);
       }
@@ -470,8 +481,8 @@
 
     document.getElementById("btnResetCamera").addEventListener("click", function() {
       controls.reset();
-      camera.position.set(0.0, 0.95, 2.7);
-      controls.target.set(0.0, 0.90, 0.0);
+      camera.position.set(0.0, 0.90, 2.6);
+      controls.target.set(0.0, 0.85, 0.0);
     });
 
     // Inspector Tab Switching
@@ -509,10 +520,11 @@
   async function init() {
     initScene();
     setupEventListeners();
-    loadAvatar();
-    await loadPackageData();
-    loadGarmentMesh("XS"); // Base size XS loaded by default
-    updateCanvasLegend();
+    updateSizePills();       // Immediately populate size pills so they are always visible!
+    updateCanvasLegend();    // Immediately set canvas legend
+    loadAvatar();            // Load SMPL-X mannequin
+    loadGarmentMesh("XS");   // Load default base size XS dress mesh
+    await loadPackageData(); // Load JSON templates and populate tables/patterns
     animate();
   }
 
