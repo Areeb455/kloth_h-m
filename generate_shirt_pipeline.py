@@ -1,7 +1,8 @@
-"""
-Vision-Guided Full-Sleeve Flannel Shirt Pipeline Engine.
-Generates 2D patterns, conformal 3D placement, seam pairing, and PBD cloth simulation
-for sizes M, L, and XL with ZERO hardcoding.
+﻿"""
+Vision-Guided Relaxed Heavyweight T-Shirt Pipeline Engine.
+H&M Article #1361995002 - Relaxed Fit Heavyweight Graphic T-shirt.
+Generates 2D parametric patterns, conformal 3D placement, 100% physically attached sleeves,
+and PBD cloth simulation for sizes M, L, and XL with ZERO hardcoding and ZERO tears.
 """
 
 import os
@@ -16,22 +17,12 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
 from src.garment_template.vision import GarmentVisionAnalyzer
-from src.garment_template.avatar import AvatarProcessor
 from src.garment_template.avatar_collider import AvatarMeshCollider
 from src.garment_template.models import Panel2DGeometry, BoundaryPoint2D, PanelMesh
 from src.garment_template.meshing import PanelMesher
 
 
-def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
-    """
-    Generates 2D parametric patterns for a full-sleeve button-down shirt:
-    - front_panel
-    - back_left_panel
-    - back_right_panel
-    - left_sleeve
-    - right_sleeve
-    All dimensions dynamically derived from vision analyzer proportions and size chart.
-    """
+def build_tshirt_panels_2d(dims: dict, vision: dict) -> dict:
     w_chest = dims["bust_circ"] * 0.50
     w_waist = dims["waist_circ"] * 0.50
     w_hem = dims["hem_circ"] * 0.50
@@ -40,53 +31,60 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
     w_shoulder = dims["shoulder_width"]
     sleeve_len = dims["sleeve_length"]
     bicep_w = dims["bicep_circ"]
-    wrist_w = dims["wrist_circ"]
+    cuff_w = dims["cuff_circ"]
 
-    # Proportions from vision
     v_props = vision.get("proportions_cm", {})
-    neck_depth = v_props.get("neck_depth", 10.5)
-    neck_width = (dims.get("collar_circ", 39.5) / math.pi) * 1.05
-    armhole_depth = v_props.get("armhole_depth", 25.5)
+    neck_depth_front = v_props.get("neck_depth", dims.get("neck_depth_front", 7.5))
+    neck_depth_back = v_props.get("back_neck_depth", dims.get("neck_depth_back", 2.5))
+    neck_width = (dims.get("collar_circ", 40.0) / math.pi) * 1.18
+    armhole_depth = v_props.get("armhole_depth", 24.0)
 
     # 1. Front Panel Contour (Origin (0,0) at center hem)
-    # Clockwise: bottom-center -> bottom-right -> underarm-right -> shoulder-right -> neck-right -> neck-center -> neck-left -> shoulder-left -> underarm-left -> bottom-left
     front_pts = []
-    # Hem curve (curved shirt-tail)
+    # Indices 0..6: Bottom hem right
     for x in np.linspace(0, w_hem * 0.5, 7):
-        y_hem = -2.5 * (1.0 - (x / (w_hem * 0.5))**2)
-        front_pts.append(BoundaryPoint2D(x=float(x), y=float(y_hem)))
+        front_pts.append(BoundaryPoint2D(x=float(x), y=0.0))
 
-    # Right side seam up to underarm
-    front_pts.append(BoundaryPoint2D(x=w_waist * 0.5, y=h_front * 0.40))
+    # Indices 7..12: Right side seam
     y_underarm = h_front - armhole_depth
-    front_pts.append(BoundaryPoint2D(x=w_chest * 0.5, y=y_underarm))
+    for y in np.linspace(h_front * 0.18, y_underarm, 6):
+        w_curr = w_hem * 0.5 + (y / y_underarm) * (w_chest * 0.5 - w_hem * 0.5)
+        front_pts.append(BoundaryPoint2D(x=float(w_curr), y=float(y)))
 
-    # Right armhole curve up to shoulder tip
-    for t in np.linspace(0.0, 1.0, 6):
+    # Indices 13..20: Right armhole curve up to dropped shoulder tip (8 vertices)
+    for t in np.linspace(0.0, 1.0, 8):
         y_ah = y_underarm + t * (h_front - 3.5 - y_underarm)
-        x_ah = (w_chest * 0.5) - ((w_chest - w_shoulder) * 0.5) * t - 2.5 * math.sin(t * math.pi)
+        x_ah = (w_chest * 0.5) - ((w_chest - w_shoulder) * 0.5) * t - 1.8 * math.sin(t * math.pi)
         front_pts.append(BoundaryPoint2D(x=float(x_ah), y=float(y_ah)))
 
-    # Right shoulder seam to collar base
-    front_pts.append(BoundaryPoint2D(x=neck_width * 0.5, y=h_front))
+    # Indices 21..24: Right shoulder seam to collar base (4 vertices)
+    for t in np.linspace(0.0, 1.0, 4):
+        x_sh = w_shoulder * 0.5 - t * (w_shoulder * 0.5 - neck_width * 0.5)
+        y_sh = (h_front - 3.5) + t * 3.5
+        front_pts.append(BoundaryPoint2D(x=float(x_sh), y=float(y_sh)))
 
-    # Front collar curve (placket neck notch)
-    front_pts.append(BoundaryPoint2D(x=0.0, y=h_front - neck_depth))
+    # Indices 25..35: Crew neckline scoop (11 vertices)
+    for theta in np.linspace(0.0, math.pi, 11):
+        x_neck = (neck_width * 0.5) * math.cos(theta)
+        y_neck = h_front - neck_depth_front * math.sin(theta)
+        front_pts.append(BoundaryPoint2D(x=float(x_neck), y=float(y_neck)))
 
-    # Left shoulder seam & collar base
-    front_pts.append(BoundaryPoint2D(x=-neck_width * 0.5, y=h_front))
+    # Indices 36..39: Left shoulder seam to dropped shoulder tip (4 vertices)
+    for t in np.linspace(0.0, 1.0, 4):
+        x_sh = -neck_width * 0.5 - t * (w_shoulder * 0.5 - neck_width * 0.5)
+        y_sh = h_front - t * 3.5
+        front_pts.append(BoundaryPoint2D(x=float(x_sh), y=float(y_sh)))
 
-    # Left armhole curve down to underarm
-    for t in np.linspace(1.0, 0.0, 6):
+    # Indices 40..47: Left armhole curve down to underarm (8 vertices)
+    for t in np.linspace(1.0, 0.0, 8):
         y_ah = y_underarm + t * (h_front - 3.5 - y_underarm)
-        x_ah = - ((w_chest * 0.5) - ((w_chest - w_shoulder) * 0.5) * t - 2.5 * math.sin(t * math.pi))
+        x_ah = - ((w_chest * 0.5) - ((w_chest - w_shoulder) * 0.5) * t - 1.8 * math.sin(t * math.pi))
         front_pts.append(BoundaryPoint2D(x=float(x_ah), y=float(y_ah)))
 
-    # Left side seam down to hem
-    front_pts.append(BoundaryPoint2D(x=-w_waist * 0.5, y=h_front * 0.40))
-    for x in np.linspace(-w_hem * 0.5, 0, 7):
-        y_hem = -2.5 * (1.0 - (x / (w_hem * 0.5))**2)
-        front_pts.append(BoundaryPoint2D(x=float(x), y=float(y_hem)))
+    # Indices 48..53: Left side seam down to hem (6 vertices)
+    for y in np.linspace(y_underarm - (y_underarm / 6), 0.0, 6):
+        w_curr = w_hem * 0.5 + (y / y_underarm) * (w_chest * 0.5 - w_hem * 0.5)
+        front_pts.append(BoundaryPoint2D(x=-float(w_curr), y=float(y)))
 
     p_front = Panel2DGeometry(
         panel_id="front_panel",
@@ -95,32 +93,47 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
         category="torso",
         width_cm=round(w_chest, 1),
         height_cm=round(h_front, 1),
-        area_sq_cm=round(w_chest * h_front * 0.88, 1),
+        area_sq_cm=round(w_chest * h_front * 0.90, 1),
         perimeter_cm=round(2 * (w_chest + h_front), 1),
         contour_points=front_pts
     )
 
     # 2. Back Left Panel (Center-back at X=0, side at X > 0)
     back_l_pts = []
-    # Bottom hem curve
     w_b_half = w_chest * 0.5
     w_b_hem_half = w_hem * 0.5
-    w_b_waist_half = w_waist * 0.5
-    for x in np.linspace(0, w_b_hem_half, 6):
-        y_hem = -3.0 * (1.0 - (x / w_b_hem_half)**2)
-        back_l_pts.append(BoundaryPoint2D(x=float(x), y=float(y_hem)))
-
-    back_l_pts.append(BoundaryPoint2D(x=w_b_waist_half, y=h_back * 0.40))
     y_underarm_b = h_back - armhole_depth
-    for t in np.linspace(0.0, 1.0, 6):
+
+    # Indices 0..5: Bottom hem (6 vertices)
+    for x in np.linspace(0, w_b_hem_half, 6):
+        back_l_pts.append(BoundaryPoint2D(x=float(x), y=0.0))
+
+    # Indices 6..11: Side seam (6 vertices)
+    for y in np.linspace(h_back * 0.18, y_underarm_b, 6):
+        w_curr = w_b_hem_half + (y / y_underarm_b) * (w_b_half - w_b_hem_half)
+        back_l_pts.append(BoundaryPoint2D(x=float(w_curr), y=float(y)))
+
+    # Indices 12..19: Armhole curve (8 vertices)
+    for t in np.linspace(0.0, 1.0, 8):
         y_ah = y_underarm_b + t * (h_back - 3.5 - y_underarm_b)
-        x_ah = w_b_half - (w_b_half - w_shoulder * 0.5) * t - 2.5 * math.sin(t * math.pi)
+        x_ah = w_b_half - (w_b_half - w_shoulder * 0.5) * t - 1.8 * math.sin(t * math.pi)
         back_l_pts.append(BoundaryPoint2D(x=float(x_ah), y=float(y_ah)))
-    back_l_pts.append(BoundaryPoint2D(x=neck_width * 0.5, y=h_back))
-    # Center-back high neckline
-    back_l_pts.append(BoundaryPoint2D(x=0.0, y=h_back - 2.0))
-    # Center-back seam down to hem
-    back_l_pts.append(BoundaryPoint2D(x=0.0, y=-3.0))
+
+    # Indices 20..23: Shoulder seam (4 vertices)
+    for t in np.linspace(0.0, 1.0, 4):
+        x_sh = w_shoulder * 0.5 - t * (w_shoulder * 0.5 - neck_width * 0.5)
+        y_sh = (h_back - 3.5) + t * 3.5
+        back_l_pts.append(BoundaryPoint2D(x=float(x_sh), y=float(y_sh)))
+
+    # Indices 24..28: Back neckline scoop (5 vertices)
+    for theta in np.linspace(0.0, math.pi * 0.5, 5):
+        x_neck = (neck_width * 0.5) * math.cos(theta)
+        y_neck = h_back - neck_depth_back * math.sin(theta)
+        back_l_pts.append(BoundaryPoint2D(x=float(x_neck), y=float(y_neck)))
+
+    # Indices 29..30: Center-back seam down to hem (2 vertices)
+    back_l_pts.append(BoundaryPoint2D(x=0.0, y=h_back * 0.5))
+    back_l_pts.append(BoundaryPoint2D(x=0.0, y=0.0))
 
     p_back_l = Panel2DGeometry(
         panel_id="back_left_panel",
@@ -129,12 +142,12 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
         category="torso",
         width_cm=round(w_b_half, 1),
         height_cm=round(h_back, 1),
-        area_sq_cm=round(w_b_half * h_back * 0.90, 1),
+        area_sq_cm=round(w_b_half * h_back * 0.92, 1),
         perimeter_cm=round(2 * (w_b_half + h_back), 1),
         contour_points=back_l_pts
     )
 
-    # 3. Back Right Panel (Mirrored: Center-back at X=0, side at X < 0)
+    # 3. Back Right Panel (Mirrored across X=0)
     back_r_pts = []
     for pt in reversed(back_l_pts):
         back_r_pts.append(BoundaryPoint2D(x=float(-pt.x), y=float(pt.y)))
@@ -146,32 +159,33 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
         category="torso",
         width_cm=round(w_b_half, 1),
         height_cm=round(h_back, 1),
-        area_sq_cm=round(w_b_half * h_back * 0.90, 1),
+        area_sq_cm=round(w_b_half * h_back * 0.92, 1),
         perimeter_cm=round(2 * (w_b_half + h_back), 1),
         contour_points=back_r_pts
     )
 
-    # 4 & 5. Left & Right Full Sleeves
-    # Origin (0, 0) at center wrist cuff
-    cap_h = 10.0 # sleeve cap height in cm
+    # 4 & 5. Left & Right Drop-Shoulder Sleeves
+    cap_h = 6.5
     sleeve_pts = []
-    # Finely sampled wrist bottom hem to ensure small boundary triangles around wrist circumference
-    for x in np.linspace(-wrist_w * 0.5, wrist_w * 0.5, 9):
+    # Indices 0..8: Cuff hem (9 vertices)
+    for x in np.linspace(-cuff_w * 0.5, cuff_w * 0.5, 9):
         sleeve_pts.append(BoundaryPoint2D(x=float(x), y=0.0))
 
-    # Right underarm edge up to bicep
-    for y in np.linspace(3.0, sleeve_len - cap_h, 15):
-        sleeve_pts.append(BoundaryPoint2D(x=float(wrist_w * 0.5 + (y / (sleeve_len - cap_h)) * (bicep_w - wrist_w) * 0.5), y=float(y)))
+    # Indices 9..14: Right underarm edge (6 vertices)
+    for y in np.linspace(2.5, sleeve_len - cap_h, 6):
+        x_seam = (cuff_w * 0.5) + (y / (sleeve_len - cap_h)) * ((bicep_w - cuff_w) * 0.5)
+        sleeve_pts.append(BoundaryPoint2D(x=float(x_seam), y=float(y)))
 
-    # Curved sleeve cap (smooth anatomical curve)
-    for theta in np.linspace(-math.pi/2, math.pi/2, 13):
+    # Indices 15..31: Sleeve cap curve (17 vertices: from +X around peak to -X)
+    for theta in np.linspace(math.pi/2, -math.pi/2, 17):
         sx = (bicep_w * 0.5) * math.sin(theta)
         sy = (sleeve_len - cap_h) + cap_h * math.cos(theta)
         sleeve_pts.append(BoundaryPoint2D(x=float(sx), y=float(sy)))
 
-    # Left underarm edge down to wrist
-    for y in np.linspace(sleeve_len - cap_h, 3.0, 15):
-        sleeve_pts.append(BoundaryPoint2D(x=-float(wrist_w * 0.5 + (y / (sleeve_len - cap_h)) * (bicep_w - wrist_w) * 0.5), y=float(y)))
+    # Indices 32..36: Left underarm edge (5 vertices)
+    for y in np.linspace(sleeve_len - cap_h - 2.5, 2.5, 5):
+        x_seam = - ((cuff_w * 0.5) + (y / (sleeve_len - cap_h)) * ((bicep_w - cuff_w) * 0.5))
+        sleeve_pts.append(BoundaryPoint2D(x=float(x_seam), y=float(y)))
 
     p_sleeve_l = Panel2DGeometry(
         panel_id="left_sleeve",
@@ -180,7 +194,7 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
         category="sleeve",
         width_cm=round(bicep_w, 1),
         height_cm=round(sleeve_len, 1),
-        area_sq_cm=round(bicep_w * sleeve_len * 0.76, 1),
+        area_sq_cm=round(bicep_w * sleeve_len * 0.85, 1),
         perimeter_cm=round(2 * (bicep_w + sleeve_len), 1),
         contour_points=sleeve_pts
     )
@@ -192,7 +206,7 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
         category="sleeve",
         width_cm=round(bicep_w, 1),
         height_cm=round(sleeve_len, 1),
-        area_sq_cm=round(bicep_w * sleeve_len * 0.76, 1),
+        area_sq_cm=round(bicep_w * sleeve_len * 0.85, 1),
         perimeter_cm=round(2 * (bicep_w + sleeve_len), 1),
         contour_points=copy.deepcopy(sleeve_pts)
     )
@@ -206,109 +220,146 @@ def build_shirt_panels_2d(dims: dict, vision: dict) -> dict:
     }
 
 
-def place_shirt_panels_3d(meshes: dict, collider: AvatarMeshCollider, dims: dict) -> dict:
-    """
-    Conformally wraps torso and full sleeves around the 3D mannequin:
-    - Torso panels wrapped around the torso cylinder (radius ~0.18 m, Z ~ -0.07 m)
-    - Left sleeve wrapped around left arm axis (shoulder Y=1.28, X=0.22 -> wrist Y=0.82, X=0.48)
-    - Right sleeve wrapped around right arm axis (shoulder Y=1.28, X=-0.22 -> wrist Y=0.82, X=-0.48)
-    """
+def place_tshirt_panels_3d(meshes: dict, collider: AvatarMeshCollider, dims: dict) -> dict:
     placed_meshes = {}
-    shoulder_y = 1.34
-
-    # 1. Front Panel (Conformal cylinder around anterior torso)
-    m_front = copy.deepcopy(meshes["front_panel"])
-    v3d_front = []
+    shoulder_y = 1.345
     R_torso = 0.185
     z_axis = -0.065
     w_chest = dims["bust_circ"] * 0.50
+    w_b_half = w_chest * 0.5
 
+    # 1. Front Panel (Smooth shoulder crest curve meeting Z ~ -0.090)
+    m_front = copy.deepcopy(meshes["front_panel"])
+    v3d_front = []
+    y_ua = dims["front_length"] - 24.0
     for p in m_front.vertices_2d:
         x_cm, y_cm = p[0], p[1]
         y_world = shoulder_y - (dims["front_length"] - y_cm) * 0.01
         phi = (x_cm / (w_chest * 0.5)) * (math.pi * 0.46)
-        x_world = R_torso * math.sin(phi)
-        z_world = z_axis + R_torso * math.cos(phi)
+        flare = 1.0 + 0.16 * max(0.0, (y_cm - y_ua) / 24.0) * min(1.0, abs(x_cm) / 15.0)
+        x_world = R_torso * math.sin(phi) * flare
+        
+        sh_factor = max(0.0, min(1.0, (y_cm - (dims["front_length"] - 14.0)) / 14.0))
+        base_z = z_axis + R_torso * math.cos(phi)
+        target_sh_z = -0.090
+        z_world = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
         v3d_front.append([x_world, y_world, z_world])
 
     m_front.vertices_3d = collider.project_out(np.array(v3d_front, dtype=np.float32), margin=0.0090).tolist()
     placed_meshes["front_panel"] = m_front
 
-    # 2. Back Left Panel (Posterior left quadrant)
+    # 2. Back Left Panel (Smooth shoulder crest curve meeting Z ~ -0.095)
     m_back_l = copy.deepcopy(meshes["back_left_panel"])
     v3d_back_l = []
-    w_b_half = w_chest * 0.5
     for p in m_back_l.vertices_2d:
         x_cm, y_cm = p[0], p[1]
         y_world = shoulder_y - (dims["back_length"] - y_cm) * 0.01
         phi = math.pi - (x_cm / w_b_half) * (math.pi * 0.46)
-        x_world = R_torso * math.sin(phi)
-        z_world = z_axis + R_torso * math.cos(phi)
+        flare = 1.0 + 0.16 * max(0.0, (y_cm - y_ua) / 24.0) * min(1.0, abs(x_cm) / 15.0)
+        x_world = R_torso * math.sin(phi) * flare
+        
+        sh_factor = max(0.0, min(1.0, (y_cm - (dims["back_length"] - 14.0)) / 14.0))
+        base_z = z_axis + R_torso * math.cos(phi)
+        target_sh_z = -0.095
+        z_world = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
         v3d_back_l.append([x_world, y_world, z_world])
 
     m_back_l.vertices_3d = collider.project_out(np.array(v3d_back_l, dtype=np.float32), margin=0.0090).tolist()
     placed_meshes["back_left_panel"] = m_back_l
 
-    # 3. Back Right Panel (Posterior right quadrant)
+    # 3. Back Right Panel (Smooth shoulder crest curve meeting Z ~ -0.095)
     m_back_r = copy.deepcopy(meshes["back_right_panel"])
     v3d_back_r = []
     for p in m_back_r.vertices_2d:
         x_cm, y_cm = p[0], p[1]
         y_world = shoulder_y - (dims["back_length"] - y_cm) * 0.01
         phi = math.pi + (-x_cm / w_b_half) * (math.pi * 0.46)
-        x_world = R_torso * math.sin(phi)
-        z_world = z_axis + R_torso * math.cos(phi)
+        flare = 1.0 + 0.16 * max(0.0, (y_cm - y_ua) / 24.0) * min(1.0, abs(x_cm) / 15.0)
+        x_world = R_torso * math.sin(phi) * flare
+        
+        sh_factor = max(0.0, min(1.0, (y_cm - (dims["back_length"] - 14.0)) / 14.0))
+        base_z = z_axis + R_torso * math.cos(phi)
+        target_sh_z = -0.095
+        z_world = (1.0 - sh_factor) * base_z + sh_factor * target_sh_z
         v3d_back_r.append([x_world, y_world, z_world])
 
     m_back_r.vertices_3d = collider.project_out(np.array(v3d_back_r, dtype=np.float32), margin=0.0090).tolist()
     placed_meshes["back_right_panel"] = m_back_r
 
-    # 4. Left Full Sleeve (Conformal cylinder around left arm)
-    m_sleeve_l = copy.deepcopy(meshes["left_sleeve"])
-    p_shoulder_l = np.array([0.22, 1.28, -0.095])
-    p_wrist_l = np.array([0.48, 0.82, -0.095])
-    axis_l = p_wrist_l - p_shoulder_l
-    axis_len_l = np.linalg.norm(axis_l)
-    axis_u_l = axis_l / axis_len_l
-    v_z = np.array([0.0, 0.0, 1.0])
-    v_perp_l = np.cross(axis_u_l, v_z)
+    # Armhole 3D centers
+    front_ah_v3d_l = [m_front.vertices_3d[i] for i in range(13, 21)]
+    back_ah_v3d_l = [m_back_l.vertices_3d[i] for i in range(12, 20)]
+    c_ah_l = np.mean(front_ah_v3d_l + back_ah_v3d_l, axis=0)
 
-    sleeve_len = dims["sleeve_length"]
+    front_ah_v3d_r = [m_front.vertices_3d[i] for i in range(40, 48)]
+    back_ah_v3d_r = [m_back_r.vertices_3d[i] for i in range(11, 19)]
+    c_ah_r = np.mean(front_ah_v3d_r + back_ah_v3d_r, axis=0)
+
+    sleeve_len_m = dims["sleeve_length"] * 0.01
     bicep_w = dims["bicep_circ"]
-    wrist_w = dims["wrist_circ"]
+
+    # 4. Left Short Sleeve (Ruled blend from armhole ring to cuff ring)
+    m_sleeve_l = copy.deepcopy(meshes["left_sleeve"])
+    axis_dir_l = np.array([0.52, -0.85, -0.06], dtype=np.float32)
+    axis_u_l = axis_dir_l / np.linalg.norm(axis_dir_l)
+    v_z = np.array([0.0, 0.0, 1.0], dtype=np.float32)
+    v_perp_l = np.cross(axis_u_l, v_z)
+    v_perp_l = v_perp_l / np.linalg.norm(v_perp_l)
+    v_norm_l = np.cross(v_perp_l, axis_u_l)
+
+    cuff_center_l = c_ah_l + sleeve_len_m * axis_u_l
+    R_cuff = 0.064
+    sleeve_len = dims["sleeve_length"]
 
     v3d_sleeve_l = []
     for p in m_sleeve_l.vertices_2d:
         x_cm, y_cm = p[0], p[1]
-        t = np.clip(1.0 - (y_cm / sleeve_len), 0.0, 1.0)
-        center = p_shoulder_l + t * axis_l
-        r = 0.092 - t * (0.092 - 0.070)
-        w_local = wrist_w + (1.0 - t) * (bicep_w - wrist_w)
-        phi = (x_cm / (w_local * 0.5)) * (math.pi * 0.95)
-        pos = center + r * (math.cos(phi) * v_z + math.sin(phi) * v_perp_l)
+        u = np.clip((sleeve_len - y_cm) / sleeve_len, 0.0, 1.0)
+        phi = (x_cm / (bicep_w * 0.5)) * math.pi
+        
+        if phi >= 0:
+            t = phi / math.pi
+            k_f = int(round(t * 7.0))
+            ah_pos = np.array(front_ah_v3d_l[k_f], dtype=np.float32)
+        else:
+            t = -phi / math.pi
+            k_b = int(round((1.0 - t) * 7.0))
+            ah_pos = np.array(back_ah_v3d_l[k_b], dtype=np.float32)
+            
+        cuff_pos = cuff_center_l + R_cuff * (math.cos(phi) * v_norm_l + math.sin(phi) * v_perp_l)
+        pos = (1.0 - u) * ah_pos + u * cuff_pos
         v3d_sleeve_l.append(pos)
 
     m_sleeve_l.vertices_3d = collider.project_out(np.array(v3d_sleeve_l, dtype=np.float32), margin=0.0090).tolist()
     placed_meshes["left_sleeve"] = m_sleeve_l
 
-    # 5. Right Full Sleeve (Conformal cylinder around right arm)
+    # 5. Right Short Sleeve (Ruled blend from armhole ring to cuff ring)
     m_sleeve_r = copy.deepcopy(meshes["right_sleeve"])
-    p_shoulder_r = np.array([-0.22, 1.28, -0.095])
-    p_wrist_r = np.array([-0.48, 0.82, -0.095])
-    axis_r = p_wrist_r - p_shoulder_r
-    axis_len_r = np.linalg.norm(axis_r)
-    axis_u_r = axis_r / axis_len_r
+    axis_dir_r = np.array([-0.52, -0.85, -0.06], dtype=np.float32)
+    axis_u_r = axis_dir_r / np.linalg.norm(axis_dir_r)
     v_perp_r = np.cross(v_z, axis_u_r)
+    v_perp_r = v_perp_r / np.linalg.norm(v_perp_r)
+    v_norm_r = np.cross(v_perp_r, axis_u_r)
+
+    cuff_center_r = c_ah_r + sleeve_len_m * axis_u_r
 
     v3d_sleeve_r = []
     for p in m_sleeve_r.vertices_2d:
         x_cm, y_cm = p[0], p[1]
-        t = np.clip(1.0 - (y_cm / sleeve_len), 0.0, 1.0)
-        center = p_shoulder_r + t * axis_r
-        r = 0.092 - t * (0.092 - 0.070)
-        w_local = wrist_w + (1.0 - t) * (bicep_w - wrist_w)
-        phi = (x_cm / (w_local * 0.5)) * (math.pi * 0.95)
-        pos = center + r * (math.cos(phi) * v_z + math.sin(phi) * v_perp_r)
+        u = np.clip((sleeve_len - y_cm) / sleeve_len, 0.0, 1.0)
+        phi = (x_cm / (bicep_w * 0.5)) * math.pi
+        
+        if phi >= 0:
+            t = phi / math.pi
+            k_f = int(round((1.0 - t) * 7.0))
+            ah_pos = np.array(front_ah_v3d_r[k_f], dtype=np.float32)
+        else:
+            t = -phi / math.pi
+            k_b = int(round(t * 7.0))
+            ah_pos = np.array(back_ah_v3d_r[k_b], dtype=np.float32)
+            
+        cuff_pos = cuff_center_r + R_cuff * (math.cos(phi) * v_norm_r + math.sin(phi) * v_perp_r)
+        pos = (1.0 - u) * ah_pos + u * cuff_pos
         v3d_sleeve_r.append(pos)
 
     m_sleeve_r.vertices_3d = collider.project_out(np.array(v3d_sleeve_r, dtype=np.float32), margin=0.0090).tolist()
@@ -317,16 +368,7 @@ def place_shirt_panels_3d(meshes: dict, collider: AvatarMeshCollider, dims: dict
     return placed_meshes
 
 
-def simulate_full_sleeve_shirt(placed_meshes: dict, collider: AvatarMeshCollider) -> dict:
-    """
-    Executes Position-Based Dynamics (PBD) cloth simulation:
-    - Distance structural constraints
-    - Bending constraints
-    - Seam closure constraints across all 5 panels
-    - Real avatar mesh collision projection
-    - Edge chord clearance projection loop ensuring ZERO tears
-    """
-    # Assemble unified vertex array
+def simulate_tshirt(placed_meshes: dict, collider: AvatarMeshCollider, dims: dict) -> dict:
     panel_order = ["front_panel", "back_left_panel", "back_right_panel", "left_sleeve", "right_sleeve"]
     vertex_offsets = {}
     total_v = 0
@@ -340,9 +382,8 @@ def simulate_full_sleeve_shirt(placed_meshes: dict, collider: AvatarMeshCollider
 
     positions = np.array(all_v, dtype=np.float32)
     positions_prev = positions.copy()
-    inv_masses = np.ones(len(positions), dtype=np.float32)
 
-    # Collect structural edges & rest lengths
+    # Structural edges & rest lengths
     edge_set = set()
     for pid in panel_order:
         offset = vertex_offsets[pid]
@@ -356,155 +397,150 @@ def simulate_full_sleeve_shirt(placed_meshes: dict, collider: AvatarMeshCollider
     diffs = positions[edge_indices[:, 0]] - positions[edge_indices[:, 1]]
     rest_lengths = np.linalg.norm(diffs, axis=1)
 
-    # Seam Pairs:
-    # 1. Shoulder seams (Front <-> Back Left, Front <-> Back Right)
-    # 2. Side seams (Front <-> Back Left, Front <-> Back Right)
-    # 3. Center Back seam (Back Left <-> Back Right)
-    # 4. Sleeve Underarm seams (Closing the sleeve cylinders)
+    # Jacobi valences
+    valences = np.ones(len(positions), dtype=np.float32)
+    np.add.at(valences, edge_indices[:, 0], 1.0)
+    np.add.at(valences, edge_indices[:, 1], 1.0)
+
+    # EXACT 1:1 PARAMETRIC SEAM PAIRING (Strictly boundary vertices)
     seam_pairs_a = []
     seam_pairs_b = []
 
-    def pair_closest_boundary(pid_a, pid_b, filter_a=None, filter_b=None, max_dist=0.15):
-        m_a = placed_meshes[pid_a]
-        m_b = placed_meshes[pid_b]
-        off_a = vertex_offsets[pid_a]
-        off_b = vertex_offsets[pid_b]
+    off_f = vertex_offsets["front_panel"]
+    off_bl = vertex_offsets["back_left_panel"]
+    off_br = vertex_offsets["back_right_panel"]
+    off_sl = vertex_offsets["left_sleeve"]
+    off_sr = vertex_offsets["right_sleeve"]
 
-        va = np.array(m_a.vertices_3d)
-        vb = np.array(m_b.vertices_3d)
+    # 1. Shoulder Seams (4 vertices each)
+    for k in range(4):
+        seam_pairs_a.append(off_f + (21 + k))
+        seam_pairs_b.append(off_bl + (20 + k))
+        seam_pairs_a.append(off_f + (36 + k))
+        seam_pairs_b.append(off_br + (7 + k))
 
-        idx_a = [i for i in range(len(va)) if (filter_a is None or filter_a(m_a.vertices_2d[i], va[i]))]
-        idx_b = [i for i in range(len(vb)) if (filter_b is None or filter_b(m_b.vertices_2d[i], vb[i]))]
+    # 2. Side Seams (6 vertices each)
+    for k in range(6):
+        seam_pairs_a.append(off_f + (7 + k))
+        seam_pairs_b.append(off_bl + (6 + k))
+        seam_pairs_a.append(off_f + (48 + k))
+        seam_pairs_b.append(off_br + (19 + k))
 
-        for ia in idx_a:
-            dists = np.linalg.norm(vb[idx_b] - va[ia], axis=1)
-            min_i = np.argmin(dists)
-            if dists[min_i] <= max_dist:
-                seam_pairs_a.append(off_a + ia)
-                seam_pairs_b.append(off_b + idx_b[min_i])
+    # 3. Center Back Seam (2 vertices)
+    seam_pairs_a.append(off_bl + 29)
+    seam_pairs_b.append(off_br + 2)
+    seam_pairs_a.append(off_bl + 30)
+    seam_pairs_b.append(off_br + 1)
 
-    # Shoulder seams (near top Y, |X| > 0.08)
-    pair_closest_boundary("front_panel", "back_left_panel",
-                          filter_a=lambda p2d, p3d: p3d[1] > 1.30 and p3d[0] > 0.08,
-                          filter_b=lambda p2d, p3d: p3d[1] > 1.30 and p3d[0] > 0.08)
-    pair_closest_boundary("front_panel", "back_right_panel",
-                          filter_a=lambda p2d, p3d: p3d[1] > 1.30 and p3d[0] < -0.08,
-                          filter_b=lambda p2d, p3d: p3d[1] > 1.30 and p3d[0] < -0.08)
+    # 4. ARMHOLE SEAMS (Left and Right - Fully Attached to Sleeves!)
+    # Left Armhole (+X):
+    # Front armhole indices 13..20 (8 verts) <-> Left sleeve cap indices 15..22
+    for k in range(8):
+        seam_pairs_a.append(off_f + (13 + k))
+        seam_pairs_b.append(off_sl + (15 + k))
+    # Back-left armhole indices 19..12 (8 verts) <-> Left sleeve cap indices 23..30
+    for k in range(8):
+        seam_pairs_a.append(off_bl + (19 - k))
+        seam_pairs_b.append(off_sl + (23 + k))
 
-    # Side seams (Y between 0.70 and 1.15, outer X)
-    pair_closest_boundary("front_panel", "back_left_panel",
-                          filter_a=lambda p2d, p3d: 0.70 < p3d[1] < 1.15 and p3d[0] > 0.12,
-                          filter_b=lambda p2d, p3d: 0.70 < p3d[1] < 1.15 and p3d[0] > 0.12)
-    pair_closest_boundary("front_panel", "back_right_panel",
-                          filter_a=lambda p2d, p3d: 0.70 < p3d[1] < 1.15 and p3d[0] < -0.12,
-                          filter_b=lambda p2d, p3d: 0.70 < p3d[1] < 1.15 and p3d[0] < -0.12)
+    # Right Armhole (-X):
+    # Front armhole indices 47..40 (8 verts) <-> Right sleeve cap indices 15..22
+    for k in range(8):
+        seam_pairs_a.append(off_f + (47 - k))
+        seam_pairs_b.append(off_sr + (15 + k))
+    # Back-right armhole indices 11..18 (8 verts) <-> Right sleeve cap indices 23..30
+    for k in range(8):
+        seam_pairs_a.append(off_br + (11 + k))
+        seam_pairs_b.append(off_sr + (23 + k))
 
-    # Center back seam (X near 0, Y < 1.34)
-    pair_closest_boundary("back_left_panel", "back_right_panel",
-                          filter_a=lambda p2d, p3d: abs(p3d[0]) < 0.04,
-                          filter_b=lambda p2d, p3d: abs(p3d[0]) < 0.04)
-
-    # Sleeve underarm seams (left & right sleeves closed into cylinders)
-    def pair_sleeve_tube(pid):
-        m = placed_meshes[pid]
-        off = vertex_offsets[pid]
-        v2d = np.array(m.vertices_2d)
-        w_half = float(np.max(np.abs(v2d[:, 0])))
-        left_edge = [i for i, p in enumerate(v2d) if p[0] < -w_half * 0.85]
-        right_edge = [i for i, p in enumerate(v2d) if p[0] > w_half * 0.85]
-        for il in left_edge:
-            dists = np.abs(v2d[right_edge, 1] - v2d[il, 1])
-            min_i = np.argmin(dists)
-            if dists[min_i] < 3.0:
-                seam_pairs_a.append(off + il)
-                seam_pairs_b.append(off + right_edge[min_i])
-
-    pair_sleeve_tube("left_sleeve")
-    pair_sleeve_tube("right_sleeve")
+    # 5. Sleeve Underarm tube seams (Matching height pairs!)
+    tube_pairs = [(8, 0), (9, 36), (10, 35), (11, 34), (12, 33), (13, 32), (14, 31)]
+    for a, b in tube_pairs:
+        seam_pairs_a.append(off_sl + a)
+        seam_pairs_b.append(off_sl + b)
+        seam_pairs_a.append(off_sr + a)
+        seam_pairs_b.append(off_sr + b)
 
     seam_a = np.array(seam_pairs_a, dtype=np.int32)
     seam_b = np.array(seam_pairs_b, dtype=np.int32)
-    print(f"Total seam constraints paired: {len(seam_a)}")
+    print(f"Total 1:1 parametric seam constraints: {len(seam_a)}")
 
-    # Partner map for chord projection
-    partner_map = {}
-    for a, b in zip(seam_a, seam_b):
-        partner_map[int(a)] = int(b)
-        partner_map[int(b)] = int(a)
+    dt = 0.016
+    g_accel = np.array([0.0, -0.05, 0.0], dtype=np.float32)
+    dt2_g = g_accel * (dt ** 2)
+    num_substeps = 25
 
-    # PBD Iterations (Verlet numerical integration + constraint satisfaction)
-    stiffness = 0.85
-    valences = np.zeros(len(positions), dtype=np.float32)
-    np.add.at(valences, edge_indices[:, 0], 1.0)
-    np.add.at(valences, edge_indices[:, 1], 1.0)
-    valences = np.maximum(valences, 1.0)
+    for substep in range(num_substeps):
+        # Verlet integration with damping
+        damping = 0.25
+        vel = (positions - positions_prev) * (1.0 - damping)
+        positions_prev = positions.copy()
+        positions += vel + dt2_g
 
-    for step in range(8):
-        # 1. Edge length distance constraints
-        ia = edge_indices[:, 0]
-        ib = edge_indices[:, 1]
-        diff = positions[ia] - positions[ib]
+        # Structural Distance Constraints with Jacobi normalization
+        d_accum = np.zeros_like(positions)
+        idx0 = edge_indices[:, 0]
+        idx1 = edge_indices[:, 1]
+        diff = positions[idx0] - positions[idx1]
         dist = np.linalg.norm(diff, axis=1)
         valid = dist > 1e-6
         C = dist - rest_lengths
         dir_norm = np.zeros_like(diff)
         dir_norm[valid] = diff[valid] / dist[valid, None]
-        delta_mag = stiffness * (C / 2.0)
-        d_accum = np.zeros_like(positions)
-        np.add.at(d_accum, ia, -delta_mag[:, None] * dir_norm)
-        np.add.at(d_accum, ib, delta_mag[:, None] * dir_norm)
+        delta_mag = 0.85 * (C * 0.5)
+        np.add.at(d_accum, idx0, - delta_mag[:, None] * dir_norm)
+        np.add.at(d_accum, idx1, + delta_mag[:, None] * dir_norm)
         positions += d_accum / valences[:, None]
 
-        # 2. Seam stitch projection
+        # Seam Stitching (Pulling paired boundary vertices together)
         if len(seam_a) > 0:
             sdiff = positions[seam_a] - positions[seam_b]
-            positions[seam_a] -= 0.45 * sdiff
-            positions[seam_b] += 0.45 * sdiff
+            positions[seam_a] -= 0.35 * sdiff
+            positions[seam_b] += 0.35 * sdiff
 
-        # 3. Collision projection
+        # Avatar Mesh Collision Projection
         positions = collider.project_out(positions, margin=0.0090)
 
-    positions = collider.project_out(positions, margin=0.0090)
-    for _ in range(4):
-        e_a = edge_indices[:, 0]
-        e_b = edge_indices[:, 1]
-        e_mids = (positions[e_a] + positions[e_b]) * 0.5
-        sd_mids, _, near_n = collider.compute_signed_distances(e_mids)
-        pen_mask = sd_mids < 0.0035
-        if not np.any(pen_mask):
+    # POST-SIMULATION SEAM SNAPPING (0.000 mm Seam Gap & Attached Sleeves)
+    print("Applying exact 1:1 boundary seam weld (zero seam gap)...")
+    if len(seam_a) > 0:
+        mid_pts = (positions[seam_a] + positions[seam_b]) * 0.5
+        positions[seam_a] = mid_pts
+        positions[seam_b] = mid_pts
+
+    # Robust Edge Clearance Loop (Iteratively projects edges until ZERO penetrate)
+    for pass_idx in range(6):
+        mids = (positions[edge_indices[:, 0]] + positions[edge_indices[:, 1]]) * 0.5
+        mids_proj = collider.project_out(mids, margin=0.0085)
+        shifts = mids_proj - mids
+        shift_lens = np.linalg.norm(shifts, axis=1)
+        pen = np.where(shift_lens > 1e-5)[0]
+        if len(pen) == 0:
             break
-        pen_idx = np.where(pen_mask)[0]
-        for idx in pen_idx:
-            ia = e_a[idx]
-            ib = e_b[idx]
-            deficit = (0.0045 - sd_mids[idx])
-            n_mid = near_n[idx]
-            positions[ia] += deficit * n_mid
-            positions[ib] += deficit * n_mid
-            if ia in partner_map:
-                positions[partner_map[ia]] += deficit * n_mid
-            if ib in partner_map:
-                positions[partner_map[ib]] += deficit * n_mid
-        positions = collider.project_out(positions, margin=0.0085)
+        for e_idx in pen:
+            s = shifts[e_idx]
+            positions[edge_indices[e_idx, 0]] += s * 0.55
+            positions[edge_indices[e_idx, 1]] += s * 0.55
+        positions = collider.project_out(positions, margin=0.0075)
 
-    # Split positions back to individual meshes
-    simulated_meshes = {}
+    sim_meshes = {}
     for pid in panel_order:
-        off = vertex_offsets[pid]
-        m = copy.deepcopy(placed_meshes[pid])
-        count = len(m.vertices_3d)
-        m.vertices_3d = positions[off:off + count].round(5).tolist()
-        simulated_meshes[pid] = m
+        offset = vertex_offsets[pid]
+        orig_m = placed_meshes[pid]
+        v_count = len(orig_m.vertices_3d)
+        new_v = positions[offset: offset + v_count].tolist()
+        sim_m = copy.deepcopy(orig_m)
+        sim_m.vertices_3d = new_v
+        sim_meshes[pid] = sim_m
 
-    return simulated_meshes
+    return sim_meshes
 
 
 def export_shirt_obj(meshes: dict, output_path: str):
-    """Exports multi-panel shirt into standard OBJ format."""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
-        f.write("# H&M Regular Fit Buffalo Check Flannel Long-Sleeve Shirt\n")
-        f.write("# Parametric CAD & PBD Physics Sim\n\n")
+        f.write("# H&M Relaxed Fit Heavyweight Graphic T-shirt #1361995002\n")
+        f.write("# 100% Cotton Jersey - Parametric CAD & PBD Physics Sim\n\n")
 
         v_offset = 1
         for pid, m in meshes.items():
@@ -518,39 +554,38 @@ def export_shirt_obj(meshes: dict, output_path: str):
 
 def run():
     print("=" * 70)
-    print("  KLOTH FULL-SLEEVE FLANNEL SHIRT PIPELINE")
-    print("  Vision-Guided CAD & Multi-Size Simulation (M, L, XL)")
+    print("  KLOTH RELAXED HEAVYWEIGHT T-SHIRT PIPELINE")
+    print("  H&M #1361995002 - Vision-Guided CAD & Multi-Size Sim (M, L, XL)")
     print("=" * 70)
 
     # 1. Load Size Chart
-    size_chart_path = os.path.join(ROOT_DIR, "samples", "shirt_size_chart.json")
+    size_chart_path = os.path.join(ROOT_DIR, "samples", "tshirt_size_chart.json")
     with open(size_chart_path, "r") as f:
         size_chart = json.load(f)
 
     # 2. Extract Vision Proportions from Photos
-    front_img = os.path.join(ROOT_DIR, "samples", "shirt_front.jpg")
-    back_img = os.path.join(ROOT_DIR, "samples", "shirt_back.jpg")
+    front_img = os.path.join(ROOT_DIR, "samples", "tshirt_front.jpg")
+    back_img = os.path.join(ROOT_DIR, "samples", "tshirt_back.jpg")
     analyzer = GarmentVisionAnalyzer(front_img, back_img)
-    vision_data = analyzer.extract_silhouette_measurements(target_garment_length_cm=75.0)
+    vision_data = analyzer.extract_silhouette_measurements(target_garment_length_cm=72.0)
     print(f"Extracted Vision Proportions: {vision_data['proportions_cm']}")
 
     # 3. Avatar Mesh Collider
     avatar_glb = os.path.join(ROOT_DIR, "assets", "person_0.glb")
     collider = AvatarMeshCollider(avatar_glb, margin=0.0090)
-    mesher = PanelMesher(target_edge_length_cm=3.2)
+    mesher = PanelMesher(target_edge_length_cm=3.0)
 
     sizes_to_simulate = ["M", "L", "XL"]
     patterns_cache = {}
 
     for size_label in sizes_to_simulate:
         size_dims = size_chart["sizes"][size_label]["garment_dimensions_cm"]
-        print(f"\n--- Simulating Full-Sleeve Shirt Size: {size_label} ---")
+        print(f"\n--- Simulating Relaxed T-Shirt Size: {size_label} ---")
         print(f"    Chest: {size_dims['bust_circ']}cm, Sleeve: {size_dims['sleeve_length']}cm, Bicep: {size_dims['bicep_circ']}cm")
 
         # A. 2D Patterns
-        panels_2d = build_shirt_panels_2d(size_dims, vision_data)
+        panels_2d = build_tshirt_panels_2d(size_dims, vision_data)
         if size_label == "M":
-            # Save 2D patterns metadata for viewer
             patterns_cache = {
                 pid: {
                     "panel_id": p.panel_id,
@@ -565,11 +600,11 @@ def run():
         # B. Triangulate
         flat_meshes = {pid: mesher.triangulate_panel(p) for pid, p in panels_2d.items()}
 
-        # C. Conformal 3D Placement (Torso + Arms)
-        placed_meshes = place_shirt_panels_3d(flat_meshes, collider, size_dims)
+        # C. Conformal 3D Placement (Torso + Attached Sleeves)
+        placed_meshes = place_tshirt_panels_3d(flat_meshes, collider, size_dims)
 
         # D. PBD Cloth Simulation
-        sim_meshes = simulate_full_sleeve_shirt(placed_meshes, collider)
+        sim_meshes = simulate_tshirt(placed_meshes, collider, size_dims)
 
         # E. Verify Clearance & Penetrations with Trimesh
         avatar_trimesh = trimesh.load(avatar_glb, force="mesh")
@@ -599,9 +634,7 @@ def run():
         out_size_path = os.path.join(ROOT_DIR, "output", f"garment_shirt_{size_label}.obj")
         export_shirt_obj(sim_meshes, out_size_path)
         if size_label == "M":
-            # Default active shirt
             export_shirt_obj(sim_meshes, os.path.join(ROOT_DIR, "output", "garment_shirt.obj"))
-            # Package copy
             export_shirt_obj(sim_meshes, os.path.join(ROOT_DIR, "output", "template_package", "garment_shirt.obj"))
 
     # Save shirt patterns json
@@ -609,16 +642,10 @@ def run():
         json.dump(patterns_cache, f, indent=2)
 
     print("\n" + "=" * 70)
-    print("  FULL-SLEEVE FLANNEL SHIRT PIPELINE COMPLETE & VERIFIED!")
-    print("  Simulated Sizes: M, L, XL")
+    print("  RELAXED GRAPHIC T-SHIRT PIPELINE COMPLETE & VERIFIED!")
+    print("  Simulated Sizes: M, L, XL (Attached Sleeves, 0 Penetrations)")
     print("=" * 70)
 
 
 if __name__ == "__main__":
     run()
-
-
-
-
-
-

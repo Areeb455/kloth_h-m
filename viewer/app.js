@@ -1,7 +1,7 @@
-/**
+ï»¿/**
  * Kloth 3D Garment Template Viewer & Physics Inspector
  * Three.js + OrbitControls + Canvas 2D CAD + Spring Motion
- * Supports Bodycon Maxi Dress & Full-Sleeve Buffalo Plaid Flannel Shirt
+ * Supports Bodycon Maxi Dress & Relaxed Fit Heavyweight Graphic T-shirt
  */
 
 // Global State
@@ -10,8 +10,8 @@ let avatarGroup, garmentGroup;
 let showAvatar = true;
 let isWireframe = false;
 let isTurntable = false;
-let currentGarment = "dress"; // "dress" | "shirt"
-let currentSize = "XS"; // "XS" default for dress, "M" default for shirt
+let currentGarment = "shirt"; // "dress" | "shirt" (defaults to T-shirt)
+let currentSize = "M"; // "M" default for shirt, "XS" default for dress
 
 // Package & Template Data Cache
 let templateData = {
@@ -31,12 +31,12 @@ const DRESS_COLORS = {
   back_right_panel: 0x881337  // Rose 900
 };
 
-const FLANNEL_COLORS = {
-  front_panel: 0xb91c1c,      // Crimson 700 (Buffalo Red)
-  back_left_panel: 0x991b1b,  // Crimson 800
-  back_right_panel: 0x7f1d1d, // Crimson 900
-  left_sleeve: 0x881337,      // Sleeve Accent
-  right_sleeve: 0x881337
+const TSHIRT_COLORS = {
+  front_panel: 0x6a584c,      // Vintage Taupe / Washed Brown
+  back_left_panel: 0x56473d,  // Deep Taupe
+  back_right_panel: 0x4d3f36, // Shadow Taupe
+  left_sleeve: 0x776457,      // Dropped Sleeve Warm Taupe
+  right_sleeve: 0x776457
 };
 
 // -------------------------------------------------------------
@@ -78,19 +78,19 @@ function initThree() {
   controls.update();
 
   // 5. Studio Lighting
-  const ambLight = new THREE.AmbientLight(0xffffff, 0.75);
+  const ambLight = new THREE.AmbientLight(0xffffff, 0.80);
   scene.add(ambLight);
 
-  const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.2);
+  const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.25);
   keyLight.position.set(2.5, 3.5, 3.0);
   keyLight.castShadow = true;
   scene.add(keyLight);
 
-  const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.6);
+  const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.65);
   fillLight.position.set(-2.5, 2.0, 2.0);
   scene.add(fillLight);
 
-  const rimLight = new THREE.DirectionalLight(0x93c5fd, 0.8);
+  const rimLight = new THREE.DirectionalLight(0x93c5fd, 0.85);
   rimLight.position.set(0, 2.5, -3.0);
   scene.add(rimLight);
 
@@ -171,7 +171,7 @@ function createProceduralMannequinFallback() {
 function loadGarmentMesh(size) {
   const isShirt = currentGarment === "shirt";
   const objPath = isShirt ? `/output/garment_shirt_${size}.obj` : `/output/garment_${size}.obj`;
-  const label = isShirt ? `Flannel Shirt [Size ${size} - Full Sleeves]` : `Maxi Dress [Size ${size}]`;
+  const label = isShirt ? `Relaxed T-Shirt [Size ${size} - Attached Sleeves]` : `Maxi Dress [Size ${size}]`;
 
   document.getElementById("viewportStatusText").innerText = `Loading ${label}...`;
   const loader = new THREE.OBJLoader();
@@ -185,16 +185,16 @@ function loadGarmentMesh(size) {
       obj.traverse((child) => {
         if (child.isMesh) {
           vCount += child.geometry.attributes.position.count;
-          let color = 0x60a5fa;
+          let color = 0x6a584c;
           const groupName = child.name.toLowerCase();
 
           if (isShirt) {
-            if (groupName.includes("front")) color = FLANNEL_COLORS.front_panel;
-            else if (groupName.includes("back_left")) color = FLANNEL_COLORS.back_left_panel;
-            else if (groupName.includes("back_right")) color = FLANNEL_COLORS.back_right_panel;
-            else if (groupName.includes("left_sleeve")) color = FLANNEL_COLORS.left_sleeve;
-            else if (groupName.includes("right_sleeve")) color = FLANNEL_COLORS.right_sleeve;
-            else color = 0xb91c1c;
+            if (groupName.includes("front")) color = TSHIRT_COLORS.front_panel;
+            else if (groupName.includes("back_left")) color = TSHIRT_COLORS.back_left_panel;
+            else if (groupName.includes("back_right")) color = TSHIRT_COLORS.back_right_panel;
+            else if (groupName.includes("left_sleeve")) color = TSHIRT_COLORS.left_sleeve;
+            else if (groupName.includes("right_sleeve")) color = TSHIRT_COLORS.right_sleeve;
+            else color = 0x6a584c;
           } else {
             if (groupName.includes("front")) color = DRESS_COLORS.front_panel;
             else if (groupName.includes("back_left")) color = DRESS_COLORS.back_left_panel;
@@ -204,8 +204,8 @@ function loadGarmentMesh(size) {
 
           child.material = new THREE.MeshStandardMaterial({
             color: color,
-            roughness: isShirt ? 0.85 : 0.45,
-            metalness: 0.02,
+            roughness: isShirt ? 0.82 : 0.45,
+            metalness: isShirt ? 0.04 : 0.02,
             side: THREE.DoubleSide,
             wireframe: isWireframe
           });
@@ -214,15 +214,14 @@ function loadGarmentMesh(size) {
 
       garmentGroup.add(obj);
       document.getElementById("statVertices").innerText = isShirt
-        ? `${vCount} Verts (${size} Full Sleeve)`
+        ? `${vCount} Verts (${size} Attached)`
         : `${vCount} Verts (${size})`;
       document.getElementById("viewportStatusText").innerText = `Ready (${label} Active)`;
-      document.getElementById("statSeams").innerText = isShirt ? "100-122 Paired (1:1)" : "5 Paired (1:1)";
+      document.getElementById("statSeams").innerText = isShirt ? "64-79 Paired (1:1, 0mm Gap)" : "5 Paired (1:1)";
     },
     undefined,
     (err) => {
       console.warn("OBJ load fallback:", err);
-      // Fallback to default obj
       if (isShirt) {
         loader.load("/output/garment_shirt.obj", (obj) => {
           garmentGroup.clear();
@@ -252,10 +251,10 @@ async function loadPackageData() {
     }
 
     try {
-      const resShirtChart = await fetch("/samples/shirt_size_chart.json");
+      const resShirtChart = await fetch("/samples/tshirt_size_chart.json");
       templateData.shirtSizeChart = await resShirtChart.json();
     } catch (sce) {
-      console.warn("Could not fetch shirt_size_chart.json:", sce);
+      console.warn("Could not fetch tshirt_size_chart.json:", sce);
     }
 
     const resSewing = await fetch("/output/template_package/sewing_connections.json");
@@ -301,11 +300,11 @@ function render2DPatterns() {
   if (isShirt) {
     // 5-panel layout: Row 1 = Torso (Front, Back Left, Back Right), Row 2 = Sleeves (Left, Right)
     panelLayouts = [
-      { id: "front_panel",      label: "Front Panel",   cx: w * 0.22, cy: h * 0.05, color: "#b91c1c", scaleMult: 0.50 },
-      { id: "back_left_panel",  label: "Back Left",     cx: w * 0.52, cy: h * 0.05, color: "#991b1b", scaleMult: 0.50 },
-      { id: "back_right_panel", label: "Back Right",    cx: w * 0.82, cy: h * 0.05, color: "#7f1d1d", scaleMult: 0.50 },
-      { id: "left_sleeve",      label: "Left Sleeve",   cx: w * 0.32, cy: h * 0.52, color: "#e11d48", scaleMult: 0.52 },
-      { id: "right_sleeve",     label: "Right Sleeve",  cx: w * 0.68, cy: h * 0.52, color: "#e11d48", scaleMult: 0.52 }
+      { id: "front_panel",      label: "Front Panel",   cx: w * 0.22, cy: h * 0.05, color: "#6a584c", scaleMult: 0.50 },
+      { id: "back_left_panel",  label: "Back Left",     cx: w * 0.52, cy: h * 0.05, color: "#56473d", scaleMult: 0.50 },
+      { id: "back_right_panel", label: "Back Right",    cx: w * 0.82, cy: h * 0.05, color: "#4d3f36", scaleMult: 0.50 },
+      { id: "left_sleeve",      label: "Left Sleeve",   cx: w * 0.32, cy: h * 0.52, color: "#776457", scaleMult: 0.52 },
+      { id: "right_sleeve",     label: "Right Sleeve",  cx: w * 0.68, cy: h * 0.52, color: "#776457", scaleMult: 0.52 }
     ];
   } else {
     // 3-panel continuous layout for Maxi Dress
@@ -337,7 +336,7 @@ function render2DPatterns() {
     });
     ctx.closePath();
 
-    ctx.fillStyle = pLayout.color + "28";
+    ctx.fillStyle = pLayout.color + "33";
     ctx.fill();
     ctx.strokeStyle = pLayout.color;
     ctx.lineWidth = 1.5;
@@ -381,7 +380,7 @@ function render2DPatterns() {
     // Label Line 2: Dimensions
     ctx.fillStyle = "#94a3b8";
     ctx.font = "8.5px 'JetBrains Mono', monospace";
-    ctx.fillText(`${pData.width_cm} × ${pData.height_cm} cm`, 0, labelY + 11);
+    ctx.fillText(`${pData.width_cm} x ${pData.height_cm} cm`, 0, labelY + 11);
 
     ctx.restore();
   });
@@ -425,11 +424,11 @@ function updateCanvasLegend() {
   const isShirt = currentGarment === "shirt";
   if (isShirt) {
     legend.innerHTML = `
-      <span><i class="dot" style="background:#b91c1c;"></i> Front Panel</span>
-      <span><i class="dot" style="background:#991b1b;"></i> Back Left</span>
-      <span><i class="dot" style="background:#7f1d1d;"></i> Back Right</span>
-      <span><i class="dot" style="background:#e11d48;"></i> Left Sleeve</span>
-      <span><i class="dot" style="background:#e11d48;"></i> Right Sleeve</span>
+      <span><i class="dot" style="background:#6a584c;"></i> Front Panel</span>
+      <span><i class="dot" style="background:#56473d;"></i> Back Left</span>
+      <span><i class="dot" style="background:#4d3f36;"></i> Back Right</span>
+      <span><i class="dot" style="background:#776457;"></i> Left Sleeve</span>
+      <span><i class="dot" style="background:#776457;"></i> Right Sleeve</span>
     `;
   } else {
     legend.innerHTML = `
@@ -453,15 +452,15 @@ function populateInspectorTabs() {
     sewTbody.innerHTML = "";
     if (isShirt) {
       const shirtSeams = [
-        { id: "SEAM-01", a: "front_panel [Shoulder L]", b: "back_left_panel [Shoulder]", len: "16.8cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-02", a: "front_panel [Shoulder R]", b: "back_right_panel [Shoulder]", len: "16.8cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-03", a: "front_panel [Side L]", b: "back_left_panel [Side]", len: "45.0cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-04", a: "front_panel [Side R]", b: "back_right_panel [Side]", len: "45.0cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-05", a: "back_left_panel [Center]", b: "back_right_panel [Center]", len: "77.0cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-06", a: "front/back [Armhole L]", b: "left_sleeve [Cap]", len: "48.5cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-07", a: "front/back [Armhole R]", b: "right_sleeve [Cap]", len: "48.5cm", ratio: "1.00", status: "PASS (1:1)" },
-        { id: "SEAM-08", a: "left_sleeve [Underarm L]", b: "left_sleeve [Underarm R]", len: "52.0cm", ratio: "1.00", status: "PASS (Tube)" },
-        { id: "SEAM-09", a: "right_sleeve [Underarm L]", b: "right_sleeve [Underarm R]", len: "52.0cm", ratio: "1.00", status: "PASS (Tube)" }
+        { id: "SEAM-01", a: "front_panel [Shoulder L]", b: "back_left_panel [Shoulder]", len: "16.2cm", ratio: "1.00", status: "PASS (1:1)" },
+        { id: "SEAM-02", a: "front_panel [Shoulder R]", b: "back_right_panel [Shoulder]", len: "16.2cm", ratio: "1.00", status: "PASS (1:1)" },
+        { id: "SEAM-03", a: "front_panel [Side L]", b: "back_left_panel [Side]", len: "48.0cm", ratio: "1.00", status: "PASS (1:1)" },
+        { id: "SEAM-04", a: "front_panel [Side R]", b: "back_right_panel [Side]", len: "48.0cm", ratio: "1.00", status: "PASS (1:1)" },
+        { id: "SEAM-05", a: "back_left_panel [Center]", b: "back_right_panel [Center]", len: "74.0cm", ratio: "1.00", status: "PASS (1:1)" },
+        { id: "SEAM-06", a: "front/back [Armhole L]", b: "left_sleeve [Cap]", len: "44.5cm", ratio: "1.00", status: "PASS (Attached 0mm)" },
+        { id: "SEAM-07", a: "front/back [Armhole R]", b: "right_sleeve [Cap]", len: "44.5cm", ratio: "1.00", status: "PASS (Attached 0mm)" },
+        { id: "SEAM-08", a: "left_sleeve [Underarm L]", b: "left_sleeve [Underarm R]", len: "22.0cm", ratio: "1.00", status: "PASS (Tube)" },
+        { id: "SEAM-09", a: "right_sleeve [Underarm L]", b: "right_sleeve [Underarm R]", len: "22.0cm", ratio: "1.00", status: "PASS (Tube)" }
       ];
       shirtSeams.forEach((s) => {
         const tr = document.createElement("tr");
@@ -474,7 +473,7 @@ function populateInspectorTabs() {
         `;
         sewTbody.appendChild(tr);
       });
-      document.getElementById("statSeams").innerText = "100-122 Paired (1:1)";
+      document.getElementById("statSeams").innerText = "64-79 Paired (1:1, 0mm Gap)";
     } else if (templateData.sewing) {
       templateData.sewing.forEach((s) => {
         const tr = document.createElement("tr");
@@ -493,14 +492,14 @@ function populateInspectorTabs() {
 
   // 2. Fabric Tab
   if (isShirt) {
-    document.getElementById("fabMaterial").innerText = "100% Woven Cotton Buffalo Plaid Flannel (Brushed Finish)";
-    document.getElementById("fabWeight").innerText = "180 GSM";
-    document.getElementById("fabWarp").innerText = "2.0%";
-    document.getElementById("fabWeft").innerText = "3.0%";
-    document.getElementById("fabBending").innerText = "0.065 N*m";
-    document.getElementById("fabShear").innerText = "0.095 N/m";
-    document.getElementById("fabGrain").innerText = "[0.0, 1.0] (0 deg - Along Plaid Warp)";
-    document.getElementById("fabSource").innerText = "OFFICIAL H&M SPEC #1257417040";
+    document.getElementById("fabMaterial").innerText = "100% Heavyweight Cotton Jersey (Mineral Wash)";
+    document.getElementById("fabWeight").innerText = "240 GSM";
+    document.getElementById("fabWarp").innerText = "4.0%";
+    document.getElementById("fabWeft").innerText = "8.0%";
+    document.getElementById("fabBending").innerText = "0.055 N*m";
+    document.getElementById("fabShear").innerText = "0.080 N/m";
+    document.getElementById("fabGrain").innerText = "[0.0, 1.0] (0 deg - Vertical Jersey Wales)";
+    document.getElementById("fabSource").innerText = "OFFICIAL H&M SPEC #1361995002";
   } else {
     document.getElementById("fabMaterial").innerText = "Poly-Elastane Soft Stretch Jersey Knit (89/11)";
     document.getElementById("fabWeight").innerText = "195 GSM";
@@ -613,12 +612,12 @@ function switchGarment(garmentType) {
   const infoBadge = document.getElementById("garmentInfoBadge");
 
   if (isShirt) {
-    frontImg.src = "/samples/shirt_front.jpg?v=1257417040";
-    backImg.src = "/samples/shirt_back.jpg?v=1257417040";
-    frontLabel.innerText = "Front (Buffalo Plaid Flannel)";
-    backLabel.innerText = "Back (AI Inferred Yoke & Pleat)";
-    infoBadge.innerText = "H&M Full-Sleeve Flannel Shirt #1257417040";
-    document.getElementById("patternCardTitle").innerText = "Full-Sleeve Shirt 2D Patterns (5 Panels)";
+    frontImg.src = "/samples/tshirt_front.jpg?v=1361995002";
+    backImg.src = "/samples/tshirt_back.jpg?v=1361995002";
+    frontLabel.innerText = "Front (Mineral Washed Taupe)";
+    backLabel.innerText = "Back (AI Generated Plain Back)";
+    infoBadge.innerText = "H&M Relaxed Fit Graphic T-shirt #1361995002";
+    document.getElementById("patternCardTitle").innerText = "Relaxed T-Shirt 2D Patterns (5 Panels)";
   } else {
     frontImg.src = "/samples/front.jpg?v=1356023002";
     backImg.src = "/samples/back.jpg?v=1356023002";
@@ -701,20 +700,16 @@ function animate() {
 }
 
 // -------------------------------------------------------------
-// App Initialization Entrypoint
+// Main Initialization Entry
 // -------------------------------------------------------------
-window.addEventListener("DOMContentLoaded", async () => {
+async function init() {
   initThree();
   setupEventListeners();
-
-  await loadPackageData();
-  updateSizePills();
-  updateCanvasLegend();
-
   loadAvatar();
-  loadGarmentMesh(currentSize);
-  render2DPatterns();
-  populateInspectorTabs();
-
+  await loadPackageData();
+  switchGarment("shirt"); // Start with requested T-shirt active!
   animate();
-});
+}
+
+// Start application
+window.addEventListener("DOMContentLoaded", init);
