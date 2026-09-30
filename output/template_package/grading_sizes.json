@@ -31,7 +31,7 @@
       },
       "mesh_obj_filename": "garment_XXS.obj",
       "vertex_count": 879,
-      "face_count": 1456
+      "face_count": 1452
     },
     "XS": {
       "size_label": "XS",
@@ -53,8 +53,8 @@
         "length_delta_cm": 0.0
       },
       "mesh_obj_filename": "garment_XS.obj",
-      "vertex_count": 934,
-      "face_count": 1558
+      "vertex_count": 925,
+      "face_count": 1538
     },
     "S": {
       "size_label": "S",
@@ -76,8 +76,8 @@
         "length_delta_cm": 2.0
       },
       "mesh_obj_filename": "garment_S.obj",
-      "vertex_count": 1019,
-      "face_count": 1724
+      "vertex_count": 1016,
+      "face_count": 1714
     },
     "M": {
       "size_label": "M",
@@ -99,8 +99,8 @@
         "length_delta_cm": 4.0
       },
       "mesh_obj_filename": "garment_M.obj",
-      "vertex_count": 1092,
-      "face_count": 1860
+      "vertex_count": 1088,
+      "face_count": 1854
     },
     "L": {
       "size_label": "L",
@@ -122,8 +122,8 @@
         "length_delta_cm": 6.0
       },
       "mesh_obj_filename": "garment_L.obj",
-      "vertex_count": 1216,
-      "face_count": 2098
+      "vertex_count": 1212,
+      "face_count": 2096
     },
     "XL": {
       "size_label": "XL",
@@ -145,8 +145,8 @@
         "length_delta_cm": 7.0
       },
       "mesh_obj_filename": "garment_XL.obj",
-      "vertex_count": 1314,
-      "face_count": 2286
+      "vertex_count": 1308,
+      "face_count": 2284
     },
     "XXL": {
       "size_label": "XXL",
@@ -168,8 +168,8 @@
         "length_delta_cm": 8.0
       },
       "mesh_obj_filename": "garment_XXL.obj",
-      "vertex_count": 1461,
-      "face_count": 2564
+      "vertex_count": 1457,
+      "face_count": 2572
     }
   }
 }

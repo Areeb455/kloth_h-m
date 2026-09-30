@@ -70,10 +70,10 @@
       "category": "Cloth Simulation",
       "name": "Seam Assembly Gap (< 5 mm)",
       "status": "PASS",
-      "details": "Max residual seam gap: 2.20 mm, Average gap: 0.94 mm (Threshold: < 5.0 mm)",
+      "details": "Max residual seam gap: 2.86 mm, Average gap: 0.93 mm (Threshold: < 5.0 mm)",
       "metrics": {
-        "max_gap_mm": 2.2,
-        "avg_gap_mm": 0.94
+        "max_gap_mm": 2.86,
+        "avg_gap_mm": 0.93
       }
     },
     {
@@ -89,23 +89,23 @@
       "category": "Cloth Simulation",
       "name": "Simulation Equilibrium Settling",
       "status": "PASS",
-      "details": "Final kinetic energy: 0.000049 J, Max step displacement: 2.483 mm",
+      "details": "Final kinetic energy: 0.000049 J, Max step displacement: 1.227 mm",
       "metrics": {
         "final_ke": 4.9e-05,
-        "max_displacement_mm": 2.483
+        "max_displacement_mm": 1.227
       }
     },
     {
       "category": "Mannequin Fit",
       "name": "Avatar Real Mesh Non-Penetration",
       "status": "PASS",
-      "details": "Tested 934 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 6.74 mm, max penetration depth: 0.0 mm",
+      "details": "Tested 925 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 5.6 mm, max penetration depth: 0.0 mm",
       "metrics": {
-        "total_vertices": 934,
+        "total_vertices": 925,
         "penetrated_vertices": 0,
         "pct_vertices_inside": 0.0,
         "max_penetration_mm": 0.0,
-        "min_signed_dist_mm": 6.74,
+        "min_signed_dist_mm": 5.6,
         "zero_penetration_pass": true
       }
     },
@@ -113,49 +113,49 @@
       "category": "Edge Strain Preservation",
       "name": "front_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "front_panel per-edge stretch vs 2D rest: mean=21.25%, p95=70.15% (Limit: <= 15.0%), max=153.21% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "front_panel per-edge stretch vs 2D rest: mean=21.06%, p95=70.17% (Limit: <= 15.0%), max=147.81% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 21.25,
-        "p95_strain_pct": 70.15,
-        "max_strain_pct": 153.21
+        "mean_strain_pct": 21.06,
+        "p95_strain_pct": 70.17,
+        "max_strain_pct": 147.81
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_left_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_left_panel per-edge stretch vs 2D rest: mean=21.19%, p95=66.45% (Limit: <= 15.0%), max=433.28% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "back_left_panel per-edge stretch vs 2D rest: mean=21.34%, p95=67.05% (Limit: <= 15.0%), max=200.12% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 21.19,
-        "p95_strain_pct": 66.45,
-        "max_strain_pct": 433.28
+        "mean_strain_pct": 21.34,
+        "p95_strain_pct": 67.05,
+        "max_strain_pct": 200.12
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_right_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_right_panel per-edge stretch vs 2D rest: mean=22.15%, p95=65.68% (Limit: <= 15.0%), max=370.79% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "back_right_panel per-edge stretch vs 2D rest: mean=22.32%, p95=67.26% (Limit: <= 15.0%), max=123.87% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 22.15,
-        "p95_strain_pct": 65.68,
-        "max_strain_pct": 370.79
+        "mean_strain_pct": 22.32,
+        "p95_strain_pct": 67.26,
+        "max_strain_pct": 123.87
       }
     },
     {
       "category": "Mesh Topology",
       "name": "front_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 786 face indices within [0, 451]",
+      "details": "All 778 face indices within [0, 448]",
       "metrics": {
-        "face_count": 786
+        "face_count": 778
       }
     },
     {
       "category": "Mesh Topology",
       "name": "front_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 786",
+      "details": "Found 0 degenerate faces out of 778",
       "metrics": {
         "degenerate_count": 0
       }
@@ -164,16 +164,16 @@
       "category": "Mesh Topology",
       "name": "back_left_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 376 face indices within [0, 235]",
+      "details": "All 366 face indices within [0, 230]",
       "metrics": {
-        "face_count": 376
+        "face_count": 366
       }
     },
     {
       "category": "Mesh Topology",
       "name": "back_left_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 376",
+      "details": "Found 0 degenerate faces out of 366",
       "metrics": {
         "degenerate_count": 0
       }
@@ -182,16 +182,16 @@
       "category": "Mesh Topology",
       "name": "back_right_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 396 face indices within [0, 245]",
+      "details": "All 394 face indices within [0, 244]",
       "metrics": {
-        "face_count": 396
+        "face_count": 394
       }
     },
     {
       "category": "Mesh Topology",
       "name": "back_right_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 396",
+      "details": "Found 0 degenerate faces out of 394",
       "metrics": {
         "degenerate_count": 0
       }
@@ -210,11 +210,11 @@
       "category": "Sewing Integrity",
       "name": "seam_shoulder_right - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 4.1 cm, Len B: 3.82 cm (ratio: 1.07)",
+      "details": "Len A: 3.82 cm, Len B: 3.82 cm (ratio: 1.00)",
       "metrics": {
-        "length_a": 4.1,
+        "length_a": 3.82,
         "length_b": 3.82,
-        "ratio": 1.073
+        "ratio": 1.0
       }
     },
     {
@@ -231,11 +231,11 @@
       "category": "Sewing Integrity",
       "name": "seam_shoulder_left - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 4.1 cm, Len B: 3.82 cm (ratio: 1.07)",
+      "details": "Len A: 3.82 cm, Len B: 3.82 cm (ratio: 1.00)",
       "metrics": {
-        "length_a": 4.1,
+        "length_a": 3.82,
         "length_b": 3.82,
-        "ratio": 1.073
+        "ratio": 1.0
       }
     },
     {
@@ -273,11 +273,11 @@
       "category": "Sewing Integrity",
       "name": "seam_side_right - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 100.39 cm, Len B: 102.39 cm (ratio: 0.98)",
+      "details": "Len A: 100.39 cm, Len B: 100.39 cm (ratio: 1.00)",
       "metrics": {
         "length_a": 100.39,
-        "length_b": 102.39,
-        "ratio": 0.98
+        "length_b": 100.39,
+        "ratio": 1.0
       }
     },
     {
@@ -294,11 +294,11 @@
       "category": "Sewing Integrity",
       "name": "seam_side_left - Gather Ratio",
       "status": "PASS",
-      "details": "Len A: 100.39 cm, Len B: 102.39 cm (ratio: 0.98)",
+      "details": "Len A: 100.39 cm, Len B: 100.39 cm (ratio: 1.00)",
       "metrics": {
         "length_a": 100.39,
-        "length_b": 102.39,
-        "ratio": 0.98
+        "length_b": 100.39,
+        "ratio": 1.0
       }
     },
     {

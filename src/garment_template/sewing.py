@@ -95,10 +95,15 @@ class SewingEngine:
             va, len_a = self._find_edge_vertices(s_def["panel_a"], s_def["edge_a"])
             vb, len_b = self._find_edge_vertices(s_def["panel_b"], s_def["edge_b"])
 
-            # Equalize vertex count for 1:1 simulation mapping
-            pair_count = max(2, min(len(va), len(vb)))
-            idx_a_sub = [va[int(round(i))] for i in np.linspace(0, len(va) - 1, pair_count)]
-            idx_b_sub = [vb[int(round(i))] for i in np.linspace(0, len(vb) - 1, pair_count)]
+            # When counts match exactly (guaranteed by our 1:1 parametric pattern generator), pair directly
+            if len(va) == len(vb):
+                idx_a_sub = list(va)
+                idx_b_sub = list(vb)
+            else:
+                # Equalize vertex count for 1:1 simulation mapping
+                pair_count = max(2, min(len(va), len(vb)))
+                idx_a_sub = [va[int(round(i))] for i in np.linspace(0, len(va) - 1, pair_count)]
+                idx_b_sub = [vb[int(round(i))] for i in np.linspace(0, len(vb) - 1, pair_count)]
 
             gather_ratio = round(len_a / max(1e-4, len_b), 3)
             delta = abs(len_a - len_b)

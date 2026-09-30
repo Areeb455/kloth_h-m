@@ -42,11 +42,11 @@ class PatternGenerator:
         self.neck_drop_back = vp.get("back_neck_depth", 13.7)
         self.armhole_drop = vp.get("armhole_depth", 18.1)
 
-        self.shoulder_w = dimensions.get("shoulder_width", 23.5)
-        self.neck_half_w = 8.0  # Narrow tank strap width: (23.5/2 - 8.0) = 3.75 cm (~3 cm)
+        self.shoulder_w = dimensions.get("shoulder_width", 22.5)
+        self.neck_half_w = 8.0  # Narrow tank strap width: (22.5/2 - 8.0) = 3.25 cm (~3 cm)
 
     def _sample_bezier_curve(self, p0: Tuple[float, float], p1: Tuple[float, float],
-                             p2: Tuple[float, float], num_pts: int = 8) -> List[Tuple[float, float]]:
+                             p2: Tuple[float, float], num_pts: int = 10) -> List[Tuple[float, float]]:
         """Samples quadratic Bezier curve for neckline and armholes."""
         t = np.linspace(0, 1, num_pts)
         pts = []
@@ -70,7 +70,7 @@ class PatternGenerator:
 
     def build_front_panel(self) -> Panel2DGeometry:
         h = self.total_len_front
-        half_shoulder = self.shoulder_w / 2.0
+        half_shoulder = self.shoulder_w / 2.0  # Constant 11.25 cm (strap outer edge)
         half_bust = self.w_bust / 2.0
         half_waist = self.w_waist / 2.0
         half_hip = self.w_hip / 2.0
@@ -86,26 +86,19 @@ class PatternGenerator:
 
         # 1. Right shoulder
         p_neck_inner_r = (self.neck_half_w, 0.0)
-        p_shoulder_outer_r = (half_shoulder, -2.5)
+        p_shoulder_outer_r = (half_shoulder, -2.0)
         idx_sh_r_start = len(points)
         points.append(p_neck_inner_r)
         points.extend(self._resample_straight_segment(p_neck_inner_r, p_shoulder_outer_r, 2.5))
         edges["shoulder_right"] = [idx_sh_r_start, len(points) - 1]
 
-        # 2. Right armhole -- fixed scoop keeps strap narrow for ALL sizes
-        # Side-seam still ends at full bust width (sewing seam match).
-        # Armhole CURVE only spans from strap tip to a fixed narrow scoop point.
-        # A horizontal bridge at underarm level connects scoop -> bust width.
+        # 2. Right armhole -- smooth vertical scoop from strap outer edge directly to underarm
         p_underarm_r = (half_bust, armhole_y)
-        strap_scoop_w = half_shoulder + 2.25  # ~13.5 cm from center, FIXED (not bust-based)
-        p_scoop_r = (strap_scoop_w, armhole_y)
-        ctrl_arm_r = (strap_scoop_w, armhole_y * 0.35)  # fixed control -- same for all sizes
-        arm_pts_r = self._sample_bezier_curve(p_shoulder_outer_r, ctrl_arm_r, p_scoop_r, num_pts=8)[1:]
+        ctrl_arm_r = (half_shoulder, armhole_y * 0.70)
+        arm_pts_r = self._sample_bezier_curve(p_shoulder_outer_r, ctrl_arm_r, p_underarm_r, num_pts=10)[1:]
         idx_arm_r_start = len(points) - 1
         for p in arm_pts_r:
             points.append(p)
-        # Horizontal underarm bridge: fixed scoop -> full bust width (exposed edge, not sewn)
-        points.extend(self._resample_straight_segment(p_scoop_r, p_underarm_r, 2.0))
         edges["armhole_right"] = [idx_arm_r_start, len(points) - 1]
 
         # 3. Continuous Right Side Seam (underarm -> waist -> hip -> hem)
@@ -133,15 +126,10 @@ class PatternGenerator:
         idx_side_l_end = len(points) - 1
         edges["side_seam_left"] = [idx_side_l_start, idx_side_l_end]
 
-        # 6. Left armhole -- fixed scoop keeps strap narrow for ALL sizes
-        p_shoulder_outer_l = (-half_shoulder, -2.5)
-        strap_scoop_w_l = half_shoulder + 2.25  # ~13.5 cm from center, FIXED
-        p_scoop_l = (-strap_scoop_w_l, armhole_y)
-        # Horizontal bridge: bust width -> fixed scoop (exposed underarm, not sewn)
-        points.extend(self._resample_straight_segment(p_underarm_l, p_scoop_l, 2.0))
-        # Armhole curve: fixed scoop -> strap shoulder (tight, consistent for all sizes)
-        ctrl_arm_l = (-strap_scoop_w_l, armhole_y * 0.35)
-        arm_pts_l = self._sample_bezier_curve(p_scoop_l, ctrl_arm_l, p_shoulder_outer_l, num_pts=8)[1:]
+        # 6. Left armhole -- smooth vertical scoop from underarm to strap outer edge
+        p_shoulder_outer_l = (-half_shoulder, -2.0)
+        ctrl_arm_l = (-half_shoulder, armhole_y * 0.70)
+        arm_pts_l = self._sample_bezier_curve(p_underarm_l, ctrl_arm_l, p_shoulder_outer_l, num_pts=10)[1:]
         for p in arm_pts_l:
             points.append(p)
         edges["armhole_left"] = [idx_side_l_end, len(points) - 1]
@@ -178,7 +166,8 @@ class PatternGenerator:
 
     def build_back_panel(self, side_half: str) -> Panel2DGeometry:
         is_right = (side_half == "right")
-        h = self.total_len_back
+        h_front = self.total_len_front
+        h_back = self.total_len_back
         half_shoulder = self.shoulder_w / 2.0
         half_bust = self.w_bust / 2.0
         half_waist = self.w_waist / 2.0
@@ -186,17 +175,19 @@ class PatternGenerator:
         half_hem = self.w_hem / 2.0
 
         armhole_y = -self.armhole_drop
-        waist_y = -min(40.0, round(h * 0.35, 2))
-        hip_y = -min(60.0, round(h * 0.52, 2))
-        hem_y = -h
+        waist_y = -min(40.0, round(h_front * 0.35, 2))
+        hip_y = -min(60.0, round(h_front * 0.52, 2))
+        # Side seam endpoints and heights strictly match front panel for 100% 1:1 vertex correspondence
+        side_hem_y = -h_front
+        cb_hem_y = -h_back
 
         points = []
         edges = {}
 
         if is_right:
             p_cb_top = (0.0, -self.neck_drop_back)
-            p_cb_bottom = (0.0, hem_y)
-            p_hem_outer = (half_hem, hem_y)
+            p_cb_bottom = (0.0, cb_hem_y)
+            p_hem_outer = (half_hem, side_hem_y)
             p_hip = (half_hip, hip_y)
             p_waist = (half_waist, waist_y)
             p_underarm = (half_bust, armhole_y)
@@ -209,30 +200,25 @@ class PatternGenerator:
             points.extend(self._resample_straight_segment(p_cb_top, p_cb_bottom, 3.0))
             edges["center_back_seam"] = [idx_cb_start, len(points) - 1]
 
-            # 2. Hem
+            # 2. Hem (center back bottom to side seam hem)
             idx_hem_start = len(points) - 1
             points.extend(self._resample_straight_segment(p_cb_bottom, p_hem_outer, 3.0))
             edges["hem"] = [idx_hem_start, len(points) - 1]
 
-            # 3. Continuous Side Seam
+            # 3. Continuous Side Seam (1:1 vertex pairing with front side seam)
             idx_side_start = len(points) - 1
             points.extend(self._resample_straight_segment(p_hem_outer, p_hip, 3.0))
             points.extend(self._resample_straight_segment(p_hip, p_waist, 3.0))
             points.extend(self._resample_straight_segment(p_waist, p_underarm, 3.0))
             edges["side_seam_right"] = [idx_side_start, len(points) - 1]
 
-            # 4. Armhole -- fixed scoop keeps strap narrow for ALL sizes
-            strap_scoop_br = half_shoulder + 2.25  # fixed ~13.5 cm
-            p_scoop_br = (strap_scoop_br, armhole_y)
-            # Horizontal bridge: bust width -> fixed scoop
-            bridge_start_br = len(points) - 1
-            points.extend(self._resample_straight_segment(p_underarm, p_scoop_br, 2.0))
-            # Armhole curve: fixed scoop -> strap shoulder (tight, consistent)
-            ctrl_br = (strap_scoop_br, armhole_y * 0.35)
-            arm_pts = self._sample_bezier_curve(p_scoop_br, ctrl_br, p_sh_outer, num_pts=8)[1:]
+            # 4. Armhole (smooth scoop from underarm up to strap outer edge)
+            ctrl_br = (half_shoulder, armhole_y * 0.70)
+            arm_pts = self._sample_bezier_curve(p_underarm, ctrl_br, p_sh_outer, num_pts=10)[1:]
+            arm_start_br = len(points) - 1
             for p in arm_pts:
                 points.append(p)
-            edges["armhole_right"] = [bridge_start_br, len(points) - 1]
+            edges["armhole_right"] = [arm_start_br, len(points) - 1]
 
             # 5. Shoulder Seam
             idx_sh_start = len(points) - 1
@@ -249,8 +235,8 @@ class PatternGenerator:
             panel_name = "Back Right Shift Panel"
         else:
             p_cb_top = (0.0, -self.neck_drop_back)
-            p_cb_bottom = (0.0, hem_y)
-            p_hem_outer = (-half_hem, hem_y)
+            p_cb_bottom = (0.0, cb_hem_y)
+            p_hem_outer = (-half_hem, side_hem_y)
             p_hip = (-half_hip, hip_y)
             p_waist = (-half_waist, waist_y)
             p_underarm = (-half_bust, armhole_y)
@@ -270,27 +256,22 @@ class PatternGenerator:
             points.extend(self._resample_straight_segment(p_neck_inner, p_sh_outer, 2.5))
             edges["shoulder_left"] = [idx_sh_start, len(points) - 1]
 
-            # 3. Armhole -- fixed scoop keeps strap narrow for ALL sizes
-            strap_scoop_bl = half_shoulder + 2.25  # fixed ~13.5 cm
-            p_scoop_bl = (-strap_scoop_bl, armhole_y)
-            # Armhole curve: strap shoulder -> fixed scoop (tight, consistent)
-            ctrl_bl = (-strap_scoop_bl, armhole_y * 0.35)
-            arm_pts = self._sample_bezier_curve(p_sh_outer, ctrl_bl, p_scoop_bl, num_pts=8)[1:]
+            # 3. Armhole (strap outer edge down to underarm)
+            ctrl_bl = (-half_shoulder, armhole_y * 0.70)
+            arm_pts = self._sample_bezier_curve(p_sh_outer, ctrl_bl, p_underarm, num_pts=10)[1:]
             arm_bl_start = len(points) - 1
             for p in arm_pts:
                 points.append(p)
-            # Horizontal bridge: fixed scoop -> bust width
-            points.extend(self._resample_straight_segment(p_scoop_bl, p_underarm, 2.0))
             edges["armhole_left"] = [arm_bl_start, len(points) - 1]
 
-            # 4. Side Seam
+            # 4. Side Seam (underarm to side hem)
             idx_side_start = len(points) - 1
             points.extend(self._resample_straight_segment(p_underarm, p_waist, 3.0))
             points.extend(self._resample_straight_segment(p_waist, p_hip, 3.0))
             points.extend(self._resample_straight_segment(p_hip, p_hem_outer, 3.0))
             edges["side_seam_left"] = [idx_side_start, len(points) - 1]
 
-            # 5. Hem
+            # 5. Hem (side hem to center back bottom)
             idx_hem_start = len(points) - 1
             points.extend(self._resample_straight_segment(p_hem_outer, p_cb_bottom, 3.0))
             edges["hem"] = [idx_hem_start, len(points) - 1]
@@ -317,7 +298,6 @@ class PatternGenerator:
             contour_points=[BoundaryPoint2D(x=p[0], y=p[1]) for p in points],
             edges=edges
         )
-
 
     def generate_all_panels(self) -> Dict[str, Panel2DGeometry]:
         """Generates continuous full-length panels matching the real garment."""

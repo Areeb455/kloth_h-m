@@ -77,9 +77,13 @@ class GarmentPlacer:
             sign = 1.0 if x_cm >= 0 else -1.0
 
             # Wrap boundary vertices to reach near the coronal midplane (~88 degrees)
-            if y_cm > -14.0:
-                # Shoulder strap region: maintain proportional arc based on shoulder span
-                theta = sign * (abs(x_cm) / 18.0) * (math.pi / 2.0) * 0.95
+            if y_cm > -18.0:
+                # Shoulder & chest strap region: smooth transition from shoulder span arc (18.0) down to chest width
+                # Guarantees straps remain sleek, vertical, and non-baggy across ALL sizes (XXS to XXL)
+                t = min(1.0, max(0.0, -y_cm / 18.0))
+                ref_w = (1.0 - t) * 18.0 + t * max(local_w, 18.0)
+                u_chest = min(1.0, abs(x_cm) / ref_w)
+                theta = sign * u_chest * (math.pi / 2.0) * 0.95
             else:
                 # Torso and lower body: normalize by local row width to close side seams cleanly (< 1.5 cm gap)
                 theta = sign * u_norm * (math.pi / 2.0) * 0.96
