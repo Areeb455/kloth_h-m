@@ -92,13 +92,20 @@ class PatternGenerator:
         points.extend(self._resample_straight_segment(p_neck_inner_r, p_shoulder_outer_r, 2.5))
         edges["shoulder_right"] = [idx_sh_r_start, len(points) - 1]
 
-        # 2. Right armhole
+        # 2. Right armhole -- fixed scoop keeps strap narrow for ALL sizes
+        # Side-seam still ends at full bust width (sewing seam match).
+        # Armhole CURVE only spans from strap tip to a fixed narrow scoop point.
+        # A horizontal bridge at underarm level connects scoop -> bust width.
         p_underarm_r = (half_bust, armhole_y)
-        ctrl_arm_r = (half_bust * 0.85, armhole_y * 0.5)
-        arm_pts_r = self._sample_bezier_curve(p_shoulder_outer_r, ctrl_arm_r, p_underarm_r, num_pts=8)[1:]
+        strap_scoop_w = half_shoulder + 2.25  # ~13.5 cm from center, FIXED (not bust-based)
+        p_scoop_r = (strap_scoop_w, armhole_y)
+        ctrl_arm_r = (strap_scoop_w, armhole_y * 0.35)  # fixed control -- same for all sizes
+        arm_pts_r = self._sample_bezier_curve(p_shoulder_outer_r, ctrl_arm_r, p_scoop_r, num_pts=8)[1:]
         idx_arm_r_start = len(points) - 1
         for p in arm_pts_r:
             points.append(p)
+        # Horizontal underarm bridge: fixed scoop -> full bust width (exposed edge, not sewn)
+        points.extend(self._resample_straight_segment(p_scoop_r, p_underarm_r, 2.0))
         edges["armhole_right"] = [idx_arm_r_start, len(points) - 1]
 
         # 3. Continuous Right Side Seam (underarm -> waist -> hip -> hem)
@@ -126,10 +133,15 @@ class PatternGenerator:
         idx_side_l_end = len(points) - 1
         edges["side_seam_left"] = [idx_side_l_start, idx_side_l_end]
 
-        # 6. Left armhole
+        # 6. Left armhole -- fixed scoop keeps strap narrow for ALL sizes
         p_shoulder_outer_l = (-half_shoulder, -2.5)
-        ctrl_arm_l = (-half_bust * 0.85, armhole_y * 0.5)
-        arm_pts_l = self._sample_bezier_curve(p_underarm_l, ctrl_arm_l, p_shoulder_outer_l, num_pts=8)[1:]
+        strap_scoop_w_l = half_shoulder + 2.25  # ~13.5 cm from center, FIXED
+        p_scoop_l = (-strap_scoop_w_l, armhole_y)
+        # Horizontal bridge: bust width -> fixed scoop (exposed underarm, not sewn)
+        points.extend(self._resample_straight_segment(p_underarm_l, p_scoop_l, 2.0))
+        # Armhole curve: fixed scoop -> strap shoulder (tight, consistent for all sizes)
+        ctrl_arm_l = (-strap_scoop_w_l, armhole_y * 0.35)
+        arm_pts_l = self._sample_bezier_curve(p_scoop_l, ctrl_arm_l, p_shoulder_outer_l, num_pts=8)[1:]
         for p in arm_pts_l:
             points.append(p)
         edges["armhole_left"] = [idx_side_l_end, len(points) - 1]
@@ -209,11 +221,18 @@ class PatternGenerator:
             points.extend(self._resample_straight_segment(p_waist, p_underarm, 3.0))
             edges["side_seam_right"] = [idx_side_start, len(points) - 1]
 
-            # 4. Armhole
-            arm_pts = self._sample_bezier_curve(p_underarm, (half_bust * 0.88, armhole_y * 0.5), p_sh_outer, num_pts=8)[1:]
+            # 4. Armhole -- fixed scoop keeps strap narrow for ALL sizes
+            strap_scoop_br = half_shoulder + 2.25  # fixed ~13.5 cm
+            p_scoop_br = (strap_scoop_br, armhole_y)
+            # Horizontal bridge: bust width -> fixed scoop
+            bridge_start_br = len(points) - 1
+            points.extend(self._resample_straight_segment(p_underarm, p_scoop_br, 2.0))
+            # Armhole curve: fixed scoop -> strap shoulder (tight, consistent)
+            ctrl_br = (strap_scoop_br, armhole_y * 0.35)
+            arm_pts = self._sample_bezier_curve(p_scoop_br, ctrl_br, p_sh_outer, num_pts=8)[1:]
             for p in arm_pts:
                 points.append(p)
-            edges["armhole_right"] = [len(points) - 1 - len(arm_pts), len(points) - 1]
+            edges["armhole_right"] = [bridge_start_br, len(points) - 1]
 
             # 5. Shoulder Seam
             idx_sh_start = len(points) - 1
@@ -251,11 +270,18 @@ class PatternGenerator:
             points.extend(self._resample_straight_segment(p_neck_inner, p_sh_outer, 2.5))
             edges["shoulder_left"] = [idx_sh_start, len(points) - 1]
 
-            # 3. Armhole
-            arm_pts = self._sample_bezier_curve(p_sh_outer, (-half_bust * 0.88, armhole_y * 0.5), p_underarm, num_pts=8)[1:]
+            # 3. Armhole -- fixed scoop keeps strap narrow for ALL sizes
+            strap_scoop_bl = half_shoulder + 2.25  # fixed ~13.5 cm
+            p_scoop_bl = (-strap_scoop_bl, armhole_y)
+            # Armhole curve: strap shoulder -> fixed scoop (tight, consistent)
+            ctrl_bl = (-strap_scoop_bl, armhole_y * 0.35)
+            arm_pts = self._sample_bezier_curve(p_sh_outer, ctrl_bl, p_scoop_bl, num_pts=8)[1:]
+            arm_bl_start = len(points) - 1
             for p in arm_pts:
                 points.append(p)
-            edges["armhole_left"] = [len(points) - 1 - len(arm_pts), len(points) - 1]
+            # Horizontal bridge: fixed scoop -> bust width
+            points.extend(self._resample_straight_segment(p_scoop_bl, p_underarm, 2.0))
+            edges["armhole_left"] = [arm_bl_start, len(points) - 1]
 
             # 4. Side Seam
             idx_side_start = len(points) - 1

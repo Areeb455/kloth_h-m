@@ -12,9 +12,9 @@
     "panel_b_id": "back_right_panel",
     "edge_b_name": "shoulder_right",
     "edge_b_vertex_indices": [
+      89,
       88,
-      87,
-      86
+      87
     ],
     "edge_b_length_cm": 3.82,
     "seam_order": 1,
@@ -27,9 +27,9 @@
     "panel_a_id": "front_panel",
     "edge_a_name": "shoulder_left",
     "edge_a_vertex_indices": [
-      102,
-      101,
-      100
+      104,
+      103,
+      102
     ],
     "edge_a_length_cm": 4.1,
     "panel_b_id": "back_left_panel",
@@ -51,6 +51,7 @@
     "edge_a_name": "center_back_seam",
     "edge_a_vertex_indices": [
       0,
+      93,
       92,
       91,
       90,
@@ -85,8 +86,7 @@
       61,
       60,
       59,
-      58,
-      57
+      58
     ],
     "edge_a_length_cm": 106.3,
     "panel_b_id": "back_right_panel",
@@ -141,7 +141,6 @@
     "panel_a_id": "front_panel",
     "edge_a_name": "side_seam_right",
     "edge_a_vertex_indices": [
-      9,
       10,
       11,
       12,
@@ -176,7 +175,8 @@
       41,
       42,
       43,
-      44
+      44,
+      45
     ],
     "edge_a_length_cm": 100.39,
     "panel_b_id": "back_right_panel",
@@ -230,6 +230,7 @@
     "panel_a_id": "front_panel",
     "edge_a_name": "side_seam_left",
     "edge_a_vertex_indices": [
+      94,
       93,
       92,
       91,
@@ -264,14 +265,12 @@
       62,
       61,
       60,
-      59,
-      58
+      59
     ],
     "edge_a_length_cm": 100.39,
     "panel_b_id": "back_left_panel",
     "edge_b_name": "side_seam_left",
     "edge_b_vertex_indices": [
-      14,
       15,
       16,
       17,
@@ -289,7 +288,7 @@
       29,
       30,
       31,
-      33,
+      32,
       34,
       35,
       36,
@@ -306,7 +305,8 @@
       47,
       48,
       49,
-      50
+      50,
+      51
     ],
     "edge_b_length_cm": 102.39,
     "seam_order": 5,

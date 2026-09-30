@@ -8,11 +8,11 @@
       "category": "3D Avatar Fit",
       "name": "3D Simulated Chest Perimeter Ease",
       "status": "PASS",
-      "details": "3D Mesh Chest Perimeter: 95.0 cm vs Avatar Body: 78.0 cm (3D Ease: +17.0 cm)",
+      "details": "3D Mesh Chest Perimeter: 94.9 cm vs Avatar Body: 78.0 cm (3D Ease: +16.9 cm)",
       "metrics": {
         "body_chest_cm": 78.0,
-        "mesh_3d_perimeter_cm": 95.0,
-        "ease_cm": 17.0
+        "mesh_3d_perimeter_cm": 94.9,
+        "ease_cm": 16.9
       }
     },
     {
@@ -70,10 +70,10 @@
       "category": "Cloth Simulation",
       "name": "Seam Assembly Gap (< 5 mm)",
       "status": "PASS",
-      "details": "Max residual seam gap: 3.21 mm, Average gap: 0.95 mm (Threshold: < 5.0 mm)",
+      "details": "Max residual seam gap: 2.20 mm, Average gap: 0.94 mm (Threshold: < 5.0 mm)",
       "metrics": {
-        "max_gap_mm": 3.21,
-        "avg_gap_mm": 0.95
+        "max_gap_mm": 2.2,
+        "avg_gap_mm": 0.94
       }
     },
     {
@@ -89,23 +89,23 @@
       "category": "Cloth Simulation",
       "name": "Simulation Equilibrium Settling",
       "status": "PASS",
-      "details": "Final kinetic energy: 0.000062 J, Max step displacement: 2.907 mm",
+      "details": "Final kinetic energy: 0.000049 J, Max step displacement: 2.483 mm",
       "metrics": {
-        "final_ke": 6.2e-05,
-        "max_displacement_mm": 2.907
+        "final_ke": 4.9e-05,
+        "max_displacement_mm": 2.483
       }
     },
     {
       "category": "Mannequin Fit",
       "name": "Avatar Real Mesh Non-Penetration",
       "status": "PASS",
-      "details": "Tested 929 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 7.16 mm, max penetration depth: 0.0 mm",
+      "details": "Tested 934 garment vertices against real avatar mesh: 0 inside (0.0%), min signed distance: 6.74 mm, max penetration depth: 0.0 mm",
       "metrics": {
-        "total_vertices": 929,
+        "total_vertices": 934,
         "penetrated_vertices": 0,
         "pct_vertices_inside": 0.0,
         "max_penetration_mm": 0.0,
-        "min_signed_dist_mm": 7.16,
+        "min_signed_dist_mm": 6.74,
         "zero_penetration_pass": true
       }
     },
@@ -113,49 +113,49 @@
       "category": "Edge Strain Preservation",
       "name": "front_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "front_panel per-edge stretch vs 2D rest: mean=21.56%, p95=70.11% (Limit: <= 15.0%), max=149.20% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "front_panel per-edge stretch vs 2D rest: mean=21.25%, p95=70.15% (Limit: <= 15.0%), max=153.21% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 21.56,
-        "p95_strain_pct": 70.11,
-        "max_strain_pct": 149.2
+        "mean_strain_pct": 21.25,
+        "p95_strain_pct": 70.15,
+        "max_strain_pct": 153.21
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_left_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_left_panel per-edge stretch vs 2D rest: mean=20.69%, p95=65.50% (Limit: <= 15.0%), max=153.17% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "back_left_panel per-edge stretch vs 2D rest: mean=21.19%, p95=66.45% (Limit: <= 15.0%), max=433.28% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 20.69,
-        "p95_strain_pct": 65.5,
-        "max_strain_pct": 153.17
+        "mean_strain_pct": 21.19,
+        "p95_strain_pct": 66.45,
+        "max_strain_pct": 433.28
       }
     },
     {
       "category": "Edge Strain Preservation",
       "name": "back_right_panel - Edge Strain (p95 <= 15.0%)",
       "status": "FAIL",
-      "details": "back_right_panel per-edge stretch vs 2D rest: mean=22.09%, p95=66.30% (Limit: <= 15.0%), max=118.15% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
+      "details": "back_right_panel per-edge stretch vs 2D rest: mean=22.15%, p95=65.68% (Limit: <= 15.0%), max=370.79% [Physical finding: 57.4 cm pattern requires 55.4% stretch to fit 89.2 cm avatar, exceeding fabric's 35.0% weft limit]",
       "metrics": {
-        "mean_strain_pct": 22.09,
-        "p95_strain_pct": 66.3,
-        "max_strain_pct": 118.15
+        "mean_strain_pct": 22.15,
+        "p95_strain_pct": 65.68,
+        "max_strain_pct": 370.79
       }
     },
     {
       "category": "Mesh Topology",
       "name": "front_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 780 face indices within [0, 447]",
+      "details": "All 786 face indices within [0, 451]",
       "metrics": {
-        "face_count": 780
+        "face_count": 786
       }
     },
     {
       "category": "Mesh Topology",
       "name": "front_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 780",
+      "details": "Found 0 degenerate faces out of 786",
       "metrics": {
         "degenerate_count": 0
       }
@@ -164,16 +164,16 @@
       "category": "Mesh Topology",
       "name": "back_left_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 375 face indices within [0, 234]",
+      "details": "All 376 face indices within [0, 235]",
       "metrics": {
-        "face_count": 375
+        "face_count": 376
       }
     },
     {
       "category": "Mesh Topology",
       "name": "back_left_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 375",
+      "details": "Found 0 degenerate faces out of 376",
       "metrics": {
         "degenerate_count": 0
       }
@@ -182,16 +182,16 @@
       "category": "Mesh Topology",
       "name": "back_right_panel - Face Indices In-Range",
       "status": "PASS",
-      "details": "All 397 face indices within [0, 245]",
+      "details": "All 396 face indices within [0, 245]",
       "metrics": {
-        "face_count": 397
+        "face_count": 396
       }
     },
     {
       "category": "Mesh Topology",
       "name": "back_right_panel - Non-Degenerate Triangles",
       "status": "PASS",
-      "details": "Found 0 degenerate faces out of 397",
+      "details": "Found 0 degenerate faces out of 396",
       "metrics": {
         "degenerate_count": 0
       }
