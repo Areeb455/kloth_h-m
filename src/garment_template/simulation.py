@@ -1,4 +1,4 @@
-"""
+﻿"""
 Position-Based Dynamics (PBD) Cloth Simulation Module.
 Assembles and sews 2D/3D garment panels in 3D space:
 1. Structural distance constraints derived from 2D rest lengths, with directional
@@ -119,6 +119,24 @@ class ClothSimulator:
         p2d_b = self.vertices_2d[self.edge_indices[:, 1]]
         diff_2d = p2d_a - p2d_b
         self.edge_rest_lengths = np.linalg.norm(diff_2d, axis=1) * 0.01
+
+        # Hard per-edge length caps derived from fabric rated elongation limits.
+        # k = 1 - stretch% is a PBD compliance factor; it dampens but does NOT prevent
+        # an edge from stretching beyond the physical limit under large external forces.
+        # We store explicit per-edge maximum lengths to enforce fabric elongation limit.
+        # Weft cap (cross-grain, X-dominant): e.g. 1.35 for 35% weft
+        # Warp cap (grainline, Y-dominant):   e.g. 1.18 for 18% warp
+        weft_limit = 1.0 + self.stretch_weft_pct / 100.0
+        warp_limit = 1.0 + self.stretch_warp_pct / 100.0
+        diff_2d_raw = (p2d_a - p2d_b)  # cm
+        l2d_cm = np.maximum(1e-6, np.linalg.norm(diff_2d_raw, axis=1))
+        dy_raw = np.abs(diff_2d_raw[:, 1])
+        dx_raw = np.abs(diff_2d_raw[:, 0])
+        cos2_raw = (dy_raw / l2d_cm) ** 2
+        sin2_raw = (dx_raw / l2d_cm) ** 2
+        # Blended per-edge limit in metres (same unit as edge_rest_lengths)
+        per_edge_limit = (warp_limit * cos2_raw + weft_limit * sin2_raw) * self.edge_rest_lengths
+        self.edge_max_lengths = per_edge_limit.astype(np.float32)
 
         # Anisotropic directional stiffness derived from fabric warp/weft stretch:
         # Warp (grainline, Y-axis): stretch_warp_percent (15%) -> stiffness ~ 0.85
@@ -251,8 +269,16 @@ class ClothSimulator:
                     w_sum = wa + wb
                     delta_mag = self.edge_stiffness * (C / w_sum)
 
-                    np.add.at(d_accum, ia, - (wa * delta_mag)[:, None] * dir_norm)
-                    np.add.at(d_accum, ib, + (wb * delta_mag)[:, None] * dir_norm)
+                    # Hard stretch cap: override delta for edges that exceed
+                    # the fabric elongation limit (e.g. 35% weft) regardless
+                    # of the PBD stiffness factor.  Only push overlength edges
+                    # (C_cap > 0), never pull already-short edges.
+                    C_cap = dist - self.edge_max_lengths
+                    cap_mask = C_cap > 0
+                    delta_final = np.where(cap_mask, C_cap / w_sum, delta_mag)
+
+                    np.add.at(d_accum, ia, - (wa * delta_final)[:, None] * dir_norm)
+                    np.add.at(d_accum, ib, + (wb * delta_final)[:, None] * dir_norm)
 
                 # B. Bending Constraints
                 if len(self.bend_indices) > 0:
@@ -446,3 +472,5 @@ class ClothSimulator:
             "area_2d_sq_cm": round(total_2d_area, 1),
             "strain_ratio": round(area_ratio, 3)
         }
+
+

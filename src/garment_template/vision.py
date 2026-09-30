@@ -1,4 +1,4 @@
-"""
+﻿"""
 Computer Vision Analysis Module.
 Processes garment imagery (front.jpg and back.jpg):
 1. Segments garment silhouette from studio background.
@@ -185,3 +185,4 @@ class GarmentVisionAnalyzer:
             if len(xs) > 0:
                 return int(xs[-1] - xs[0])
         return 0
+

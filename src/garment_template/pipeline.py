@@ -1,4 +1,4 @@
-"""
+﻿"""
 End-to-End Pipeline Orchestrator.
 Executes the full pipeline:
 Vision Analysis (front/back photos) -> Sizing & Ease ->
@@ -130,7 +130,8 @@ class PipelineOrchestrator:
             sewing_conns=sewing_conns,
             torso_profile_fn=torso_fn,
             mesh_collider=mesh_collider,
-            simulation_metrics=sim_metrics
+            simulation_metrics=sim_metrics,
+            fabric_properties=self.product_details.get("fabric_properties", {})
         )
         val_report = validator.run_all_checks()
         report_dict = val_report.to_dict()
@@ -165,3 +166,4 @@ class PipelineOrchestrator:
         print("        Read-back summary:", loaded_pkg.summary())
 
         return pkg_dir, val_report, loaded_pkg
+
