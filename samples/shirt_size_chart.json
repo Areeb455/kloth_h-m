@@ -1,0 +1,102 @@
+{
+  "brand": "H&M",
+  "category": "Men's Shirts",
+  "garment_name": "Regular Fit Long-Sleeve Buffalo Plaid Flannel Shirt",
+  "article_number": "1257417040",
+  "measurement_criteria_source": "H&M Size Guide (Men - Shirts: Chest over fullest part, Waist at narrowest point, Arm length from shoulder to wrist, Neckline collar circumference)",
+  "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 94-98 -> 94, 82-86 -> 82, 60-61 -> 60)",
+  "primary_base_size": "M",
+  "supported_sizes": [
+    "M",
+    "L",
+    "XL"
+  ],
+  "assumptions": {
+    "ease_allowances_cm": {
+      "chest": 14.0,
+      "waist": 14.0,
+      "arm_bicep": 8.0,
+      "arm_wrist": 6.0,
+      "rationale": "Woven 100% cotton flannel fabric has minimal stretch (~2-3%). A regular fit long-sleeve shirt requires positive comfort ease (+14 cm total chest circumference: M body 94 cm -> garment chest 108 cm, flat width 54 cm) to allow uninhibited arm movement, reaching, and button closure."
+    },
+    "length_specifications_cm": {
+      "front_length": 75.0,
+      "back_length": 77.0,
+      "sleeve_length": 60.0,
+      "length_grade_increment": 2.0,
+      "sleeve_grade_increment": 1.0,
+      "rationale": "Standard mens shirting length with curved shirt-tail hem. Back is 2 cm longer to stay tucked or drape neatly over seat when seated."
+    }
+  },
+  "sizes": {
+    "M": {
+      "eur_size": "48-50",
+      "uk_size": "38R-40R",
+      "body_measurements_cm": {
+        "chest": 94.0,
+        "waist": 82.0,
+        "arm_length": 60.0,
+        "neckline": 38.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 108.0,
+        "waist_circ": 104.0,
+        "hip_circ": 106.0,
+        "hem_circ": 108.0,
+        "front_length": 75.0,
+        "back_length": 77.0,
+        "shoulder_width": 47.0,
+        "sleeve_length": 60.0,
+        "bicep_circ": 38.0,
+        "wrist_circ": 24.0,
+        "collar_circ": 39.5
+      }
+    },
+    "L": {
+      "eur_size": "52-54",
+      "uk_size": "42R-44R",
+      "body_measurements_cm": {
+        "chest": 102.0,
+        "waist": 90.0,
+        "arm_length": 61.0,
+        "neckline": 40.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 116.0,
+        "waist_circ": 112.0,
+        "hip_circ": 114.0,
+        "hem_circ": 116.0,
+        "front_length": 77.0,
+        "back_length": 79.0,
+        "shoulder_width": 49.0,
+        "sleeve_length": 61.0,
+        "bicep_circ": 40.5,
+        "wrist_circ": 25.0,
+        "collar_circ": 41.5
+      }
+    },
+    "XL": {
+      "eur_size": "56-58",
+      "uk_size": "46R-48R",
+      "body_measurements_cm": {
+        "chest": 110.0,
+        "waist": 98.5,
+        "arm_length": 62.0,
+        "neckline": 42.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 124.0,
+        "waist_circ": 120.0,
+        "hip_circ": 122.0,
+        "hem_circ": 124.0,
+        "front_length": 79.0,
+        "back_length": 81.0,
+        "shoulder_width": 51.0,
+        "sleeve_length": 62.0,
+        "bicep_circ": 43.0,
+        "wrist_circ": 26.0,
+        "collar_circ": 43.5
+      }
+    }
+  }
+}

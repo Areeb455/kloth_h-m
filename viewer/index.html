@@ -35,21 +35,15 @@
         </button>
         <button class="garment-toggle-btn" id="btnGarmentShirt" data-garment="shirt">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
-          Oxford Shirt #1257417040
+          Flannel Shirt #1257417040 (Full Sleeves)
         </button>
       </div>
 
       <div class="nav-actions">
         <div class="size-selector-group" id="sizeSelectorGroup">
-          <label>ACTIVE SIZE:</label>
+          <label id="sizeSelectorLabel">ACTIVE SIZE:</label>
           <div class="size-pill-group" id="sizePillGroup">
-            <button class="size-pill" data-size="XXS">XXS</button>
-            <button class="size-pill active" data-size="XS">XS <span class="base-badge">BASE</span></button>
-            <button class="size-pill" data-size="S">S</button>
-            <button class="size-pill" data-size="M">M</button>
-            <button class="size-pill" data-size="L">L</button>
-            <button class="size-pill" data-size="XL">XL</button>
-            <button class="size-pill" data-size="XXL">XXL</button>
+            <!-- Dynamically populated per garment (XXS-XXL for dress, M-XL for shirt) -->
           </div>
         </div>
         <a href="/output/garment_template_package.zip" download class="btn btn-primary" id="btnDownloadPkg">
@@ -90,10 +84,7 @@
           <div class="canvas-container">
             <canvas id="patternCanvas"></canvas>
             <div class="canvas-legend" id="canvasLegend">
-              <span><i class="dot dot-front"></i> Front Panel</span>
-              <span><i class="dot dot-back-left"></i> Back Left</span>
-              <span><i class="dot dot-back-right"></i> Back Right</span>
-              <span><i class="dot dot-seam"></i> Center-Back Seam</span>
+              <!-- Dynamically populated based on active garment -->
             </div>
           </div>
         </div>
@@ -129,9 +120,9 @@
           <div id="threeContainer"></div>
           <div class="viewport-overlay-stats">
             <div class="stat-pill"><span class="label">Avatar:</span> <span class="val">SMPL-X (52 Joints)</span></div>
-            <div class="stat-pill"><span class="label">Garment:</span> <span class="val" id="statVertices">875 Verts (XXS)</span></div>
+            <div class="stat-pill"><span class="label">Garment:</span> <span class="val" id="statVertices">1022 Verts (M Full Sleeve)</span></div>
             <div class="stat-pill"><span class="label">Clearance:</span> <span class="val" style="color:#34d399;">0.0% Penetration (0 Tears)</span></div>
-            <div class="stat-pill"><span class="label">Seams:</span> <span class="val" id="statSeams">5 Paired (1:1)</span></div>
+            <div class="stat-pill"><span class="label">Seams:</span> <span class="val" id="statSeams">100 Paired (1:1)</span></div>
           </div>
         </div>
       </section>
@@ -185,16 +176,16 @@
 
           <!-- Grading Tab -->
           <div class="tab-pane" id="tab-grading">
-            <h4>Multi-Size Grading Matrix (XXS - XXL)</h4>
+            <h4 id="gradingTabTitle">Multi-Size Grading Matrix</h4>
             <div class="table-responsive">
               <table class="data-table">
                 <thead>
                   <tr>
                     <th>Size</th>
-                    <th>Bust Delta</th>
-                    <th>Waist Delta</th>
-                    <th>Hip Delta</th>
-                    <th>Length Delta</th>
+                    <th>Chest / Bust</th>
+                    <th>Waist</th>
+                    <th>Arm / Sleeve</th>
+                    <th>Length</th>
                     <th>Mesh File</th>
                   </tr>
                 </thead>
