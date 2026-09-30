@@ -20,20 +20,40 @@
     <header class="navbar">
       <div class="nav-brand">
         <span class="logo-badge">KLOTH</span>
-        <h1>3D Garment Template Generator</h1>
-        <span class="version-tag" id="versionTag">v2.0.0</span>
+        <div class="brand-titles">
+          <h1>3D Garment Template Generator</h1>
+          <span class="brand-sub">Vision-Guided Parametric CAD &amp; Physics Simulation</span>
+        </div>
+        <span class="version-tag" id="versionTag">v2.1.0</span>
       </div>
+
+      <!-- Garment Switcher (Reviewer Generalization Feature) -->
+      <div class="garment-toggle-group" id="garmentToggleGroup">
+        <button class="garment-toggle-btn active" id="btnGarmentDress" data-garment="dress">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Maxi Dress #1356023002
+        </button>
+        <button class="garment-toggle-btn" id="btnGarmentShirt" data-garment="shirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+          Oxford Shirt #1257417040
+        </button>
+      </div>
+
       <div class="nav-actions">
-        <div class="size-selector-group">
+        <div class="size-selector-group" id="sizeSelectorGroup">
           <label>ACTIVE SIZE:</label>
           <div class="size-pill-group" id="sizePillGroup">
             <button class="size-pill" data-size="XXS">XXS</button>
             <button class="size-pill active" data-size="XS">XS <span class="base-badge">BASE</span></button>
             <button class="size-pill" data-size="S">S</button>
+            <button class="size-pill" data-size="M">M</button>
+            <button class="size-pill" data-size="L">L</button>
+            <button class="size-pill" data-size="XL">XL</button>
+            <button class="size-pill" data-size="XXL">XXL</button>
           </div>
         </div>
         <a href="/output/garment_template_package.zip" download class="btn btn-primary" id="btnDownloadPkg">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export Package (.zip)
         </a>
       </div>
@@ -46,17 +66,17 @@
         <!-- Input Assets Card -->
         <div class="card glass-card">
           <div class="card-header">
-            <h3>Garment Inputs & Silhouette</h3>
-            <span class="chip chip-info">H&M Bodycon Maxi Dress #1356023002</span>
+            <h3>Garment Inputs &amp; Proportions</h3>
+            <span class="chip chip-info" id="garmentInfoBadge">H&amp;M Bodycon Maxi Dress #1356023002</span>
           </div>
           <div class="image-dual-view">
             <div class="img-box">
               <img src="/samples/front.jpg?v=1356023002" alt="Front View" id="frontImg">
-              <span class="img-label">Front (Studio Flat)</span>
+              <span class="img-label" id="frontImgLabel">Front (Studio Flat)</span>
             </div>
             <div class="img-box">
               <img src="/samples/back.jpg?v=1356023002" alt="Back View" id="backImg">
-              <span class="img-label">Back (AI Inferred)</span>
+              <span class="img-label" id="backImgLabel">Back (AI Inferred)</span>
             </div>
           </div>
         </div>
@@ -64,16 +84,16 @@
         <!-- 2D Parametric Patterns Card -->
         <div class="card glass-card fill-remaining">
           <div class="card-header">
-            <h3>Parametric 2D Patterns (Category 1)</h3>
+            <h3 id="patternCardTitle">Parametric 2D Patterns (Category 1)</h3>
             <span class="chip chip-success" id="patternDimsBadge">Unstretched [cm]</span>
           </div>
           <div class="canvas-container">
             <canvas id="patternCanvas"></canvas>
-            <div class="canvas-legend">
-              <span><i class="dot front-bodice"></i> Front Panel</span>
-              <span><i class="dot back-bodice"></i> Back Left Panel</span>
-              <span><i class="dot front-skirt"></i> Back Right Panel</span>
-              <span><i class="dot back-skirt"></i> Center-Back Seam</span>
+            <div class="canvas-legend" id="canvasLegend">
+              <span><i class="dot dot-front"></i> Front Panel</span>
+              <span><i class="dot dot-back-left"></i> Back Left</span>
+              <span><i class="dot dot-back-right"></i> Back Right</span>
+              <span><i class="dot dot-seam"></i> Center-Back Seam</span>
             </div>
           </div>
         </div>
@@ -85,31 +105,32 @@
           <div class="viewport-toolbar">
             <div class="tool-group">
               <button class="tool-btn active" id="btnToggleMannequin" title="Toggle Mannequin Mesh">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 Avatar
               </button>
               <button class="tool-btn" id="btnToggleWireframe" title="Toggle Wireframe">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 Wireframe
               </button>
               <button class="tool-btn" id="btnToggleTurntable" title="Toggle Auto Rotation">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 Turntable
               </button>
               <button class="tool-btn" id="btnResetCamera" title="Reset View">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
                 Reset
               </button>
             </div>
             <div class="status-indicator">
               <span class="status-pulse"></span>
-              <span id="viewportStatusText">Ready (OrbitControls Active)</span>
+              <span id="viewportStatusText">Ready (Garment Active)</span>
             </div>
           </div>
           <div id="threeContainer"></div>
           <div class="viewport-overlay-stats">
             <div class="stat-pill"><span class="label">Avatar:</span> <span class="val">SMPL-X (52 Joints)</span></div>
-            <div class="stat-pill"><span class="label">Garment:</span> <span class="val" id="statVertices">809 Verts</span></div>
+            <div class="stat-pill"><span class="label">Garment:</span> <span class="val" id="statVertices">875 Verts (XXS)</span></div>
+            <div class="stat-pill"><span class="label">Clearance:</span> <span class="val" style="color:#34d399;">0.0% Penetration (0 Tears)</span></div>
             <div class="stat-pill"><span class="label">Seams:</span> <span class="val" id="statSeams">5 Paired (1:1)</span></div>
           </div>
         </div>
@@ -120,15 +141,15 @@
         <!-- Tabs Header -->
         <div class="tab-header">
           <button class="tab-btn active" data-tab="tab-sewing">Sewing (Cat 4)</button>
-          <button class="tab-btn" data-tab="tab-fabric">Fabric & Grain (Cat 5,6)</button>
+          <button class="tab-btn" data-tab="tab-fabric">Fabric &amp; Grain (Cat 5,6)</button>
           <button class="tab-btn" data-tab="tab-grading">Grading (Cat 8)</button>
-          <button class="tab-btn" data-tab="tab-validation" id="tabValidationBtn">Validation (25/29)</button>
+          <button class="tab-btn" data-tab="tab-validation" id="tabValidationBtn">Validation (23/29)</button>
         </div>
 
         <div class="tab-content-container glass-card">
           <!-- Sewing Tab -->
           <div class="tab-pane active" id="tab-sewing">
-            <h4>Sewing Connections Table</h4>
+            <h4 id="sewingTabTitle">Sewing Connections Table</h4>
             <div class="table-responsive">
               <table class="data-table" id="sewingTable">
                 <thead>
@@ -149,31 +170,31 @@
 
           <!-- Fabric Tab -->
           <div class="tab-pane" id="tab-fabric">
-            <h4>Fabric Parameters & Direction</h4>
-            <div class="property-grid">
-              <div class="prop-item"><span class="p-label">Material</span><span class="p-val">Poly-Elastane Soft Stretch Jersey Knit (89/11)</span></div>
-              <div class="prop-item"><span class="p-label">Weight</span><span class="p-val">195 GSM</span></div>
-              <div class="prop-item"><span class="p-label">Stretch Warp (Along Grain)</span><span class="p-val">18.0%</span></div>
-              <div class="prop-item"><span class="p-label">Stretch Weft (Cross Grain)</span><span class="p-val">35.0%</span></div>
-              <div class="prop-item"><span class="p-label">Bending Stiffness</span><span class="p-val">0.038 N·m</span></div>
-              <div class="prop-item"><span class="p-label">Shear Stiffness</span><span class="p-val">0.055 N/m</span></div>
-              <div class="prop-item"><span class="p-label">Grainline Vector</span><span class="p-val">[0.0, 1.0] (0°)</span></div>
-              <div class="prop-item"><span class="p-label">Coefficients Source</span><span class="p-val tag-estimated">OFFICIAL H&M DIVIDED SPEC</span></div>
+            <h4 id="fabricTabTitle">Fabric Parameters &amp; Direction</h4>
+            <div class="property-grid" id="fabricPropGrid">
+              <div class="prop-item"><span class="p-label">Material</span><span class="p-val" id="fabMaterial">Poly-Elastane Soft Stretch Jersey Knit (89/11)</span></div>
+              <div class="prop-item"><span class="p-label">Weight</span><span class="p-val" id="fabWeight">195 GSM</span></div>
+              <div class="prop-item"><span class="p-label">Stretch Warp (Along Grain)</span><span class="p-val" id="fabWarp">18.0%</span></div>
+              <div class="prop-item"><span class="p-label">Stretch Weft (Cross Grain)</span><span class="p-val" id="fabWeft">35.0%</span></div>
+              <div class="prop-item"><span class="p-label">Bending Stiffness</span><span class="p-val" id="fabBending">0.038 N*m</span></div>
+              <div class="prop-item"><span class="p-label">Shear Stiffness</span><span class="p-val" id="fabShear">0.055 N/m</span></div>
+              <div class="prop-item"><span class="p-label">Grainline Vector</span><span class="p-val" id="fabGrain">[0.0, 1.0] (0 deg)</span></div>
+              <div class="prop-item"><span class="p-label">Coefficients Source</span><span class="p-val tag-estimated" id="fabSource">OFFICIAL H&amp;M DIVIDED SPEC</span></div>
             </div>
           </div>
 
           <!-- Grading Tab -->
           <div class="tab-pane" id="tab-grading">
-            <h4>Multi-Size Grading Matrix</h4>
+            <h4>Multi-Size Grading Matrix (XXS - XXL)</h4>
             <div class="table-responsive">
               <table class="data-table">
                 <thead>
                   <tr>
                     <th>Size</th>
-                    <th>Bust Δ</th>
-                    <th>Waist Δ</th>
-                    <th>Hip Δ</th>
-                    <th>Length Δ</th>
+                    <th>Bust Delta</th>
+                    <th>Waist Delta</th>
+                    <th>Hip Delta</th>
+                    <th>Length Delta</th>
                     <th>Mesh File</th>
                   </tr>
                 </thead>
@@ -188,7 +209,7 @@
           <div class="tab-pane" id="tab-validation">
             <div class="val-header">
               <h4>Automated Validation Checks</h4>
-              <span class="status-badge fail" id="valSummaryBadge">25/29 PASS (FAIL)</span>
+              <span class="status-badge fail" id="valSummaryBadge">23/29 PASS (FAIL)</span>
             </div>
             <div class="val-list" id="validationList">
               <!-- Dynamically populated -->

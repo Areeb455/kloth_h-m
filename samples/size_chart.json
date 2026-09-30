@@ -7,7 +7,15 @@
   "measurement_criteria_source": "H&M How to Measure Guide (Chest over fullest bust, Waist at narrowest point, Low Hip around fullest part, Inside leg from crotch to floor)",
   "range_rule": "Assignment specification: Use lower number wherever size chart gives a range (e.g. 78-82 -> 78, 64-66 -> 64, 83-87 -> 83)",
   "primary_base_size": "XS",
-  "supported_sizes": ["XXS", "XS", "S"],
+  "supported_sizes": [
+    "XXS",
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+  ],
   "source_breakdown": {
     "chart_source": "Directly extracted from user-provided H&M size chart screenshot (SIZE GUIDE - DRESSES, JUMPSUITS ETC. / REGULAR XXS-S)."
   },
@@ -107,6 +115,110 @@
         "front_length": 120.0,
         "back_length": 122.0,
         "shoulder_width": 24.5
+      }
+    },
+    "M": {
+      "eur_size": 40,
+      "uk_size": 12,
+      "source": "hm_regular_chart",
+      "raw_ranges": {
+        "chest": "90-98",
+        "waist": "74-82.5",
+        "low_hip": "94.5-100.5",
+        "inside_leg": "75"
+      },
+      "body_measurements_cm": {
+        "chest": 90.0,
+        "waist": 74.0,
+        "low_hip": 94.5,
+        "inside_leg": 75.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 67.4,
+        "waist_circ": 60.2,
+        "hip_circ": 77.2,
+        "hem_circ": 86.0,
+        "front_length": 122.0,
+        "back_length": 124.0,
+        "shoulder_width": 25.5
+      }
+    },
+    "L": {
+      "eur_size": 44,
+      "uk_size": 16,
+      "source": "hm_regular_chart",
+      "raw_ranges": {
+        "chest": "98-107",
+        "waist": "82.5-93",
+        "low_hip": "100.5-107.5",
+        "inside_leg": "77"
+      },
+      "body_measurements_cm": {
+        "chest": 98.0,
+        "waist": 82.5,
+        "low_hip": 100.5,
+        "inside_leg": 77.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 75.4,
+        "waist_circ": 67.2,
+        "hip_circ": 85.2,
+        "hem_circ": 94.0,
+        "front_length": 124.0,
+        "back_length": 126.0,
+        "shoulder_width": 27.0
+      }
+    },
+    "XL": {
+      "eur_size": 48,
+      "uk_size": 20,
+      "source": "hm_regular_chart",
+      "raw_ranges": {
+        "chest": "107-119",
+        "waist": "93-105",
+        "low_hip": "107.5-117.5",
+        "inside_leg": "77"
+      },
+      "body_measurements_cm": {
+        "chest": 107.0,
+        "waist": 93.0,
+        "low_hip": 107.5,
+        "inside_leg": 77.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 84.4,
+        "waist_circ": 75.2,
+        "hip_circ": 94.2,
+        "hem_circ": 103.0,
+        "front_length": 125.0,
+        "back_length": 127.0,
+        "shoulder_width": 28.5
+      }
+    },
+    "XXL": {
+      "eur_size": 52,
+      "uk_size": 24,
+      "source": "hm_regular_chart",
+      "raw_ranges": {
+        "chest": "119-131",
+        "waist": "105-117.5",
+        "low_hip": "117.5-128",
+        "inside_leg": "77"
+      },
+      "body_measurements_cm": {
+        "chest": 119.0,
+        "waist": 105.0,
+        "low_hip": 117.5,
+        "inside_leg": 77.0
+      },
+      "garment_dimensions_cm": {
+        "bust_circ": 94.4,
+        "waist_circ": 85.2,
+        "hip_circ": 104.2,
+        "hem_circ": 113.0,
+        "front_length": 126.0,
+        "back_length": 128.0,
+        "shoulder_width": 30.0
       }
     }
   }

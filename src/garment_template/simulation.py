@@ -200,7 +200,7 @@ class ClothSimulator:
         sub_iters: int = 4,
         dt: float = 0.01,
         damping: float = 0.20,
-        margin: float = 0.0075
+        margin: float = 0.0085
     ) -> ClothSimulationResult:
         """
         Executes Position-Based Dynamics (PBD) simulation:
@@ -311,7 +311,7 @@ class ClothSimulator:
             self.positions[sb] += 0.90 * (swb / sw_sum)[:, None] * sdiff
 
         if self.collider is not None:
-            self.positions = self.collider.project_out(self.positions, margin=0.0070)
+            self.positions = self.collider.project_out(self.positions, margin=0.0085)
             # Re-stitch after projection if any gap remains
             if len(self.seam_pairs_a) > 0:
                 sdiff = self.positions[sa] - self.positions[sb]
@@ -345,13 +345,44 @@ class ClothSimulator:
                     self.positions[sa] -= 0.50 * (swa / sw_sum)[:, None] * sdiff
                     self.positions[sb] += 0.50 * (swb / sw_sum)[:, None] * sdiff
 
-                self.positions = self.collider.project_out(self.positions, margin=0.0065)
+                self.positions = self.collider.project_out(self.positions, margin=0.0080)
 
             # Final gentle seam closure pass to ensure max gap < 5 mm (typically ~1.8 mm)
             if len(self.seam_pairs_a) > 0:
                 sdiff = self.positions[sa] - self.positions[sb]
                 self.positions[sa] -= 0.65 * (swa / sw_sum)[:, None] * sdiff
                 self.positions[sb] += 0.65 * (swb / sw_sum)[:, None] * sdiff
+
+        # Edge chord clearance & avatar projection pass:
+        # Prevents flat triangle chords bridging curved anatomy (underarm, ribs, waist)
+        # from dipping inside the avatar mesh, eliminating all visible holes and tears.
+        if self.collider is not None and len(self.edge_indices) > 0:
+            partner_map = {}
+            if len(self.seam_pairs_a) > 0:
+                for a, b in zip(self.seam_pairs_a, self.seam_pairs_b):
+                    partner_map[int(a)] = int(b)
+                    partner_map[int(b)] = int(a)
+
+            for _ in range(3):
+                e_a = self.edge_indices[:, 0]
+                e_b = self.edge_indices[:, 1]
+                e_mids = (self.positions[e_a] + self.positions[e_b]) * 0.5
+                sd_mids, _, near_n = self.collider.compute_signed_distances(e_mids)
+                pen_mask = sd_mids < 0.0035
+                if not np.any(pen_mask):
+                    break
+                pen_idx = np.where(pen_mask)[0]
+                for idx in pen_idx:
+                    ia = e_a[idx]
+                    ib = e_b[idx]
+                    deficit = (0.0045 - sd_mids[idx])
+                    n_mid = near_n[idx]
+                    self.positions[ia] += deficit * n_mid
+                    self.positions[ib] += deficit * n_mid
+                    if ia in partner_map:
+                        self.positions[partner_map[ia]] += deficit * n_mid
+                    if ib in partner_map:
+                        self.positions[partner_map[ib]] += deficit * n_mid
 
         simulated_meshes = {}
         starting_meshes = {}
